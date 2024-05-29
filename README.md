@@ -1,6 +1,6 @@
 # spring-hedera
-Module for Spring that adds support to communicate with the Hedera network. 
-This module is based on the Hedera Java SDK and Spring Boot.
+Module for Spring that adds support to communicate with the [Hedera network](https://hedera.com). 
+This module is based on the [Hedera Java SDK](https://github.com/hashgraph/hedera-sdk-java) and [Spring Boot](https://spring.io/projects/spring-boot).
 
 > [!WARNING]  
 > This project has just been started and is not yet ready for production use.
@@ -69,8 +69,15 @@ public class HederaAccountService {
 
     public HBars transfer(String accountId) {
         AccountBalanceQuery query = ...
-        AccountBalanceResult result =mhederaClient.execute(query);
+        AccountBalanceResult result =hederaClient.execute(query);
         return result.hbars();
     }
 }
 ```
+
+All APIs of the client are synchronous and return the result of the operation. For asynchronous operations, you can
+easily wrap calls by use the [`@Async` annotation of spring](https://spring.io/guides/gs/async-method).
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
