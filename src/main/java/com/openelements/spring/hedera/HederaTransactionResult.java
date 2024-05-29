@@ -14,6 +14,25 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents the result of a transaction.
+ * @param accountId The account ID.
+ * @param transactionId The transaction ID.
+ * @param status The status of the transaction.
+ * @param exchangeRate The exchange rate of the transaction.
+ * @param fileId The file ID.
+ * @param contractId The contract ID.
+ * @param topicId The topic ID.
+ * @param tokenId The token ID.
+ * @param topicSequenceNumber The topic sequence number.
+ * @param topicRunningHash The topic running hash.
+ * @param totalSupply The total supply.
+ * @param scheduleId The schedule ID.
+ * @param scheduledTransactionId The scheduled transaction ID.
+ * @param serials The serials.
+ * @param duplicates The duplicates.
+ * @param children The children.
+ */
 public record HederaTransactionResult(AccountId accountId,
                                       TransactionId transactionId,
                                       Status status,
