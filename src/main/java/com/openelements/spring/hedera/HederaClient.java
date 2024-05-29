@@ -14,5 +14,5 @@ public interface HederaClient {
 
     HederaTransactionResult requestResult(HederaTransactionResponse transactionResponse) throws HederaException;
 
-    AccountBalance executeAccountBalanceQuery(final AccountBalanceQuery query) throws HederaException;
+    AccountBalanceResult executeAccountBalanceQuery(final AccountBalanceQuery query) throws HederaException;
 }
