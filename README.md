@@ -69,7 +69,7 @@ public class HederaAccountService {
 
     public HBars transfer(String accountId) {
         AccountBalanceQuery query = ...
-        AccountBalanceResult result =hederaClient.execute(query);
+        AccountBalanceResult result = hederaClient.execute(query);
         return result.hbars();
     }
 }
