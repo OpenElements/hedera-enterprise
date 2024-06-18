@@ -51,16 +51,6 @@ Once that is done you can autowire the `HederaClient` class and call the methods
 
 ```java
 
-import com.open.elements.spring.hedera.HederaClient;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.crypto.TransferTransaction;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 @Service
 public class HederaAccountService {
 
