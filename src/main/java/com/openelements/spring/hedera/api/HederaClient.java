@@ -16,30 +16,6 @@ import com.openelements.spring.hedera.api.protocol.HederaTransactionResult;
 public interface HederaClient {
 
     /**
-     * Calls a create account transaction.
-     * @param transaction The transaction to call.
-     * @return The response of the transaction.
-     * @throws HederaException If the transaction fails.
-     */
-    HederaTransactionResponse callCreateAccountTransaction(AccountCreateTransaction transaction) throws HederaException;
-
-    /**
-     * Calls a create file transaction.
-     * @param transaction The transaction to call.
-     * @return The response of the transaction.
-     * @throws HederaException If the transaction fails.
-     */
-    HederaTransactionResponse callCreateFileTransaction(FileCreateTransaction transaction) throws HederaException;
-
-    /**
-     * Calls a create file transaction.
-     * @param transactionResponse The response of the transaction.
-     * @return The result of the transaction.
-     * @throws HederaException If the transaction fails.
-     */
-    HederaTransactionResult requestResult(HederaTransactionResponse transactionResponse) throws HederaException;
-
-    /**
      * Executes an account balance query.
      * @param query The query to execute.
      * @return The result of the query.

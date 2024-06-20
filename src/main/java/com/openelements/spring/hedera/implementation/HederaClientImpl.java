@@ -30,28 +30,6 @@ public class HederaClientImpl implements HederaClient {
     public HederaClientImpl(Client client) {this.client = client;}
 
     @Override
-    public HederaTransactionResponse callCreateAccountTransaction(final AccountCreateTransaction transaction) throws HederaException {
-       return execute(transaction);
-    }
-
-    @Override
-    public HederaTransactionResponse callCreateFileTransaction(final FileCreateTransaction transaction) throws HederaException {
-        return execute(transaction);
-    }
-
-    @Override
-    public HederaTransactionResult requestResult(HederaTransactionResponse transactionResponse) throws HederaException {
-        TransactionReceiptQuery query = new TransactionReceiptQuery();
-        query.setTransactionId(transactionResponse.transactionId());
-        query.setNodeAccountIds(Collections.singletonList(transactionResponse.nodeId()));
-        final TransactionReceipt receipt = execute(query);
-        return new HederaTransactionResult(receipt.accountId, receipt.transactionId, receipt.status, receipt.exchangeRate,
-                receipt.fileId, receipt.contractId, receipt.topicId, receipt.tokenId, receipt.topicSequenceNumber,
-                receipt.topicRunningHash, receipt.totalSupply, receipt.scheduleId, receipt.scheduledTransactionId,
-                receipt.serials, receipt.duplicates, receipt.children);
-    }
-
-    @Override
     public AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException {
         final AccountBalance balance = execute(new AccountBalanceQuery().setAccountId(request.accountId()));
         return new AccountBalanceResult(balance.hbars);
@@ -66,11 +44,11 @@ public class HederaClientImpl implements HederaClient {
                 .setTransactionMemo(request.fileMemo())
                 .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()));
 
-        final TransactionReceipt receipt = executeAndWaitForReceipt(transaction);
+        final TransactionReceipt receipt = execute(transaction);
         return new FileCreateResult(receipt.transactionId, receipt.status, receipt.fileId);
     }
 
-    private <T extends Transaction<T>, R> TransactionReceipt executeAndWaitForReceipt(T transaction) throws HederaException {
+    private <T extends Transaction<T>, R> TransactionReceipt execute(T transaction) throws HederaException {
         try {
             final TransactionResponse response = transaction.execute(client);
             return response.getReceipt(client);
@@ -87,12 +65,4 @@ public class HederaClientImpl implements HederaClient {
         }
     }
 
-    private <T extends Transaction<T>> HederaTransactionResponse execute(T transaction) throws HederaException {
-        try {
-            final TransactionResponse response = transaction.execute(client);
-            return new HederaTransactionResponse(response.nodeId, response.transactionId, response.transactionHash);
-        } catch (PrecheckStatusException | TimeoutException e) {
-            throw new HederaException("Failed to execute transaction", e);
-        }
-    }
 }
