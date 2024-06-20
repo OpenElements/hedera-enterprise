@@ -2,8 +2,6 @@ package com.openelements.spring.hedera.test;
 
 import com.hedera.hashgraph.sdk.Status;
 import com.openelements.spring.hedera.api.HederaClient;
-import com.openelements.spring.hedera.api.protocol.FileContentsRequest;
-import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
 import com.openelements.spring.hedera.api.protocol.FileCreateResult;
 import org.junit.jupiter.api.Assertions;

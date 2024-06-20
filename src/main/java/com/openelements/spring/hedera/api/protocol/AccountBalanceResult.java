@@ -1,8 +1,6 @@
 package com.openelements.spring.hedera.api.protocol;
 
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.TokenId;
-import java.util.Map;
 
 /**
  * Represents the result of an account balance query.

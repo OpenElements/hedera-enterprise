@@ -1,6 +1,5 @@
 package com.openelements.spring.hedera.api;
 
-import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
 import com.openelements.spring.hedera.api.protocol.FileContentsRequest;
