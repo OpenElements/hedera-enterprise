@@ -17,7 +17,7 @@ public interface HederaClient {
      * @return The response of the transaction.
      * @throws HederaException If the transaction fails.
      */
-    HederaTransactionResponse callCreateAccountTransaction(final AccountCreateTransaction transaction) throws HederaException;
+    HederaTransactionResponse callCreateAccountTransaction(AccountCreateTransaction transaction) throws HederaException;
 
     /**
      * Calls a create file transaction.
@@ -25,7 +25,7 @@ public interface HederaClient {
      * @return The response of the transaction.
      * @throws HederaException If the transaction fails.
      */
-    HederaTransactionResponse callCreateFileTransaction(final FileCreateTransaction transaction) throws HederaException;
+    HederaTransactionResponse callCreateFileTransaction(FileCreateTransaction transaction) throws HederaException;
 
     /**
      * Calls a create file transaction.
@@ -41,5 +41,5 @@ public interface HederaClient {
      * @return The result of the query.
      * @throws HederaException If the query fails.
      */
-    AccountBalanceResult executeAccountBalanceQuery(final AccountBalanceQuery query) throws HederaException;
+    AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException;
 }

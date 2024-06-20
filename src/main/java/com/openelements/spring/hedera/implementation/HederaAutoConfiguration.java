@@ -21,10 +21,23 @@ public class HederaAutoConfiguration {
     private final HederaNetwork network;
 
     public HederaAutoConfiguration(final HederaProperties properties) {
-        this.properties = properties;
-        accountId = AccountId.fromString(properties.getAccountId());
-        privateKey = PrivateKey.fromString(properties.getPrivateKey());
-        network = HederaNetwork.valueOf(properties.getNetwork().toUpperCase());
+        try {
+            this.properties = properties;
+            if(properties.getAccountId() == null) {
+                throw new IllegalArgumentException("'spring.hedera.accountId' property must be set");
+            }
+            if(properties.getPrivateKey() == null) {
+                throw new IllegalArgumentException("'spring.hedera.privateKey' property must be set");
+            }
+            if(properties.getNetwork() == null) {
+                throw new IllegalArgumentException("'spring.hedera.network' property must be set");
+            }
+            accountId = AccountId.fromString(properties.getAccountId());
+            privateKey = PrivateKey.fromString(properties.getPrivateKey());
+            network = HederaNetwork.valueOf(properties.getNetwork().toUpperCase());
+        } catch (Exception e) {
+            throw new IllegalStateException("Can not create Hedera specific configuration", e);
+        }
     }
 
     @Bean

@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.openelements.spring.hedera.AccountBalanceRequest;
 import com.openelements.spring.hedera.AccountBalanceResult;
 import com.openelements.spring.hedera.HederaClient;
 import com.openelements.spring.hedera.HederaException;
@@ -48,8 +49,8 @@ public class HederaClientImpl implements HederaClient {
     }
 
     @Override
-    public AccountBalanceResult executeAccountBalanceQuery(AccountBalanceQuery query) throws HederaException {
-        final AccountBalance balance = execute(query);
+    public AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException {
+        final AccountBalance balance = execute(new AccountBalanceQuery().setAccountId(request.accountId()));
         return new AccountBalanceResult(balance.hbars);
     }
 
