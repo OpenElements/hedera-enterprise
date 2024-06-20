@@ -15,9 +15,12 @@ import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
 import com.openelements.spring.hedera.api.HederaClient;
 import com.openelements.spring.hedera.api.HederaException;
+import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
+import com.openelements.spring.hedera.api.protocol.FileCreateResult;
 import com.openelements.spring.hedera.api.protocol.HederaTransactionResponse;
 import com.openelements.spring.hedera.api.protocol.HederaTransactionResult;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 public class HederaClientImpl implements HederaClient {
@@ -54,11 +57,33 @@ public class HederaClientImpl implements HederaClient {
         return new AccountBalanceResult(balance.hbars);
     }
 
+    @Override
+    public FileCreateResult executeFileCreateTransaction(FileCreateRequest request) throws HederaException {
+        final FileCreateTransaction transaction = new FileCreateTransaction()
+                .setContents(request.contents())
+                .setMaxTransactionFee(request.maxTransactionFee())
+                .setTransactionValidDuration(request.transactionValidDuration())
+                .setTransactionMemo(request.fileMemo())
+                .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()));
+
+        final TransactionReceipt receipt = executeAndWaitForReceipt(transaction);
+        return new FileCreateResult(receipt.transactionId, receipt.status, receipt.fileId);
+    }
+
+    private <T extends Transaction<T>, R> TransactionReceipt executeAndWaitForReceipt(T transaction) throws HederaException {
+        try {
+            final TransactionResponse response = transaction.execute(client);
+            return response.getReceipt(client);
+        } catch (Exception e) {
+            throw new HederaException("Failed to execute transaction", e);
+        }
+    }
+
     private <R, Q extends Query<R, Q>> R execute(Q query) throws HederaException {
         try {
             return query.execute(client);
         } catch (PrecheckStatusException | TimeoutException e) {
-            throw new HederaException("Failed to execute transaction", e);
+            throw new HederaException("Failed to execute query", e);
         }
     }
 

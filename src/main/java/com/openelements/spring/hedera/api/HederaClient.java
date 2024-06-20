@@ -4,6 +4,8 @@ import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
+import com.openelements.spring.hedera.api.protocol.FileCreateResult;
 import com.openelements.spring.hedera.api.protocol.HederaTransactionResponse;
 import com.openelements.spring.hedera.api.protocol.HederaTransactionResult;
 
@@ -44,4 +46,12 @@ public interface HederaClient {
      * @throws HederaException If the query fails.
      */
     AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException;
+
+    /**
+     * Executes a file create transaction.
+     * @param request The request to execute.
+     * @return The result of the transaction.
+     * @throws HederaException If the transaction fails.
+     */
+    FileCreateResult executeFileCreateTransaction(FileCreateRequest request) throws HederaException;
 }

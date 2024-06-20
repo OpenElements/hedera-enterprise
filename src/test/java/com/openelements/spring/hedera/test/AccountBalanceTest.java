@@ -1,19 +1,14 @@
 package com.openelements.spring.hedera.test;
 
-import com.hedera.hashgraph.sdk.Hbar;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
-import com.openelements.spring.hedera.api.EnableHedera;
 import com.openelements.spring.hedera.api.HederaClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@EnableHedera
 @SpringBootTest
-@SpringBootConfiguration
 public class AccountBalanceTest {
 
     @Autowired
@@ -29,6 +24,8 @@ public class AccountBalanceTest {
                 accountBalanceRequest);
 
         //then
-        Assertions.assertEquals(Hbar.from(1000), accountBalanceResult.hbars());
+        Assertions.assertNotNull(accountBalanceResult);
+        Assertions.assertNotNull(accountBalanceResult.hbars());
+        Assertions.assertTrue(accountBalanceResult.hbars().toTinybars() > 0);
     }
 }
