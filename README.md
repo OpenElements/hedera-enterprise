@@ -56,7 +56,7 @@ public class HederaAccountService {
     @Autowired
     private HederaClient hederaClient;
 
-    public HBars transfer(String accountId) {
+    public HBars getBalance(String accountId) {
         AccountBalanceRequest request = AccountBalanceRequest.of("0.0.2237621");
         AccountBalanceResult result = hederaClient.execute(request);
         return result.hbars();
