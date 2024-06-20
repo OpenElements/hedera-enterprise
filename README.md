@@ -57,7 +57,7 @@ public class HederaAccountService {
     private HederaClient hederaClient;
 
     public HBars transfer(String accountId) {
-        AccountBalanceQuery query = ...
+        AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of("0.0.2237621");
         AccountBalanceResult result = hederaClient.execute(query);
         return result.hbars();
     }
