@@ -1,9 +1,11 @@
 package com.openelements.spring.hedera.implementation;
 
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Query;
@@ -15,10 +17,10 @@ import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
 import com.openelements.spring.hedera.api.HederaClient;
 import com.openelements.spring.hedera.api.HederaException;
+import com.openelements.spring.hedera.api.protocol.FileContentsRequest;
+import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
 import com.openelements.spring.hedera.api.protocol.FileCreateResult;
-import com.openelements.spring.hedera.api.protocol.HederaTransactionResponse;
-import com.openelements.spring.hedera.api.protocol.HederaTransactionResult;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -33,6 +35,12 @@ public class HederaClientImpl implements HederaClient {
     public AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException {
         final AccountBalance balance = execute(new AccountBalanceQuery().setAccountId(request.accountId()));
         return new AccountBalanceResult(balance.hbars);
+    }
+
+    public FileContentsResponse executeFileContentsQuery(FileContentsRequest request) throws HederaException {
+        final ByteString byteString = execute(new FileContentsQuery().setFileId(request.fileId()));
+        final byte[] bytes = byteString.toByteArray();
+        return new FileContentsResponse(bytes);
     }
 
     @Override
