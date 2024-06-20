@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
+import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Query;
 import com.hedera.hashgraph.sdk.Transaction;
@@ -22,6 +23,7 @@ import com.openelements.spring.hedera.api.protocol.FileContentsRequest;
 import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
 import com.openelements.spring.hedera.api.protocol.FileCreateResult;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -30,6 +32,29 @@ public class HederaClientImpl implements HederaClient {
     private final Client client;
 
     public HederaClientImpl(Client client) {this.client = client;}
+
+    @Override
+    public FileId uploadFile(byte[] contents) throws HederaException {
+        if(contents.length <= FileCreateRequest.FILE_CREATE_MAX_BYTES) {
+            final FileCreateRequest request = FileCreateRequest.of(contents);
+            final FileCreateResult result = executeFileCreateTransaction(request);
+            return result.fileId();
+        } else {
+            byte[] start = Arrays.copyOf(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES);
+            final FileCreateRequest request = FileCreateRequest.of(start);
+            final FileCreateResult result = executeFileCreateTransaction(request);
+            FileId fileId = result.fileId();
+            byte[] remaining = Arrays.copyOfRange(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES, contents.length);
+            while(remaining.length > 0) {
+                final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_BYTES);
+                byte[] next = Arrays.copyOf(remaining, length);
+                final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
+                final FileAppendResult appendResult = executeFileAppendRequestTransaction(appendRequest);
+                remaining = Arrays.copyOfRange(remaining, length, remaining.length);
+            }
+            return fileId;
+        }
+    }
 
     @Override
     public AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException {

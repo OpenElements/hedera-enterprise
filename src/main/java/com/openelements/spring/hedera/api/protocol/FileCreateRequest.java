@@ -10,7 +10,7 @@ public record FileCreateRequest(Hbar maxTransactionFee,
 
     private static final String DEFAULT_FILE_MEMO = "";
 
-    private static final int FILE_CREATE_MAX_BYTES = 2048;
+    public static final int FILE_CREATE_MAX_BYTES = 2048;
 
     public FileCreateRequest {
         if (contents.length > FILE_CREATE_MAX_BYTES) {

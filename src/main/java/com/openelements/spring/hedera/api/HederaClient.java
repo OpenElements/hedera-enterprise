@@ -1,5 +1,6 @@
 package com.openelements.spring.hedera.api;
 
+import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
 import com.openelements.spring.hedera.api.protocol.FileAppendRequest;
@@ -14,6 +15,8 @@ import com.openelements.spring.hedera.api.protocol.FileCreateResult;
  * Interface for interacting with the Hedera network.
  */
 public interface HederaClient {
+
+    FileId uploadFile(byte[] contents) throws HederaException;
 
     /**
      * Executes an account balance query.
