@@ -24,7 +24,6 @@ To configure the module, you need to add the following properties to your applic
 ```properties
 spring.hedera.accountId=0.0.53854625
 spring.hedera.privateKey=3030020100300706052b8104000a04220420c23ff08c429aa5a1d80bb300f436dd89adc5a4aa9a4544d7f3b00b2045c6cc37
-spring.hedera.publicKey=302d300706052b8104000a03220003cd09e0aaafe0d4a7c602f581aa00202c5aa4ffbae9b96f479fc1db36f4594a17
 spring.hedera.network=testnet
 ```
 
