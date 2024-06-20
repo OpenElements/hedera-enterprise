@@ -11,12 +11,12 @@ import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.openelements.spring.hedera.AccountBalanceRequest;
-import com.openelements.spring.hedera.AccountBalanceResult;
-import com.openelements.spring.hedera.HederaClient;
-import com.openelements.spring.hedera.HederaException;
-import com.openelements.spring.hedera.HederaTransactionResponse;
-import com.openelements.spring.hedera.HederaTransactionResult;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.HederaClient;
+import com.openelements.spring.hedera.api.HederaException;
+import com.openelements.spring.hedera.api.protocol.HederaTransactionResponse;
+import com.openelements.spring.hedera.api.protocol.HederaTransactionResult;
 import java.util.Collections;
 import java.util.concurrent.TimeoutException;
 

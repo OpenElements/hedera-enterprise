@@ -1,9 +1,11 @@
-package com.openelements.spring.hedera;
+package com.openelements.spring.hedera.api;
 
-import com.hedera.hashgraph.sdk.AccountBalance;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.protocol.HederaTransactionResponse;
+import com.openelements.spring.hedera.api.protocol.HederaTransactionResult;
 
 
 /**

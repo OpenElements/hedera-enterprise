@@ -3,7 +3,7 @@ package com.openelements.spring.hedera.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.openelements.spring.hedera.HederaClient;
+import com.openelements.spring.hedera.api.HederaClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

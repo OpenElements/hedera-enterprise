@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera;
+package com.openelements.spring.hedera.api.protocol;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountId;

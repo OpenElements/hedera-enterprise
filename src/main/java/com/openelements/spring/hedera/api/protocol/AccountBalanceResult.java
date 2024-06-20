@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera;
+package com.openelements.spring.hedera.api.protocol;
 
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TokenId;

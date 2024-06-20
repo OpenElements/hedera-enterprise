@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera;
+package com.openelements.spring.hedera.api;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

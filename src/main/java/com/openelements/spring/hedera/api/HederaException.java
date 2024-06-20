@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera;
+package com.openelements.spring.hedera.api;
 
 /**
  * Represents an exception that occurred while interacting with the Hedera network.

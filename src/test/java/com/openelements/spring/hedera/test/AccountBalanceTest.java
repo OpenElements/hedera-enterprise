@@ -1,11 +1,10 @@
 package com.openelements.spring.hedera.test;
 
-import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.openelements.spring.hedera.AccountBalanceRequest;
-import com.openelements.spring.hedera.AccountBalanceResult;
-import com.openelements.spring.hedera.EnableHedera;
-import com.openelements.spring.hedera.HederaClient;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.EnableHedera;
+import com.openelements.spring.hedera.api.HederaClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
