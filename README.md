@@ -23,12 +23,13 @@ To configure the module, you need to add the following properties to your applic
 
 ```properties
 spring.hedera.accountId=0.0.53854625
-spring.hedera.privateKey=3030020100300706052b8104000a04220420c23ff08c429aa5a1d80bb300f436dd89adc5a4aa9a4544d7f3b00b2045c6cc37
+spring.hedera.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
 spring.hedera.network=testnet
 ```
 
 The account information (accountId, privateKey, publicKey) can all be found at the
 [Hedera portal](https://portal.hedera.com/) for a testnet or previewnet account.
+Today only the "DER Encoded Private Key" of the "ECDSA" key type is supported for the `spring.hedera.privateKey` property.
 
 ## Usage
 
@@ -66,6 +67,23 @@ public class HederaAccountService {
 
 All APIs of the client are synchronous and return the result of the operation. For asynchronous operations, you can
 easily wrap calls by use the [`@Async` annotation of spring](https://spring.io/guides/gs/async-method).
+
+## Built the project
+
+The project is based on [Maven](https://maven.apache.org/). To build the project, you can use the following command:
+
+```shell
+./mvnw verify
+```
+
+The tests in the project are working against the Hedera testnet.
+To run the tests, you need to provide the "DER Encoded Private Key" of the "ECDSA" testnet account in a `.env` file in
+the root of the project. The file should look like this:
+
+
+```
+spring.hedera.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+```
 
 ## License
 
