@@ -2,6 +2,8 @@ package com.openelements.spring.hedera.api;
 
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.protocol.FileAppendRequest;
+import com.openelements.spring.hedera.api.protocol.FileAppendResult;
 import com.openelements.spring.hedera.api.protocol.FileContentsRequest;
 import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
@@ -22,6 +24,8 @@ public interface HederaClient {
     AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException;
 
     FileContentsResponse executeFileContentsQuery(FileContentsRequest request) throws HederaException;
+
+    FileAppendResult executeFileAppendRequestTransaction(FileAppendRequest request) throws HederaException;
 
     /**
      * Executes a file create transaction.

@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
@@ -15,6 +16,8 @@ import com.openelements.spring.hedera.api.HederaClient;
 import com.openelements.spring.hedera.api.HederaException;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.protocol.FileAppendRequest;
+import com.openelements.spring.hedera.api.protocol.FileAppendResult;
 import com.openelements.spring.hedera.api.protocol.FileContentsRequest;
 import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
@@ -51,6 +54,19 @@ public class HederaClientImpl implements HederaClient {
 
         final TransactionReceipt receipt = execute(transaction);
         return new FileCreateResult(receipt.transactionId, receipt.status, receipt.fileId);
+    }
+
+    @Override
+    public FileAppendResult executeFileAppendRequestTransaction(FileAppendRequest request) throws HederaException {
+        final FileAppendTransaction transaction = new FileAppendTransaction()
+                .setFileId(request.fileId())
+                .setContents(request.contents())
+                .setMaxTransactionFee(request.maxTransactionFee())
+                .setTransactionValidDuration(request.transactionValidDuration())
+                .setTransactionMemo(request.fileMemo());
+
+        final TransactionReceipt receipt = execute(transaction);
+        return new FileAppendResult(receipt.transactionId, receipt.status, receipt.fileId);
     }
 
     private <T extends Transaction<T>, R> TransactionReceipt execute(T transaction) throws HederaException {
