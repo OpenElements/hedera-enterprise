@@ -5,7 +5,7 @@ import java.time.Duration;
 
 public interface TransactionRequest {
 
-    Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
+    Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(10);
 
     Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
