@@ -13,8 +13,12 @@ public record ContractCallRequest(Hbar maxTransactionFee,
                                   String functionName,
                                   List<ContractParam<?>> constructorParams) implements TransactionRequest {
 
-    public static ContractCallRequest of(ContractId contractId, String functionName) {
-        return of(contractId, functionName, List.of());
+    public static ContractCallRequest of(ContractId contractId, String functionName, ContractParam<?>... constructorParams) {
+        if(constructorParams == null) {
+            return of(contractId, functionName, List.of());
+        } else {
+            return of(contractId, functionName, List.of(constructorParams));
+        }
     }
 
     public static ContractCallRequest of(ContractId contractId, String functionName, List<ContractParam<?>> constructorParams) {

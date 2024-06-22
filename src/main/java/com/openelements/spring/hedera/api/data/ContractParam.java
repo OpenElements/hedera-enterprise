@@ -24,7 +24,7 @@ public record ContractParam<T>(T value, ParamSupplier<T> supplier) {
 
     public static ContractParam int256(BigInteger value) {
         Objects.requireNonNull(value, "value must not be null");
-        return new ContractParam(value, BigIntegerBasedNumericDatatypes.UINT256);
+        return new ContractParam(value, BigIntegerBasedNumericDatatypes.INT256);
     }
 
     public static ContractParam int256(long value) {

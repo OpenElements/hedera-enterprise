@@ -234,4 +234,8 @@ public class HederaClientImpl implements HederaClient {
         }
     }
 
+    @Override
+    public Client getClient() {
+        return client;
+    }
 }

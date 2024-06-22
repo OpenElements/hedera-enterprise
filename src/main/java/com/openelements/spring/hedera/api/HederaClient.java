@@ -1,5 +1,6 @@
 package com.openelements.spring.hedera.api;
 
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
@@ -51,4 +52,6 @@ public interface HederaClient {
     ContractCreateResult executeContractCreateTransaction(ContractCreateRequest request) throws HederaException;
 
     ContractCallResult executeContractCallTransaction(ContractCallRequest request) throws HederaException;
+
+    Client getClient();
 }

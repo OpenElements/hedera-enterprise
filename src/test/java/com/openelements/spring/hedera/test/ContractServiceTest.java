@@ -1,7 +1,10 @@
 package com.openelements.spring.hedera.test;
 
+import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
+import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.openelements.spring.hedera.api.HederaClient;
 import static com.openelements.spring.hedera.api.data.ContractParam.*;
 
@@ -10,6 +13,7 @@ import com.openelements.spring.hedera.api.protocol.ContractCallRequest;
 import com.openelements.spring.hedera.api.protocol.ContractCallResult;
 import com.openelements.spring.hedera.api.protocol.ContractCreateRequest;
 import com.openelements.spring.hedera.api.protocol.ContractCreateResult;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -126,9 +130,9 @@ public class ContractServiceTest {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
         final ContractId contract = hederaClient.createContract(path);
-        final ContractCallRequest request = ContractCallRequest.of(contract, "set", List.of(ContractParam.int256(123)));
 
         //when
+        final ContractCallRequest request = ContractCallRequest.of(contract, "set", int256(123));
         final ContractCallResult result = hederaClient.executeContractCallTransaction(request);
 
         //then
