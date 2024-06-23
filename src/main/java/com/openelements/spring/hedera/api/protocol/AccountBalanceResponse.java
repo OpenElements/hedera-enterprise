@@ -7,5 +7,5 @@ import com.hedera.hashgraph.sdk.Hbar;
  *
  * @param hbars The balance of the account in hbars.
  */
-public record AccountBalanceResult(Hbar hbars) {
+public record AccountBalanceResponse(Hbar hbars) {
 }

@@ -1,12 +1,11 @@
 package com.openelements.spring.hedera.api;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.spring.hedera.api.data.ContractParam;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
-import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceResponse;
 import com.openelements.spring.hedera.api.protocol.ContractCallRequest;
 import com.openelements.spring.hedera.api.protocol.ContractCallResult;
 import com.openelements.spring.hedera.api.protocol.ContractCreateRequest;
@@ -18,7 +17,7 @@ import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
 import com.openelements.spring.hedera.api.protocol.FileCreateResult;
 import com.openelements.spring.hedera.api.protocol.FileDeleteRequest;
-import com.openelements.spring.hedera.api.protocol.FileDeleteResponse;
+import com.openelements.spring.hedera.api.protocol.FileDeleteResult;
 import java.nio.file.Path;
 
 
@@ -39,13 +38,13 @@ public interface HederaClient {
 
     byte[] readFile(FileId fileId) throws HederaException;
 
-    AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException;
+    AccountBalanceResponse executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException;
 
     FileContentsResponse executeFileContentsQuery(FileContentsRequest request) throws HederaException;
 
     FileAppendResult executeFileAppendRequestTransaction(FileAppendRequest request) throws HederaException;
 
-    FileDeleteResponse executeFileDeleteTransaction(FileDeleteRequest request) throws HederaException;
+    FileDeleteResult executeFileDeleteTransaction(FileDeleteRequest request) throws HederaException;
 
     FileCreateResult executeFileCreateTransaction(FileCreateRequest request) throws HederaException;
 

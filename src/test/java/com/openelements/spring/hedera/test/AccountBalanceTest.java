@@ -2,7 +2,7 @@ package com.openelements.spring.hedera.test;
 
 import com.openelements.spring.hedera.api.HederaClient;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
-import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class AccountBalanceTest {
         AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of("0.0.4457570");
 
         //when
-        final AccountBalanceResult accountBalanceResult = hederaClient.executeAccountBalanceQuery(
+        final AccountBalanceResponse accountBalanceResult = hederaClient.executeAccountBalanceQuery(
                 accountBalanceRequest);
 
         //then

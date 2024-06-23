@@ -21,7 +21,7 @@ import com.openelements.spring.hedera.api.HederaClient;
 import com.openelements.spring.hedera.api.HederaException;
 import com.openelements.spring.hedera.api.data.ContractParam;
 import com.openelements.spring.hedera.api.protocol.AccountBalanceRequest;
-import com.openelements.spring.hedera.api.protocol.AccountBalanceResult;
+import com.openelements.spring.hedera.api.protocol.AccountBalanceResponse;
 import com.openelements.spring.hedera.api.protocol.ContractCallRequest;
 import com.openelements.spring.hedera.api.protocol.ContractCallResult;
 import com.openelements.spring.hedera.api.protocol.ContractCreateRequest;
@@ -33,7 +33,7 @@ import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
 import com.openelements.spring.hedera.api.protocol.FileCreateResult;
 import com.openelements.spring.hedera.api.protocol.FileDeleteRequest;
-import com.openelements.spring.hedera.api.protocol.FileDeleteResponse;
+import com.openelements.spring.hedera.api.protocol.FileDeleteResult;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -99,7 +99,7 @@ public class HederaClientImpl implements HederaClient {
 
     @Override
     public byte[] readFile(FileId fileId) throws HederaException {
-        final FileContentsRequest request = new FileContentsRequest(fileId);
+        final FileContentsRequest request = FileContentsRequest.of(fileId);
         final FileContentsResponse response = executeFileContentsQuery(request);
         return response.contents();
     }
@@ -129,13 +129,19 @@ public class HederaClientImpl implements HederaClient {
     }
 
     @Override
-    public AccountBalanceResult executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException {
-        final AccountBalance balance = execute(new AccountBalanceQuery().setAccountId(request.accountId()));
-        return new AccountBalanceResult(balance.hbars);
+    public AccountBalanceResponse executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException {
+        final AccountBalanceQuery query = new AccountBalanceQuery().setAccountId(request.accountId())
+                .setQueryPayment(request.queryPayment())
+                .setMaxQueryPayment(request.maxQueryPayment());
+        final AccountBalance balance = execute(query);
+        return new AccountBalanceResponse(balance.hbars);
     }
 
     public FileContentsResponse executeFileContentsQuery(FileContentsRequest request) throws HederaException {
-        final ByteString byteString = execute(new FileContentsQuery().setFileId(request.fileId()));
+        final FileContentsQuery query = new FileContentsQuery().setFileId(request.fileId())
+                .setQueryPayment(request.queryPayment())
+                .setMaxQueryPayment(request.maxQueryPayment());
+        final ByteString byteString = execute(query);
         final byte[] bytes = byteString.toByteArray();
         return new FileContentsResponse(bytes);
     }
@@ -167,13 +173,13 @@ public class HederaClientImpl implements HederaClient {
     }
 
     @Override
-    public FileDeleteResponse executeFileDeleteTransaction(FileDeleteRequest request) throws HederaException {
+    public FileDeleteResult executeFileDeleteTransaction(FileDeleteRequest request) throws HederaException {
         FileDeleteTransaction transaction = new FileDeleteTransaction()
                 .setFileId(request.fileId())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration());
         final TransactionReceipt receipt = execute(transaction);
-        return FileDeleteResponse.create(receipt.transactionId);
+        return FileDeleteResult.create(receipt.transactionId);
     }
 
     @Override

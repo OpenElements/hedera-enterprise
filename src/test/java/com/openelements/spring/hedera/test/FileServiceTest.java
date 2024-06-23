@@ -8,7 +8,7 @@ import com.openelements.spring.hedera.api.protocol.FileContentsResponse;
 import com.openelements.spring.hedera.api.protocol.FileCreateRequest;
 import com.openelements.spring.hedera.api.protocol.FileCreateResult;
 import com.openelements.spring.hedera.api.protocol.FileDeleteRequest;
-import com.openelements.spring.hedera.api.protocol.FileDeleteResponse;
+import com.openelements.spring.hedera.api.protocol.FileDeleteResult;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ public class FileServiceTest {
         final FileCreateRequest request = FileCreateRequest.of(contents);
         final FileCreateResult result = hederaClient.executeFileCreateTransaction(request);
         final FileId fileId = result.fileId();
-        final FileContentsRequest contentsRequest = new FileContentsRequest(fileId);
+        final FileContentsRequest contentsRequest = FileContentsRequest.of(fileId);
 
         //when
         final FileContentsResponse fileContentsResponse = hederaClient.executeFileContentsQuery(contentsRequest);
@@ -64,7 +64,7 @@ public class FileServiceTest {
         final FileDeleteRequest deleteRequest = FileDeleteRequest.of(fileId);
 
         //when
-        final FileDeleteResponse deleteResponse = hederaClient.executeFileDeleteTransaction(deleteRequest);
+        final FileDeleteResult deleteResponse = hederaClient.executeFileDeleteTransaction(deleteRequest);
 
         //then
         Assertions.assertNotNull(deleteResponse);
