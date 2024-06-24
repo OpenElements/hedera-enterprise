@@ -27,5 +27,6 @@ public class AccountBalanceTest {
         Assertions.assertNotNull(accountBalanceResult);
         Assertions.assertNotNull(accountBalanceResult.hbars());
         Assertions.assertTrue(accountBalanceResult.hbars().toTinybars() > 0);
+        System.out.println("Balance: " + accountBalanceResult.hbars().toString() + " HBARs");
     }
 }

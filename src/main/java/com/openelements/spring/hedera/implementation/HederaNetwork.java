@@ -2,9 +2,9 @@ package com.openelements.spring.hedera.implementation;
 
 public enum HederaNetwork {
 
-    PREVIEWNET("previewnet", 297, "https://previewnet.hashio.io/api"),
-    TESTNET("testnet", 296, "https://testnet.hashio.io/api"),
-    MAINNET("mainnet", 295, "https://mainnet.hashio.io/api");
+    PREVIEWNET("previewnet", 297, "https://previewnet.mirrornode.hedera.com/", "https://previewnet.hashio.io/api"),
+    TESTNET("testnet", 296, "https://testnet.mirrornode.hedera.com/", "https://testnet.hashio.io/api"),
+    MAINNET("mainnet", 295, "https://mainnet.mirrornode.hedera.com/","https://mainnet.hashio.io/api");
 
     /**
      * See https://docs.web3j.io/4.8.7/smart_contracts/interacting_with_smart_contract/#specifying-the-chain-id-on-transactions-eip-155
@@ -22,9 +22,12 @@ public enum HederaNetwork {
      */
     private final String name;
 
-    HederaNetwork(final String name, final long chainId, final String relayUrl) {
+    private final String mirrornodeEndpoint;
+
+    HederaNetwork(final String name, final long chainId, final String mirrornodeEndpoint, final String relayUrl) {
         this.name = name;
         this.chainId = chainId;
+        this.mirrornodeEndpoint = mirrornodeEndpoint;
         this.relayUrl = relayUrl;
     }
 

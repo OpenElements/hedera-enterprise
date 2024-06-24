@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
+import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
@@ -16,6 +17,7 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Query;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.openelements.spring.hedera.api.HederaClient;
 import com.openelements.spring.hedera.api.HederaException;
@@ -133,7 +135,7 @@ public class HederaClientImpl implements HederaClient {
         final AccountBalanceQuery query = new AccountBalanceQuery().setAccountId(request.accountId())
                 .setQueryPayment(request.queryPayment())
                 .setMaxQueryPayment(request.maxQueryPayment());
-        final AccountBalance balance = execute(query);
+        final AccountBalance balance = executeQueryAndWait(query);
         return new AccountBalanceResponse(balance.hbars);
     }
 
@@ -141,7 +143,7 @@ public class HederaClientImpl implements HederaClient {
         final FileContentsQuery query = new FileContentsQuery().setFileId(request.fileId())
                 .setQueryPayment(request.queryPayment())
                 .setMaxQueryPayment(request.maxQueryPayment());
-        final ByteString byteString = execute(query);
+        final ByteString byteString = executeQueryAndWait(query);
         final byte[] bytes = byteString.toByteArray();
         return new FileContentsResponse(bytes);
     }
@@ -155,7 +157,7 @@ public class HederaClientImpl implements HederaClient {
                 .setTransactionMemo(request.fileMemo())
                 .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()));
 
-        final TransactionReceipt receipt = execute(transaction);
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         return new FileCreateResult(receipt.transactionId, receipt.status, receipt.fileId);
     }
 
@@ -168,7 +170,7 @@ public class HederaClientImpl implements HederaClient {
                 .setTransactionValidDuration(request.transactionValidDuration())
                 .setTransactionMemo(request.fileMemo());
 
-        final TransactionReceipt receipt = execute(transaction);
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         return new FileAppendResult(receipt.transactionId, receipt.status, receipt.fileId);
     }
 
@@ -178,7 +180,7 @@ public class HederaClientImpl implements HederaClient {
                 .setFileId(request.fileId())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration());
-        final TransactionReceipt receipt = execute(transaction);
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         return FileDeleteResult.create(receipt.transactionId);
     }
 
@@ -191,7 +193,7 @@ public class HederaClientImpl implements HederaClient {
                 .setGas(DEFAULT_GAS)
                 .setTransactionValidDuration(request.transactionValidDuration())
                 .setConstructorParameters(constructorParams);
-        final TransactionReceipt receipt = execute(transaction);
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         return new ContractCreateResult(receipt.transactionId, receipt.status, receipt.contractId);
     }
 
@@ -204,8 +206,8 @@ public class HederaClientImpl implements HederaClient {
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setGas(DEFAULT_GAS)
                 .setTransactionValidDuration(request.transactionValidDuration());
-        final TransactionReceipt receipt =  execute(transaction);
-        return new ContractCallResult(receipt.transactionId, receipt.status);
+        final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
+        return new ContractCallResult(record.transactionId, record.receipt.status, record.contractFunctionResult);
     }
 
     private ContractFunctionParameters createParameters(List<ContractParam<?>> params) {
@@ -216,7 +218,7 @@ public class HederaClientImpl implements HederaClient {
         return constructorParams;
     }
 
-    private <T extends Transaction<T>, R> TransactionReceipt execute(T transaction) throws HederaException {
+    private <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(T transaction) throws HederaException {
         try {
             log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
             final TransactionResponse response = transaction.execute(client);
@@ -231,7 +233,22 @@ public class HederaClientImpl implements HederaClient {
         }
     }
 
-    private <R, Q extends Query<R, Q>> R execute(Q query) throws HederaException {
+    private <T extends Transaction<T>> TransactionRecord executeTransactionAndWaitOnRecord(T transaction) throws HederaException {
+        try {
+            log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
+            final TransactionResponse response = transaction.execute(client);
+            try {
+                log.debug("Waiting for receipt of transaction '{}' of type {}", response.transactionId, transaction.getClass().getSimpleName());
+                return response.getRecord(client);
+            } catch (Exception e) {
+                throw new HederaException("Failed to receive record of transaction '" + response.transactionId + "' of type " + transaction.getClass(), e);
+            }
+        } catch (Exception e) {
+            throw new HederaException("Failed to execute transaction of type " + transaction.getClass().getSimpleName(), e);
+        }
+    }
+
+    private <R, Q extends Query<R, Q>> R executeQueryAndWait(Q query) throws HederaException {
         try {
             log.debug("Sending query of type {}", query.getClass().getSimpleName());
             return query.execute(client);

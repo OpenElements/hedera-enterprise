@@ -35,6 +35,7 @@ public class HederaAutoConfiguration {
                 throw new IllegalArgumentException("Can not parse 'spring.hedera.accountId' property", e);
             }
             try {
+                System.out.println("privateKey: '" + properties.getPrivateKey() + "'");
                 privateKey = PrivateKey.fromString(properties.getPrivateKey());
             } catch (Exception e) {
                 throw new IllegalArgumentException("Can not parse 'spring.hedera.privateKey' property", e);

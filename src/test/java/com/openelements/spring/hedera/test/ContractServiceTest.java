@@ -139,5 +139,21 @@ public class ContractServiceTest {
         Assertions.assertNotNull(result);
     }
 
+    @Test
+    void testCallFunctionResult() throws Exception {
+        //given
+        final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+        final ContractId contract = hederaClient.createContract(path);
+        final ContractCallRequest setRequest = ContractCallRequest.of(contract, "set", int256(123));
+        final ContractCallResult setResult = hederaClient.executeContractCallTransaction(setRequest);
+        final ContractCallRequest getRequest = ContractCallRequest.of(contract, "get");
+
+        //when
+        final ContractCallResult getResult = hederaClient.executeContractCallTransaction(getRequest);
+
+        //then
+        Assertions.assertNotNull(getResult);
+        Assertions.assertEquals(BigInteger.valueOf(123), getResult.contractFunctionResult().getInt256(0));
+    }
 
 }

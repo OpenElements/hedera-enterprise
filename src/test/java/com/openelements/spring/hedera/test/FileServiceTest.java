@@ -75,7 +75,7 @@ public class FileServiceTest {
         //given
         final byte[] contents = IntStream.range(0, 500).mapToObj(i -> "Hello, Hedera!")
                 .reduce((a, b) -> a + b)
-                .orElse("")
+                .get()
                 .getBytes();
 
         //when
