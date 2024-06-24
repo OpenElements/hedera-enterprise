@@ -13,7 +13,6 @@ public class HederaProperties {
 
     private String network = "mainnet";
 
-
     public String getAccountId() {
         return this.accountId;
     }

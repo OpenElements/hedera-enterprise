@@ -7,7 +7,6 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
@@ -56,7 +55,7 @@ public class HederaClientImpl implements HederaClient {
     public HederaClientImpl(Client client) {this.client = client;}
 
     @Override
-    public FileId uploadFile(byte[] contents) throws HederaException {
+    public FileId createFile(byte[] contents) throws HederaException {
         if(contents.length <= FileCreateRequest.FILE_CREATE_MAX_BYTES) {
             final FileCreateRequest request = FileCreateRequest.of(contents);
             final FileCreateResult result = executeFileCreateTransaction(request);
@@ -109,7 +108,7 @@ public class HederaClientImpl implements HederaClient {
     @Override
     public ContractId createContract(byte[] bytecode, ContractParam<?>... constructorParams) throws HederaException {
         try {
-            final FileId fileId = uploadFile(bytecode);
+            final FileId fileId = createFile(bytecode);
             final ContractId contract = createContract(fileId, constructorParams);
             deleteFile(fileId);
             return contract;

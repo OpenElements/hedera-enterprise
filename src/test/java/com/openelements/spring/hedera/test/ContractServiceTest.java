@@ -1,14 +1,10 @@
 package com.openelements.spring.hedera.test;
 
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.openelements.spring.hedera.api.HederaClient;
 import static com.openelements.spring.hedera.api.data.ContractParam.*;
 
-import com.openelements.spring.hedera.api.data.ContractParam;
 import com.openelements.spring.hedera.api.protocol.ContractCallRequest;
 import com.openelements.spring.hedera.api.protocol.ContractCallResult;
 import com.openelements.spring.hedera.api.protocol.ContractCreateRequest;
@@ -17,7 +13,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +30,7 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
         final String content = Files.readString(path, StandardCharsets.UTF_8);
         final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-        final FileId fileId = hederaClient.uploadFile(bytes);
+        final FileId fileId = hederaClient.createFile(bytes);
         final ContractCreateRequest request = ContractCreateRequest.of(fileId);
 
         //when
@@ -52,7 +47,7 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
         final String content = Files.readString(path, StandardCharsets.UTF_8);
         final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-        final FileId fileId = hederaClient.uploadFile(bytes);
+        final FileId fileId = hederaClient.createFile(bytes);
 
         //when
         final ContractId contract = hederaClient.createContract(fileId);

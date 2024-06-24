@@ -79,7 +79,7 @@ public class FileServiceTest {
                 .getBytes();
 
         //when
-        final FileId fileId = hederaClient.uploadFile(contents);
+        final FileId fileId = hederaClient.createFile(contents);
 
         //then
         Assertions.assertNotNull(fileId);
