@@ -29,6 +29,10 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
+      env:
+        HEDERA_ACCOUNT_ID: ${{ secrets.HEDERA_ACCOUNT_ID }}
+        HEDERA_PRIVATE_KEY: ${{ secrets.HEDERA_PRIVATE_KEY }}
+        HEDERA_NETWORK: ${{ secrets.HEDERA_NETWORK }}
       run: ./mvnw verify
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
