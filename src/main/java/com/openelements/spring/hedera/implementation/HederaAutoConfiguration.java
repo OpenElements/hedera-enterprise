@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties({HederaProperties.class})
 public class HederaAutoConfiguration {
 
-    private final HederaProperties properties;
-
     private final AccountId accountId;
 
     private final PrivateKey privateKey;
@@ -22,7 +20,6 @@ public class HederaAutoConfiguration {
 
     public HederaAutoConfiguration(final HederaProperties properties) {
         try {
-            this.properties = properties;
             if(properties.getAccountId() == null) {
                 throw new IllegalArgumentException("'spring.hedera.accountId' property must be set");
             }
@@ -32,9 +29,21 @@ public class HederaAutoConfiguration {
             if(properties.getNetwork() == null) {
                 throw new IllegalArgumentException("'spring.hedera.network' property must be set");
             }
-            accountId = AccountId.fromString(properties.getAccountId());
-            privateKey = PrivateKey.fromString(properties.getPrivateKey());
-            network = HederaNetwork.valueOf(properties.getNetwork().toUpperCase());
+            try {
+                accountId = AccountId.fromString(properties.getAccountId());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Can not parse 'spring.hedera.accountId' property", e);
+            }
+            try {
+                privateKey = PrivateKey.fromString(properties.getPrivateKey());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Can not parse 'spring.hedera.privateKey' property", e);
+            }
+            try {
+                network = HederaNetwork.valueOf(properties.getNetwork().toUpperCase());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Can not parse 'spring.hedera.network' property", e);
+            }
         } catch (Exception e) {
             throw new IllegalStateException("Can not create Hedera specific configuration", e);
         }
