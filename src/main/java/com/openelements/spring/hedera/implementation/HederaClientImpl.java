@@ -180,7 +180,7 @@ public class HederaClientImpl implements HederaClient {
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration());
         final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
-        return FileDeleteResult.create(receipt.transactionId);
+        return new FileDeleteResult(receipt.transactionId, receipt.status);
     }
 
     @Override

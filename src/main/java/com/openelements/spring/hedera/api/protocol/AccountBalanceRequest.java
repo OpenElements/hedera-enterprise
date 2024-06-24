@@ -8,13 +8,11 @@ import java.util.Objects;
 public record AccountBalanceRequest(@Nonnull AccountId accountId, Hbar queryPayment, Hbar maxQueryPayment) implements QueryRequest {
 
     public AccountBalanceRequest {
-        if (accountId == null) {
-            throw new IllegalArgumentException("accountId must not be null");
-        }
+        Objects.requireNonNull(accountId, "accountId must not be null");
     }
 
     @Nonnull
-    public static AccountBalanceRequest of(AccountId accountId) {
+    public static AccountBalanceRequest of(@Nonnull AccountId accountId) {
         return new AccountBalanceRequest(accountId, null, null);
     }
 
