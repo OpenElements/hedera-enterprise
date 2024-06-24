@@ -28,13 +28,25 @@ public interface HederaClient {
 
     FileId uploadFile(byte[] contents) throws HederaException;
 
+    default ContractId createContract(String fileId, ContractParam<?>... constructorParams) throws HederaException {
+        return createContract(FileId.fromString(fileId), constructorParams);
+    }
+
     ContractId createContract(FileId fileId, ContractParam<?>... constructorParams) throws HederaException;
 
     ContractId createContract(byte[] contents, ContractParam<?>... constructorParams) throws HederaException;
 
     ContractId createContract(Path pathToBin, ContractParam<?>... constructorParams) throws HederaException;
 
+    default void deleteFile(String fileId) throws HederaException {
+        deleteFile(FileId.fromString(fileId));
+    }
+
     void deleteFile(FileId fileId) throws HederaException;
+
+    default byte[] readFile(String fileId) throws HederaException {
+        return readFile(FileId.fromString(fileId));
+    }
 
     byte[] readFile(FileId fileId) throws HederaException;
 

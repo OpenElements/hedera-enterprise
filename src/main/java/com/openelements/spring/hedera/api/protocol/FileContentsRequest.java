@@ -2,20 +2,24 @@ package com.openelements.spring.hedera.api.protocol;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import java.util.Objects;
 
-public record FileContentsRequest(FileId fileId, Hbar queryPayment, Hbar maxQueryPayment) implements QueryRequest{
+public record FileContentsRequest(@Nonnull FileId fileId, @Nullable Hbar queryPayment, @Nullable Hbar maxQueryPayment) implements QueryRequest {
 
     public FileContentsRequest {
-        if (fileId == null) {
-            throw new IllegalArgumentException("fileId must not be null");
-        }
+        Objects.requireNonNull(fileId, "fileId must not be null");
     }
 
-    public static FileContentsRequest of(String fileId) {
+    @Nonnull
+    public static FileContentsRequest of(@Nonnull String fileId) {
+        Objects.requireNonNull(fileId, "fileId must not be null");
         return of(FileId.fromString(fileId));
     }
 
-    public static FileContentsRequest of(FileId fileId) {
+    @Nonnull
+    public static FileContentsRequest of(@Nonnull FileId fileId) {
         return new FileContentsRequest(fileId, null, null);
     }
 

@@ -207,7 +207,7 @@ public class HederaClientImpl implements HederaClient {
                 .setGas(DEFAULT_GAS)
                 .setTransactionValidDuration(request.transactionValidDuration());
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
-        return new ContractCallResult(record.transactionId, record.receipt.status, record.contractFunctionResult);
+        return new ContractCallResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.contractFunctionResult);
     }
 
     private ContractFunctionParameters createParameters(List<ContractParam<?>> params) {
