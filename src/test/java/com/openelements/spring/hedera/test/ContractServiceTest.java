@@ -139,7 +139,14 @@ public class ContractServiceTest {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
         final ContractId contract = hederaClient.createContract(path);
+
+
         final ContractCallRequest setRequest = ContractCallRequest.of(contract, "set", int256(123));
+
+
+
+
+
         final ContractCallResult setResult = hederaClient.executeContractCallTransaction(setRequest);
         final ContractCallRequest getRequest = ContractCallRequest.of(contract, "get");
 

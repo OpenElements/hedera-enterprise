@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
+import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
@@ -207,6 +208,13 @@ public class HederaClientImpl implements HederaClient {
                 .setTransactionValidDuration(request.transactionValidDuration());
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         return new ContractCallResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.contractFunctionResult);
+    }
+
+    @Override
+    public ContractFunctionResult callContractFunction(ContractId contractId, String functionName,
+            ContractParam<?>... params) throws HederaException {
+        final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
+        return executeContractCallTransaction(request).contractFunctionResult();
     }
 
     private ContractFunctionParameters createParameters(List<ContractParam<?>> params) {

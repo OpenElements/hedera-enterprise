@@ -1,6 +1,7 @@
 package com.openelements.spring.hedera.api;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.spring.hedera.api.data.ContractParam;
@@ -24,31 +25,7 @@ import java.nio.file.Path;
 /**
  * Interface for interacting with the Hedera network.
  */
-public interface HederaClient {
-
-    FileId createFile(byte[] contents) throws HederaException;
-
-    default byte[] readFile(String fileId) throws HederaException {
-        return readFile(FileId.fromString(fileId));
-    }
-
-    byte[] readFile(FileId fileId) throws HederaException;
-
-    default void deleteFile(String fileId) throws HederaException {
-        deleteFile(FileId.fromString(fileId));
-    }
-
-    void deleteFile(FileId fileId) throws HederaException;
-
-    default ContractId createContract(String fileId, ContractParam<?>... constructorParams) throws HederaException {
-        return createContract(FileId.fromString(fileId), constructorParams);
-    }
-
-    ContractId createContract(FileId fileId, ContractParam<?>... constructorParams) throws HederaException;
-
-    ContractId createContract(byte[] contents, ContractParam<?>... constructorParams) throws HederaException;
-
-    ContractId createContract(Path pathToBin, ContractParam<?>... constructorParams) throws HederaException;
+public interface HederaClient extends FileServiceClient, SmartContractServiceClient {
 
     AccountBalanceResponse executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException;
 
