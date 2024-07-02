@@ -5,7 +5,9 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.spring.hedera.api.data.ContractParam;
 import java.nio.file.Path;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface SmartContractServiceClient {
 
     default ContractId createContract(String fileId, ContractParam<?>... constructorParams) throws HederaException {

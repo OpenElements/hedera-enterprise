@@ -1,7 +1,9 @@
 package com.openelements.spring.hedera.api;
 
 import com.hedera.hashgraph.sdk.FileId;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface FileServiceClient {
 
     FileId createFile(byte[] contents) throws HederaException;

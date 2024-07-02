@@ -19,7 +19,7 @@ public class DatatypesTest {
     @Test
     public void testString() throws Exception {
         //given
-        final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+        final Path path = Path.of(ContractServiceTest.class.getResource("/datatypes.bin").getPath());
         final ContractId contract = hederaClient.createContract(path);
         final String expected = "Hello, World!";
 
@@ -29,5 +29,20 @@ public class DatatypesTest {
 
         //then
         Assertions.assertEquals(expected, result.getString(0));
+    }
+
+    @Test
+    public void testInt8() throws Exception {
+        //given
+        final Path path = Path.of(ContractServiceTest.class.getResource("/datatypes.bin").getPath());
+        final ContractId contract = hederaClient.createContract(path);
+        final byte expected = 7;
+
+        //when
+        final ContractFunctionResult result = hederaClient.callContractFunction(contract, "checkInt8",
+                ContractParam.int8(expected));
+
+        //then
+        Assertions.assertEquals(expected, result.getInt8(0));
     }
 }
