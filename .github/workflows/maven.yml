@@ -17,7 +17,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted]
+    runs-on: hedera-solo
 
     steps:
     - uses: actions/checkout@v4
