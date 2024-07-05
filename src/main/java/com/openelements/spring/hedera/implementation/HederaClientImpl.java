@@ -53,7 +53,10 @@ public class HederaClientImpl implements HederaClient {
     public static final int DEFAULT_GAS = 1_000_000;
     private final Client client;
 
-    public HederaClientImpl(Client client) {this.client = client;}
+    public HederaClientImpl(Client client)
+    {
+        this.client = client;
+    }
 
     @Override
     public FileId createFile(byte[] contents) throws HederaException {

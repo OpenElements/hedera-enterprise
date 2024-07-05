@@ -33,7 +33,7 @@ jobs:
         HEDERA_ACCOUNT_ID: ${{ secrets.HEDERA_ACCOUNT_ID }}
         HEDERA_PRIVATE_KEY: ${{ secrets.HEDERA_PRIVATE_KEY }}
         HEDERA_NETWORK: ${{ secrets.HEDERA_NETWORK }}
-      run: ./mvnw verify
+      run: export spring_profiles_active=solo && ./mvnw verify
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph

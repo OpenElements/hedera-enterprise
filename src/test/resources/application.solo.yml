@@ -1,0 +1,24 @@
+spring:
+  hedera:
+    accountId: ${ACCOUNT_ID}
+    privateKey: ${PRIVATE_KEY}
+    network:
+      name: solo
+      nodes:
+        - ip: 10.96.207.0
+          port: 50111
+          account: 0.0.3
+        - ip: 10.96.83.202
+          port: 50111
+          account: 0.0.4
+        - ip: 10.96.109.151
+          port: 50111
+          account: 0.0.5
+      mirrornode: localhost:8080
+logging:
+  level:
+    com:
+      openelements:
+        spring:
+          hedera: DEBUG
+

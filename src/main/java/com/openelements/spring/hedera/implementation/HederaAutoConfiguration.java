@@ -4,19 +4,28 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.openelements.spring.hedera.api.HederaClient;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
-@EnableConfigurationProperties({HederaProperties.class})
+@EnableConfigurationProperties({HederaProperties.class, HederaNetworkProperties.class})
 public class HederaAutoConfiguration {
+
+    private final static Logger log = LoggerFactory.getLogger(HederaAutoConfiguration.class);
 
     private final AccountId accountId;
 
     private final PrivateKey privateKey;
 
-    private final HederaNetwork network;
+    private final Client client;
 
     public HederaAutoConfiguration(final HederaProperties properties) {
         try {
@@ -34,17 +43,34 @@ public class HederaAutoConfiguration {
             } catch (Exception e) {
                 throw new IllegalArgumentException("Can not parse 'spring.hedera.accountId' property", e);
             }
+            log.debug("Account ID: {}", accountId.toString());
             try {
-                System.out.println("privateKey: '" + properties.getPrivateKey() + "'");
                 privateKey = PrivateKey.fromString(properties.getPrivateKey());
             } catch (Exception e) {
                 throw new IllegalArgumentException("Can not parse 'spring.hedera.privateKey' property", e);
             }
-            try {
-                network = HederaNetwork.valueOf(properties.getNetwork().toUpperCase());
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Can not parse 'spring.hedera.network' property", e);
+            log.debug("Private Key: {}", privateKey.toString());
+
+            final HederaNetworkProperties networkProperties = properties.getNetwork();
+            if(Arrays.stream(HederaNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), networkProperties.getName()))) {
+                try {
+                    final HederaNetwork network = HederaNetwork.valueOf(networkProperties.getName().toUpperCase());
+                    log.debug("Network: {}", network.getName());
+                    client = Client.forName(network.getName());
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Can not parse 'spring.hedera.network.name' property", e);
+                }
+            } else {
+               final Map<String, AccountId> nodes = new HashMap<>();
+               networkProperties.getNodes().forEach(node -> nodes.put(node.getIp() + ":" + node.getPort(), AccountId.fromString(node.getAccount())));
+               log.debug("Nodes: {}", nodes);
+               client = Client.forNetwork(nodes);
+                if(networkProperties.getMirrorNode() != null) {
+                    client.setMirrorNetwork(List.of(networkProperties.getMirrorNode()));
+                    log.debug("Mirror Node: {}", networkProperties.getMirrorNode());
+                }
             }
+            client.setOperator(accountId, privateKey);
         } catch (Exception e) {
             throw new IllegalStateException("Can not create Hedera specific configuration", e);
         }
@@ -52,7 +78,7 @@ public class HederaAutoConfiguration {
 
     @Bean
     public Client client() {
-        return Client.forName(network.getName()).setOperator(accountId, privateKey);
+        return client;
     }
 
     @Bean

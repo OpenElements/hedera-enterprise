@@ -1,6 +1,7 @@
 package com.openelements.spring.hedera.implementation;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 @ConfigurationProperties(
         prefix = "spring.hedera"
@@ -11,7 +12,8 @@ public class HederaProperties {
 
     private String privateKey;
 
-    private String network = "mainnet";
+    @NestedConfigurationProperty
+    private HederaNetworkProperties network = new HederaNetworkProperties();
 
     public String getAccountId() {
         return this.accountId;
@@ -29,11 +31,11 @@ public class HederaProperties {
         this.privateKey = privateKey;
     }
 
-    public String getNetwork() {
-        return this.network;
+    public HederaNetworkProperties getNetwork() {
+        return network;
     }
 
-    public void setNetwork(String network) {
+    public void setNetwork(HederaNetworkProperties network) {
         this.network = network;
     }
 }
