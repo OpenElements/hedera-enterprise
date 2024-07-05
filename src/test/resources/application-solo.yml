@@ -1,7 +1,5 @@
 spring:
   hedera:
-    accountId: ${ACCOUNT_ID}
-    privateKey: ${PRIVATE_KEY}
     network:
       name: solo
       nodes:
