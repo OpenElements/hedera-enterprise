@@ -38,11 +38,6 @@ public class HederaAutoConfiguration {
             if(properties.getNetwork() == null) {
                 throw new IllegalArgumentException("'spring.hedera.network' property must be set");
             }
-            log.debug("Raw Account ID: {}", properties.getAccountId());
-            log.debug("Raw Private Key: {}", properties.getPrivateKey());
-            log.debug("Raw Network Name: {}", properties.getNetwork().getName());
-            log.debug("Raw Network: {}", properties.getNetwork().getNodes());
-
             try {
                 accountId = AccountId.fromString(properties.getAccountId());
             } catch (Exception e) {
@@ -67,7 +62,9 @@ public class HederaAutoConfiguration {
             } else {
                final Map<String, AccountId> nodes = new HashMap<>();
                networkProperties.getNodes().forEach(node -> nodes.put(node.getIp() + ":" + node.getPort(), AccountId.fromString(node.getAccount())));
-               log.debug("Nodes: {}", nodes);
+               if(log.isDebugEnabled()) {
+                     nodes.forEach((k, v) -> log.debug("Node: {} -> {}", k, v.toString()));
+               }
                client = Client.forNetwork(nodes);
                 if(networkProperties.getMirrorNode() != null) {
                     client.setMirrorNetwork(List.of(networkProperties.getMirrorNode()));
