@@ -13,10 +13,4 @@ spring:
           port: 50111
           account: 0.0.5
       mirrornode: localhost:8080
-logging:
-  level:
-    com:
-      openelements:
-        spring:
-          hedera: DEBUG
 

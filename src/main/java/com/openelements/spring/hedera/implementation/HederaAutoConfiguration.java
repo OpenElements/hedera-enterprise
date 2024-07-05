@@ -38,6 +38,11 @@ public class HederaAutoConfiguration {
             if(properties.getNetwork() == null) {
                 throw new IllegalArgumentException("'spring.hedera.network' property must be set");
             }
+            log.debug("Raw Account ID: {}", properties.getAccountId());
+            log.debug("Raw Private Key: {}", properties.getPrivateKey());
+            log.debug("Raw Network Name: {}", properties.getNetwork().getName());
+            log.debug("Raw Network: {}", properties.getNetwork().getNodes());
+
             try {
                 accountId = AccountId.fromString(properties.getAccountId());
             } catch (Exception e) {
