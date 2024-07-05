@@ -5,13 +5,13 @@ spring:
     network:
       name: solo
       nodes:
-        - ip: 10.96.207.0
+        - ip: 10.96.171.15
           port: 50111
           account: 0.0.3
-        - ip: 10.96.83.202
+        - ip: 10.96.34.105
           port: 50111
           account: 0.0.4
-        - ip: 10.96.109.151
+        - ip: 10.96.201.108
           port: 50111
           account: 0.0.5
       mirrornode: localhost:8080
