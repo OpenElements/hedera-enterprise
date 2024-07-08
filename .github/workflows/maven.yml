@@ -32,4 +32,4 @@ jobs:
         SOLO_INSTALLATION_FOLDER: /root/solo
         SOLO_CLUSTER: solo-e2e
         SOLO_NAMESPACE: solo
-      run: $SOLO_INSTALLATION_FOLDER/preAction.sh && export spring_profiles_active=solo && ./mvnw verify
+      run: solo account create
