@@ -32,4 +32,5 @@ jobs:
         SOLO_INSTALLATION_FOLDER: /root/solo
         SOLO_CLUSTER: solo-e2e
         SOLO_NAMESPACE: solo
+        HOME: /root
       run: solo account create
