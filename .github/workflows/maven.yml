@@ -27,10 +27,12 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
+    - name: Prepare Hedera Solo
       env:
         SOLO_INSTALLATION_FOLDER: /root/solo
-        SOLO_CLUSTER: solo-e2e
-        SOLO_NAMESPACE: solo
         HOME: /root
-      run: $SOLO_INSTALLATION_FOLDER/preAction.sh && export spring_profiles_active=solo && ./mvnw verify
+      run: $SOLO_INSTALLATION_FOLDER/preAction.sh
+    - name: Build with Maven
+      env:
+        spring_profiles_active: solo
+      run: ./mvnw verify
