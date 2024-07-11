@@ -67,7 +67,7 @@ public class HederaClientImpl implements HederaClient {
         } else {
             if(log.isDebugEnabled()) {
                 final int appendCount = Math.floorDiv(contents.length, FileCreateRequest.FILE_CREATE_MAX_BYTES);
-                log.debug("Content is to big for 1 FileCreate transaction. Will append {} FileAppend transactions", appendCount);
+                log.debug("Content of size {} is to big for 1 FileCreate transaction. Will append {} FileAppend transactions", contents.length, appendCount);
             }
             byte[] start = Arrays.copyOf(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES);
             final FileCreateRequest request = FileCreateRequest.of(start);
@@ -92,21 +92,29 @@ public class HederaClientImpl implements HederaClient {
             final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
             return createContract(bytes, constructorParams);
         } catch (Exception e) {
-            throw new HederaException("Failed to create contract", e);
+            throw new HederaException("Failed to create contract from path " + pathToBin, e);
         }
     }
 
     @Override
     public void deleteFile(FileId fileId) throws HederaException {
-        final FileDeleteRequest request = FileDeleteRequest.of(fileId);
-        executeFileDeleteTransaction(request);
+        try {
+            final FileDeleteRequest request = FileDeleteRequest.of(fileId);
+            executeFileDeleteTransaction(request);
+        } catch (Exception e) {
+            throw new HederaException("Failed to delete file with fileId " + fileId, e);
+        }
     }
 
     @Override
     public byte[] readFile(FileId fileId) throws HederaException {
-        final FileContentsRequest request = FileContentsRequest.of(fileId);
-        final FileContentsResponse response = executeFileContentsQuery(request);
-        return response.contents();
+        try {
+            final FileContentsRequest request = FileContentsRequest.of(fileId);
+            final FileContentsResponse response = executeFileContentsQuery(request);
+            return response.contents();
+        } catch (Exception e) {
+            throw new HederaException("Failed to read file with fileId " + fileId, e);
+        }
     }
 
     @Override
@@ -117,20 +125,24 @@ public class HederaClientImpl implements HederaClient {
             deleteFile(fileId);
             return contract;
         } catch (Exception e) {
-            throw new HederaException("Failed to create contract", e);
+            throw new HederaException("Failed to create contract out of byte array", e);
         }
     }
 
     @Override
     public ContractId createContract(FileId fileId, ContractParam<?>... constructorParams) throws HederaException {
-        final ContractCreateRequest request;
-        if(constructorParams == null) {
-            request = ContractCreateRequest.of(fileId);
-        } else {
-            request = ContractCreateRequest.of(fileId, Arrays.asList(constructorParams));
+        try {
+            final ContractCreateRequest request;
+            if (constructorParams == null) {
+                request = ContractCreateRequest.of(fileId);
+            } else {
+                request = ContractCreateRequest.of(fileId, Arrays.asList(constructorParams));
+            }
+            final ContractCreateResult result = executeContractCreateTransaction(request);
+            return result.contractId();
+        } catch (Exception e) {
+            throw new HederaException("Failed to create contract with fileId " + fileId, e);
         }
-        final ContractCreateResult result = executeContractCreateTransaction(request);
-        return result.contractId();
     }
 
     @Override
@@ -216,8 +228,12 @@ public class HederaClientImpl implements HederaClient {
     @Override
     public ContractFunctionResult callContractFunction(ContractId contractId, String functionName,
             ContractParam<?>... params) throws HederaException {
-        final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
-        return executeContractCallTransaction(request).contractFunctionResult();
+        try {
+            final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
+            return executeContractCallTransaction(request).contractFunctionResult();
+        } catch (Exception e) {
+            throw new HederaException("Failed to call function '" + functionName + "' on contract with id " + contractId, e);
+        }
     }
 
     private ContractFunctionParameters createParameters(List<ContractParam<?>> params) {
