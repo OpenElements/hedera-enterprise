@@ -264,7 +264,7 @@ public class HederaClientImpl implements HederaClient {
             log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
             final TransactionResponse response = transaction.execute(client);
             try {
-                log.debug("Waiting for receipt of transaction '{}' of type {}", response.transactionId, transaction.getClass().getSimpleName());
+                log.debug("Waiting for record of transaction '{}' of type {}", response.transactionId, transaction.getClass().getSimpleName());
                 return response.getRecord(client);
             } catch (Exception e) {
                 throw new HederaException("Failed to receive record of transaction '" + response.transactionId + "' of type " + transaction.getClass(), e);
