@@ -66,12 +66,12 @@ public record ContractParam<T>(@Nonnull T value, @Nonnull String nativeType, @No
 
     @Nonnull
     public static ContractParam<Long> int16(short value) {
-        return of((long) value, LongBasedNumericDatatypes.INT8);
+        return of((long) value, LongBasedNumericDatatypes.INT16);
     }
 
     @Nonnull
     public static ContractParam<Long> uint16(int value) {
-        return of((long) value, LongBasedNumericDatatypes.UINT8);
+        return of((long) value, LongBasedNumericDatatypes.UINT16);
     }
 
     @Nonnull
