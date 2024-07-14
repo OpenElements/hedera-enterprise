@@ -114,9 +114,6 @@ public class HederaAutoConfiguration {
 
     @Bean
     ContractVerificationClient contractVerificationClient(HederaNetwork hederaNetwork) {
-        if(hederaNetwork == HederaNetwork.CUSTOM) {
-            throw new IllegalArgumentException("Contract verification is not supported for custom networks");
-        }
-        return new ContractVerificationClientImplementation(hederaNetwork.getChainId() + "");
+        return new ContractVerificationClientImplementation(hederaNetwork);
     }
 }

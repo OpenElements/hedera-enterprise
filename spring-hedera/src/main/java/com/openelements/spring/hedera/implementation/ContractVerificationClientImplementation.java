@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.data.ContractVerificationState;
+import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -24,16 +25,22 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     private record VerifyRequest(String address, String chain, String creatorTxHash, String chosenContract, Map<String, String> files) {}
 
-    private final String chainId;
+    private final HederaNetwork hederaNetwork;
 
     private final ObjectMapper objectMapper;
 
     private final RestClient restClient;
 
-    public ContractVerificationClientImplementation(@NonNull String chainId) {
-        this.chainId = Objects.requireNonNull(chainId, "hederaNetwork must not be null");
+    public ContractVerificationClientImplementation(@NonNull HederaNetwork hederaNetwork) {
+        this.hederaNetwork = Objects.requireNonNull(hederaNetwork, "hederaNetwork must not be null");
         objectMapper = new ObjectMapper();
         restClient = RestClient.create();
+    }
+
+    private void checkSupportedNetwork() {
+        if(hederaNetwork == HederaNetwork.CUSTOM) {
+            throw new IllegalArgumentException("Custom network is not supported");
+        }
     }
 
     private void handleError(HttpRequest request, ClientHttpResponse response) throws IOException {
@@ -64,6 +71,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     @Override
     public ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files) {
+        checkSupportedNetwork();
 
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.NONE) {
@@ -72,7 +80,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
         final VerifyRequest verifyRequest = new VerifyRequest(
                 contractId.toSolidityAddress(),
-                chainId,
+                hederaNetwork.getChainId(),
                 "",
                 "",
                 files
@@ -130,7 +138,9 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     @Override
     public ContractVerificationState checkVerification(ContractId contractId) {
-        final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + chainId;
+        checkSupportedNetwork();
+
+        final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + hederaNetwork.getChainId();
 
         final String resultBody = restClient.get()
                 .uri(uri)
@@ -171,12 +181,14 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     @Override
     public boolean checkVerification(ContractId contractId, String fileName, String fileContent) {
+        checkSupportedNetwork();
+
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.FULL) {
             throw new IllegalStateException("Contract is not verified");
         }
 
-        final String uri = CONTRACT_VERIFICATION_URL + "/files/" + chainId + "/" + contractId.toSolidityAddress();
+        final String uri = CONTRACT_VERIFICATION_URL + "/files/" + hederaNetwork.getChainId() + "/" + contractId.toSolidityAddress();
 
         final String resultBody = restClient.get()
                 .uri(uri)
