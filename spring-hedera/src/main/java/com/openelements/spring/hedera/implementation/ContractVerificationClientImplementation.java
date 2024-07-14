@@ -72,8 +72,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     @Override
     public ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files) {
-        checkSupportedNetwork();
-
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.NONE) {
            throw new IllegalStateException("Contract is already verified");
@@ -139,7 +137,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     @Override
     public ContractVerificationState checkVerification(ContractId contractId) {
-        checkSupportedNetwork();
 
         final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + getChainId();
 
@@ -182,8 +179,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     @Override
     public boolean checkVerification(ContractId contractId, String fileName, String fileContent) {
-        checkSupportedNetwork();
-
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.FULL) {
             throw new IllegalStateException("Contract is not verified");
