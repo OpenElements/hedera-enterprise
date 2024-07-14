@@ -2,6 +2,7 @@ package com.openelements.spring.hedera.api;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.data.ContractVerificationState;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,5 +34,9 @@ public interface ContractVerificationClient {
      * @return
      * @throws IllegalStateException if contract is already verified
      */
-    ContractVerificationState verify(ContractId contractId, String contractName, String contractSource, String contractMetadata);
+    default ContractVerificationState verify(ContractId contractId, String contractName, String contractSource, String contractMetadata) {
+        return verify(contractId, contractName, Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata));
+    }
+
+    ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files);
 }

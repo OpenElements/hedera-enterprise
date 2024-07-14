@@ -64,7 +64,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     @Override
-    public ContractVerificationState verify(ContractId contractId, String contractName, String contractSource, String contractMetadata) {
+    public ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files) {
 
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.NONE) {
@@ -76,7 +76,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 chainId,
                 "",
                 "",
-                Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata)
+                files
                 );
 
         try {
