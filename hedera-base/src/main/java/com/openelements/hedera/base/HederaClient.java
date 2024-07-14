@@ -15,6 +15,7 @@ import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 
 /**
@@ -22,19 +23,27 @@ import com.openelements.hedera.base.protocol.FileDeleteResult;
  */
 public interface HederaClient extends FileServiceClient, SmartContractServiceClient {
 
-    AccountBalanceResponse executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException;
+    @NonNull
+    AccountBalanceResponse executeAccountBalanceQuery(@NonNull AccountBalanceRequest request) throws HederaException;
 
-    FileContentsResponse executeFileContentsQuery(FileContentsRequest request) throws HederaException;
+    @NonNull
+    FileContentsResponse executeFileContentsQuery(@NonNull FileContentsRequest request) throws HederaException;
 
-    FileAppendResult executeFileAppendRequestTransaction(FileAppendRequest request) throws HederaException;
+    @NonNull
+    FileAppendResult executeFileAppendRequestTransaction(@NonNull FileAppendRequest request) throws HederaException;
 
-    FileDeleteResult executeFileDeleteTransaction(FileDeleteRequest request) throws HederaException;
+    @NonNull
+    FileDeleteResult executeFileDeleteTransaction(@NonNull FileDeleteRequest request) throws HederaException;
 
-    FileCreateResult executeFileCreateTransaction(FileCreateRequest request) throws HederaException;
+    @NonNull
+    FileCreateResult executeFileCreateTransaction(@NonNull FileCreateRequest request) throws HederaException;
 
-    ContractCreateResult executeContractCreateTransaction(ContractCreateRequest request) throws HederaException;
+    @NonNull
+    ContractCreateResult executeContractCreateTransaction(@NonNull ContractCreateRequest request) throws HederaException;
 
-    ContractCallResult executeContractCallTransaction(ContractCallRequest request) throws HederaException;
+    @NonNull
+    ContractCallResult executeContractCallTransaction(@NonNull ContractCallRequest request) throws HederaException;
 
+    @NonNull
     Client getClient();
 }

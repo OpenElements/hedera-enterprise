@@ -1,20 +1,24 @@
 package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.FileId;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public interface FileServiceClient {
 
-    FileId createFile(byte[] contents) throws HederaException;
+    @NonNull
+    FileId createFile(@NonNull byte[] contents) throws HederaException;
 
-    default byte[] readFile(String fileId) throws HederaException {
+    @NonNull
+    default byte[] readFile(@NonNull String fileId) throws HederaException {
         return readFile(FileId.fromString(fileId));
     }
 
-    byte[] readFile(FileId fileId) throws HederaException;
+    @NonNull
+    byte[] readFile(@NonNull FileId fileId) throws HederaException;
 
-    default void deleteFile(String fileId) throws HederaException {
+    default void deleteFile(@NonNull String fileId) throws HederaException {
         deleteFile(FileId.fromString(fileId));
     }
 
-    void deleteFile(FileId fileId) throws HederaException;
+    void deleteFile(@NonNull FileId fileId) throws HederaException;
 }
