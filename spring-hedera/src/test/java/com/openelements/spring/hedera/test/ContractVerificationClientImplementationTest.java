@@ -2,7 +2,7 @@ package com.openelements.spring.hedera.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.SmartContractClient;
-import com.openelements.hedera.base.data.ContractVerificationState;
+import com.openelements.spring.hedera.api.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import java.nio.charset.StandardCharsets;

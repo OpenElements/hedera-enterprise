@@ -1,7 +1,6 @@
 package com.openelements.spring.hedera.api;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hedera.base.data.ContractVerificationState;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 

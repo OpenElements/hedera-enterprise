@@ -3,9 +3,13 @@ package com.openelements.spring.hedera.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.openelements.hedera.base.HederaClient;
-import com.openelements.hedera.base.implementation.HederaClientImpl;
+import com.openelements.hedera.base.FileClient;
+import com.openelements.hedera.base.SmartContractClient;
+import com.openelements.hedera.base.implementation.FileClientImpl;
 import com.openelements.hedera.base.implementation.HederaNetwork;
+import com.openelements.hedera.base.implementation.ProtocolLevelClientImpl;
+import com.openelements.hedera.base.implementation.SmartContractClientImpl;
+import com.openelements.hedera.base.protocol.ProtocolLevelClient;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -108,8 +112,18 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    HederaClient hederaClient(final Client client) {
-        return new HederaClientImpl(client);
+    ProtocolLevelClient protocolLevelClient(final Client client) {
+        return new ProtocolLevelClientImpl(client);
+    }
+
+    @Bean
+    FileClient fileClient(final ProtocolLevelClient protocolLevelClient) {
+        return new FileClientImpl(protocolLevelClient);
+    }
+
+    @Bean
+    SmartContractClient smartContractClient(final ProtocolLevelClient protocolLevelClient, FileClient fileClient) {
+        return new SmartContractClientImpl(protocolLevelClient, fileClient);
     }
 
     @Bean

@@ -1,7 +1,7 @@
 package com.openelements.spring.hedera.implementation;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hedera.base.data.ContractVerificationState;
+import com.openelements.spring.hedera.api.ContractVerificationState;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import java.util.Map;
 import org.slf4j.Logger;

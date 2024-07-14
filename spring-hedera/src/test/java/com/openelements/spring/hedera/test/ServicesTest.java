@@ -1,8 +1,8 @@
 package com.openelements.spring.hedera.test;
 
 import com.openelements.hedera.base.FileClient;
-import com.openelements.hedera.base.HederaClient;
 import com.openelements.hedera.base.SmartContractClient;
+import com.openelements.hedera.base.protocol.ProtocolLevelClient;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class ServicesTest {
 
     @Autowired
-    private HederaClient hederaClient;
+    private ProtocolLevelClient protocolLevelClient;
 
     @Autowired
     private ContractVerificationClient verificationClient;
@@ -26,7 +26,7 @@ public class ServicesTest {
 
     @Test
     void testServices() throws Exception {
-        Assertions.assertNotNull(hederaClient);
+        Assertions.assertNotNull(protocolLevelClient);
         Assertions.assertNotNull(verificationClient);
         Assertions.assertNotNull(fileServiceClient);
         Assertions.assertNotNull(smartContractServiceClient);

@@ -2,8 +2,9 @@ package com.openelements.spring.hedera.test;
 
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hedera.base.HederaClient;
-import com.openelements.hedera.base.data.ContractParam;
+import com.openelements.hedera.base.ContractParam;
+import com.openelements.hedera.base.SmartContractClient;
+import com.openelements.hedera.base.implementation.SmartContractClientImpl;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.function.Function;
@@ -20,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class DatatypesTest {
 
     @Autowired
-    private HederaClient hederaClient;
+    private SmartContractClient smartContractClient;
 
     private static ContractId contractId;
 
@@ -28,7 +29,7 @@ public class DatatypesTest {
         if(contractId == null) {
                 try {
                     final Path path = Path.of(ContractServiceTest.class.getResource("/datatypes.bin").getPath());
-                    contractId = hederaClient.createContract(path);
+                    contractId = smartContractClient.createContract(path);
                 } catch (Exception e) {
                     throw new RuntimeException("Can not create contract", e);
                 }
@@ -43,7 +44,7 @@ public class DatatypesTest {
         final String expected = "Hello, World!";
 
         //when
-        final ContractFunctionResult result = hederaClient.callContractFunction(contract, "checkString",
+        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, "checkString",
                 ContractParam.string(expected));
 
         //then
@@ -57,7 +58,7 @@ public class DatatypesTest {
         final String expected = contract.toString();
 
         //when
-        final ContractFunctionResult result = hederaClient.callContractFunction(contract, "checkString",
+        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, "checkString",
                 ContractParam.address(expected));
 
         //then
@@ -71,7 +72,7 @@ public class DatatypesTest {
         final ContractId contract = getOrCreateContractId();
 
         //when
-        final ContractFunctionResult result = hederaClient.callContractFunction(contract, functionName, inputParam);
+        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, functionName, inputParam);
 
         //then
         Assertions.assertEquals(value, resultExtractor.apply(result));
@@ -84,7 +85,7 @@ public class DatatypesTest {
         final ContractId contract = getOrCreateContractId();
 
         //when
-        final ContractFunctionResult result = hederaClient.callContractFunction(contract, functionName, inputParam);
+        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, functionName, inputParam);
 
         //then
         Assertions.assertEquals(value, resultExtractor.apply(result));

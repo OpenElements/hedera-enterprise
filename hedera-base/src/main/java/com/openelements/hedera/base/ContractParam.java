@@ -1,4 +1,4 @@
-package com.openelements.hedera.base.data;
+package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
@@ -11,6 +11,16 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.math.BigInteger;
 import java.util.Objects;
 
+/**
+ * Represents a parameter for a smart contract call (see {@link com.openelements.hedera.base.SmartContractClient}).
+ * For all supported types, see the static factory methods.
+ * Normally a developer should not need to create instances of this class directly.
+ *
+ * @param value the value of the parameter
+ * @param nativeType the native type of the parameter
+ * @param supplier the supplier of the parameter
+ * @param <T> the type of the parameter
+ */
 public record ContractParam<T>(@NonNull T value, @NonNull String nativeType, @NonNull ParamSupplier<T> supplier) {
 
     public ContractParam {

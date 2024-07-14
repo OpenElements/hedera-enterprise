@@ -1,16 +1,18 @@
 package com.openelements.spring.hedera.test;
 
-import static com.openelements.hedera.base.data.ContractParam.int256;
-import static com.openelements.hedera.base.data.ContractParam.string;
+import static com.openelements.hedera.base.ContractParam.int256;
+import static com.openelements.hedera.base.ContractParam.string;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
-import com.openelements.hedera.base.HederaClient;
 
+import com.openelements.hedera.base.FileClient;
+import com.openelements.hedera.base.SmartContractClient;
 import com.openelements.hedera.base.protocol.ContractCallRequest;
 import com.openelements.hedera.base.protocol.ContractCallResult;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
+import com.openelements.hedera.base.protocol.ProtocolLevelClient;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -24,7 +26,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class ContractServiceTest {
 
     @Autowired
-    private HederaClient hederaClient;
+    private ProtocolLevelClient protocolLevelClient;
+
+    @Autowired
+    private FileClient fileClient;
+
+    @Autowired
+    private SmartContractClient smartContractClient;
 
     @Test
     void testContractCreate() throws Exception {
@@ -32,11 +40,11 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
         final String content = Files.readString(path, StandardCharsets.UTF_8);
         final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-        final FileId fileId = hederaClient.createFile(bytes);
+        final FileId fileId = fileClient.createFile(bytes);
         final ContractCreateRequest request = ContractCreateRequest.of(fileId);
 
         //when
-        final ContractCreateResult contractCreateResult = hederaClient.executeContractCreateTransaction(request);
+        final ContractCreateResult contractCreateResult = protocolLevelClient.executeContractCreateTransaction(request);
 
         //then
         Assertions.assertNotNull(contractCreateResult);
@@ -49,10 +57,10 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
         final String content = Files.readString(path, StandardCharsets.UTF_8);
         final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-        final FileId fileId = hederaClient.createFile(bytes);
+        final FileId fileId = fileClient.createFile(bytes);
 
         //when
-        final ContractId contract = hederaClient.createContract(fileId);
+        final ContractId contract = smartContractClient.createContract(fileId);
 
         //then
         Assertions.assertNotNull(contract);
@@ -66,7 +74,7 @@ public class ContractServiceTest {
         final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
 
         //when
-        final ContractId contract = hederaClient.createContract(bytes);
+        final ContractId contract = smartContractClient.createContract(bytes);
 
         //then
         Assertions.assertNotNull(contract);
@@ -78,7 +86,7 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
 
         //when
-        final ContractId contract = hederaClient.createContract(path);
+        final ContractId contract = smartContractClient.createContract(path);
 
         //then
         Assertions.assertNotNull(contract);
@@ -90,7 +98,7 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/large_contract.bin").getPath());
 
         //when
-        final ContractId contract = hederaClient.createContract(path);
+        final ContractId contract = smartContractClient.createContract(path);
 
         //then
         Assertions.assertNotNull(contract);
@@ -102,7 +110,7 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/string_param_constructor_contract.bin").getPath());
 
         //when
-        final ContractId contract = hederaClient.createContract(path, string("Hello"));
+        final ContractId contract = smartContractClient.createContract(path, string("Hello"));
 
         //then
         Assertions.assertNotNull(contract);
@@ -112,11 +120,11 @@ public class ContractServiceTest {
     void testCallFunction() throws Exception {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
-        final ContractId contract = hederaClient.createContract(path);
+        final ContractId contract = smartContractClient.createContract(path);
         final ContractCallRequest request = ContractCallRequest.of(contract, "get");
 
         //when
-        final ContractCallResult result = hederaClient.executeContractCallTransaction(request);
+        final ContractCallResult result = protocolLevelClient.executeContractCallTransaction(request);
 
         //then
         Assertions.assertNotNull(result);
@@ -126,11 +134,11 @@ public class ContractServiceTest {
     void testCallFunctionWithParam() throws Exception {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
-        final ContractId contract = hederaClient.createContract(path);
+        final ContractId contract = smartContractClient.createContract(path);
 
         //when
         final ContractCallRequest request = ContractCallRequest.of(contract, "set", int256(123));
-        final ContractCallResult result = hederaClient.executeContractCallTransaction(request);
+        final ContractCallResult result = protocolLevelClient.executeContractCallTransaction(request);
 
         //then
         Assertions.assertNotNull(result);
@@ -140,7 +148,7 @@ public class ContractServiceTest {
     void testCallFunctionResult() throws Exception {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
-        final ContractId contract = hederaClient.createContract(path);
+        final ContractId contract = smartContractClient.createContract(path);
 
 
         final ContractCallRequest setRequest = ContractCallRequest.of(contract, "set", int256(123));
@@ -149,11 +157,11 @@ public class ContractServiceTest {
 
 
 
-        final ContractCallResult setResult = hederaClient.executeContractCallTransaction(setRequest);
+        final ContractCallResult setResult = protocolLevelClient.executeContractCallTransaction(setRequest);
         final ContractCallRequest getRequest = ContractCallRequest.of(contract, "get");
 
         //when
-        final ContractCallResult getResult = hederaClient.executeContractCallTransaction(getRequest);
+        final ContractCallResult getResult = protocolLevelClient.executeContractCallTransaction(getRequest);
 
         //then
         Assertions.assertNotNull(getResult);

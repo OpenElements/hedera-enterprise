@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hedera.base.data.ContractVerificationState;
+import com.openelements.spring.hedera.api.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import edu.umd.cs.findbugs.annotations.NonNull;

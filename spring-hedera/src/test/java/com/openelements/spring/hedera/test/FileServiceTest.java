@@ -2,13 +2,14 @@ package com.openelements.spring.hedera.test;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Status;
-import com.openelements.hedera.base.HederaClient;
+import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.protocol.FileContentsRequest;
 import com.openelements.hedera.base.protocol.FileContentsResponse;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
+import com.openelements.hedera.base.protocol.ProtocolLevelClient;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class FileServiceTest {
 
     @Autowired
-    private HederaClient hederaClient;
+    private ProtocolLevelClient protocolLevelClient;
+
+    @Autowired
+    private FileClient fileClient;
 
     @Test
     void testCreateFile() throws Exception {
@@ -28,7 +32,7 @@ public class FileServiceTest {
         final FileCreateRequest request = FileCreateRequest.of(contents);
 
         //when
-        final FileCreateResult result = hederaClient.executeFileCreateTransaction(request);
+        final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
 
         //then
         Assertions.assertNotNull(result);
@@ -42,12 +46,12 @@ public class FileServiceTest {
         //given
         final byte[] contents = "Hello, Hedera!".getBytes();
         final FileCreateRequest request = FileCreateRequest.of(contents);
-        final FileCreateResult result = hederaClient.executeFileCreateTransaction(request);
+        final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
         final FileId fileId = result.fileId();
         final FileContentsRequest contentsRequest = FileContentsRequest.of(fileId);
 
         //when
-        final FileContentsResponse fileContentsResponse = hederaClient.executeFileContentsQuery(contentsRequest);
+        final FileContentsResponse fileContentsResponse = protocolLevelClient.executeFileContentsQuery(contentsRequest);
 
         //then
         Assertions.assertNotNull(fileContentsResponse);
@@ -59,12 +63,12 @@ public class FileServiceTest {
         //given
         final byte[] contents = "Hello, Hedera!".getBytes();
         final FileCreateRequest request = FileCreateRequest.of(contents);
-        final FileCreateResult result = hederaClient.executeFileCreateTransaction(request);
+        final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
         final FileId fileId = result.fileId();
         final FileDeleteRequest deleteRequest = FileDeleteRequest.of(fileId);
 
         //when
-        final FileDeleteResult deleteResponse = hederaClient.executeFileDeleteTransaction(deleteRequest);
+        final FileDeleteResult deleteResponse = protocolLevelClient.executeFileDeleteTransaction(deleteRequest);
 
         //then
         Assertions.assertNotNull(deleteResponse);
@@ -79,7 +83,7 @@ public class FileServiceTest {
                 .getBytes();
 
         //when
-        final FileId fileId = hederaClient.createFile(contents);
+        final FileId fileId = fileClient.createFile(contents);
 
         //then
         Assertions.assertNotNull(fileId);

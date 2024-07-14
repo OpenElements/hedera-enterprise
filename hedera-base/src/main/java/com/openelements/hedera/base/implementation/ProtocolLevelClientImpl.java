@@ -7,21 +7,17 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Query;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.openelements.hedera.base.HederaClient;
+import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.HederaException;
-import com.openelements.hedera.base.data.ContractParam;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
 import com.openelements.hedera.base.protocol.ContractCallRequest;
@@ -36,113 +32,25 @@ import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
+import com.openelements.hedera.base.protocol.ProtocolLevelClient;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HederaClientImpl implements HederaClient {
+public class ProtocolLevelClientImpl implements ProtocolLevelClient {
 
-    private final static Logger log = LoggerFactory.getLogger(HederaClientImpl.class);
+
+    private final static Logger log = LoggerFactory.getLogger(ProtocolLevelClientImpl.class);
 
     public static final int DEFAULT_GAS = 1_000_000;
+
     private final Client client;
 
-    public HederaClientImpl(Client client)
-    {
-        this.client = client;
-    }
-
-    @Override
-    public FileId createFile(byte[] contents) throws HederaException {
-        if(contents.length <= FileCreateRequest.FILE_CREATE_MAX_BYTES) {
-            final FileCreateRequest request = FileCreateRequest.of(contents);
-            final FileCreateResult result = executeFileCreateTransaction(request);
-            return result.fileId();
-        } else {
-            if(log.isDebugEnabled()) {
-                final int appendCount = Math.floorDiv(contents.length, FileCreateRequest.FILE_CREATE_MAX_BYTES);
-                log.debug("Content of size {} is to big for 1 FileCreate transaction. Will append {} FileAppend transactions", contents.length, appendCount);
-            }
-            byte[] start = Arrays.copyOf(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES);
-            final FileCreateRequest request = FileCreateRequest.of(start);
-            final FileCreateResult result = executeFileCreateTransaction(request);
-            FileId fileId = result.fileId();
-            byte[] remaining = Arrays.copyOfRange(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES, contents.length);
-            while(remaining.length > 0) {
-                final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_BYTES);
-                byte[] next = Arrays.copyOf(remaining, length);
-                final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
-                final FileAppendResult appendResult = executeFileAppendRequestTransaction(appendRequest);
-                remaining = Arrays.copyOfRange(remaining, length, remaining.length);
-            }
-            return fileId;
-        }
-    }
-
-    @Override
-    public ContractId createContract(Path pathToBin, ContractParam<?>... constructorParams) throws HederaException {
-        try {
-            String content = Files.readString(pathToBin, StandardCharsets.UTF_8);
-            final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-            return createContract(bytes, constructorParams);
-        } catch (Exception e) {
-            throw new HederaException("Failed to create contract from path " + pathToBin, e);
-        }
-    }
-
-    @Override
-    public void deleteFile(FileId fileId) throws HederaException {
-        try {
-            final FileDeleteRequest request = FileDeleteRequest.of(fileId);
-            executeFileDeleteTransaction(request);
-        } catch (Exception e) {
-            throw new HederaException("Failed to delete file with fileId " + fileId, e);
-        }
-    }
-
-    @Override
-    public byte[] readFile(FileId fileId) throws HederaException {
-        try {
-            final FileContentsRequest request = FileContentsRequest.of(fileId);
-            final FileContentsResponse response = executeFileContentsQuery(request);
-            return response.contents();
-        } catch (Exception e) {
-            throw new HederaException("Failed to read file with fileId " + fileId, e);
-        }
-    }
-
-    @Override
-    public ContractId createContract(byte[] bytecode, ContractParam<?>... constructorParams) throws HederaException {
-        try {
-            final FileId fileId = createFile(bytecode);
-            final ContractId contract = createContract(fileId, constructorParams);
-            deleteFile(fileId);
-            return contract;
-        } catch (Exception e) {
-            throw new HederaException("Failed to create contract out of byte array", e);
-        }
-    }
-
-    @Override
-    public ContractId createContract(FileId fileId, ContractParam<?>... constructorParams) throws HederaException {
-        try {
-            final ContractCreateRequest request;
-            if (constructorParams == null) {
-                request = ContractCreateRequest.of(fileId);
-            } else {
-                request = ContractCreateRequest.of(fileId, Arrays.asList(constructorParams));
-            }
-            final ContractCreateResult result = executeContractCreateTransaction(request);
-            return result.contractId();
-        } catch (Exception e) {
-            throw new HederaException("Failed to create contract with fileId " + fileId, e);
-        }
+    public ProtocolLevelClientImpl(@NonNull final Client client) {
+        this.client = Objects.requireNonNull(client, "client must not be null");
     }
 
     @Override
@@ -225,17 +133,6 @@ public class HederaClientImpl implements HederaClient {
         return new ContractCallResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.contractFunctionResult);
     }
 
-    @Override
-    public ContractFunctionResult callContractFunction(ContractId contractId, String functionName,
-            ContractParam<?>... params) throws HederaException {
-        try {
-            final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
-            return executeContractCallTransaction(request).contractFunctionResult();
-        } catch (Exception e) {
-            throw new HederaException("Failed to call function '" + functionName + "' on contract with id " + contractId, e);
-        }
-    }
-
     private ContractFunctionParameters createParameters(List<ContractParam<?>> params) {
         Objects.requireNonNull(params, "params must not be null");
         final ContractFunctionParameters constructorParams = new ContractFunctionParameters();
@@ -281,10 +178,5 @@ public class HederaClientImpl implements HederaClient {
         } catch (Exception e) {
             throw new HederaException("Failed to execute query", e);
         }
-    }
-
-    @Override
-    public Client getClient() {
-        return client;
     }
 }

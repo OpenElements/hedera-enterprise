@@ -1,6 +1,6 @@
 package com.openelements.hedera.base.test;
 
-import com.openelements.hedera.base.data.ContractParam;
+import com.openelements.hedera.base.ContractParam;
 import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
