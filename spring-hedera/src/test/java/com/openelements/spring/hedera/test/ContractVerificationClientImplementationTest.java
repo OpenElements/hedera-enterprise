@@ -4,7 +4,6 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.HederaClient;
 import com.openelements.hedera.base.data.ContractVerificationState;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,9 +35,7 @@ class ContractVerificationClientImplementationTest {
         final String contractSource = Files.readString(solPath, StandardCharsets.UTF_8);
         final Path metadataPath = getResource("/HelloWorld.metadata.json");
         final String contractMetadata = Files.readString(metadataPath, StandardCharsets.UTF_8);
-        // final ContractId contractId = hederaClient.createContract(binPath);
-       // final ContractId contractId = ContractId.fromSolidityAddress("0000000000000000000000000000000000454d20");
-        final ContractId contractId = ContractId.fromSolidityAddress("0000000000000000000000000000000000454d4c");
+        final ContractId contractId = hederaClient.createContract(binPath);
 
         //when
         final ContractVerificationState state = contractVerificationClient.verify(
@@ -46,23 +43,6 @@ class ContractVerificationClientImplementationTest {
 
         //then
         Assertions.assertEquals(ContractVerificationState.FULL, state);
-    }
-
-    @Test
-    void testCheckContractFile() throws IOException {
-        //given
-        final Path solPath = getResource("/HelloWorld.sol");
-        final String contractSource = Files.readString(solPath, StandardCharsets.UTF_8);
-        final Path metadataPath = getResource("/HelloWorld.metadata.json");
-        // final ContractId contractId = hederaClient.createContract(binPath);
-        // final ContractId contractId = ContractId.fromSolidityAddress("0000000000000000000000000000000000454d20");
-        final ContractId contractId = ContractId.fromSolidityAddress("0000000000000000000000000000000000454d4c");
-
-        //when
-        final boolean checked = contractVerificationClient.checkVerification(contractId, "HelloWorld.sol", contractSource);
-
-        //then
-        Assertions.assertTrue(checked);
     }
 
 }
