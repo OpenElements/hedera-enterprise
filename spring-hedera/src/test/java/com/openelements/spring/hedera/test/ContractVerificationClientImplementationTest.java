@@ -36,7 +36,7 @@ class ContractVerificationClientImplementationTest {
     }
 
     @Test
-    @DisabledIf("isNotSupportedChain")
+    @DisabledIf(value = "isNotSupportedChain", disabledReason = "Verification is currently not supported for custom chains")
     void test() throws Exception {
         //given
         final String contractName = "HelloWorld";
