@@ -1,0 +1,6 @@
+com/openelements/spring/hedera/api/EnableHedera.class
+com/openelements/spring/hedera/api/package-info.class
+com/openelements/spring/hedera/implementation/HederaAutoConfiguration.class
+com/openelements/spring/hedera/implementation/package-info.class
+com/openelements/spring/hedera/implementation/HederaNetworkProperties.class
+com/openelements/spring/hedera/implementation/HederaProperties.class
