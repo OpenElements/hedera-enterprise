@@ -35,4 +35,4 @@ jobs:
     - name: Build with Maven
       env:
         spring_profiles_active: solo
-      run: ./mvnw verify
+      run: cp .env spring-hedera/.env && ./mvnw verify
