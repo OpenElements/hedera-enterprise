@@ -42,8 +42,12 @@ public class HederaAutoConfiguration {
 
     @Bean
     public PrivateKey privateKey(final HederaProperties properties) {
-        if(properties.getPrivateKey() == null) {
+        final String privateKey = properties.getPrivateKey();
+        if(privateKey == null) {
             throw new IllegalArgumentException("'spring.hedera.privateKey' property must be set");
+        }
+        if(privateKey.isBlank()) {
+            throw new IllegalArgumentException("'spring.hedera.privateKey' property must not be blank");
         }
         try {
             return PrivateKey.fromString(properties.getPrivateKey());
@@ -54,8 +58,12 @@ public class HederaAutoConfiguration {
 
     @Bean
     public AccountId accountId(final HederaProperties properties) {
-        if(properties.getAccountId() == null) {
+        final String accountId = properties.getAccountId();
+        if(accountId == null) {
             throw new IllegalArgumentException("'spring.hedera.accountId' property must be set");
+        }
+        if(accountId.isBlank()) {
+            throw new IllegalArgumentException("'spring.hedera.accountId' property must not be blank");
         }
         try {
             return AccountId.fromString(properties.getAccountId());
@@ -70,9 +78,10 @@ public class HederaAutoConfiguration {
             final Client client;
             if(hederaNetwork != HederaNetwork.CUSTOM) {
                 try {
+                    log.debug("Hedera network '{}' will be used", hederaNetwork.getName());
                     client = Client.forName(hederaNetwork.getName());
                 } catch (Exception e) {
-                    throw new IllegalArgumentException("Can not parse 'spring.hedera.network.name' property", e);
+                    throw new IllegalArgumentException("Can not create client for network " + hederaNetwork.getName(), e);
                 }
             } else {
                 if(properties.getNetwork() == null) {
@@ -91,6 +100,7 @@ public class HederaAutoConfiguration {
                 }
             }
             client.setOperator(accountId, privateKey);
+            log.debug("Client created for account: {}", accountId);
             return client;
         } catch (Exception e) {
             throw new IllegalStateException("Can not create Hedera specific configuration", e);
