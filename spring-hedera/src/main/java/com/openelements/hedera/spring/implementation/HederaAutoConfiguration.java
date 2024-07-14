@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera.implementation;
+package com.openelements.hedera.spring.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
@@ -10,7 +10,7 @@ import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hedera.base.implementation.SmartContractClientImpl;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
-import com.openelements.spring.hedera.api.ContractVerificationClient;
+import com.openelements.hedera.spring.ContractVerificationClient;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

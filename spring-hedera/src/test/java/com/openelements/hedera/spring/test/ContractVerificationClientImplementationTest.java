@@ -1,10 +1,10 @@
-package com.openelements.spring.hedera.test;
+package com.openelements.hedera.spring.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.SmartContractClient;
-import com.openelements.spring.hedera.api.ContractVerificationState;
+import com.openelements.hedera.spring.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
-import com.openelements.spring.hedera.api.ContractVerificationClient;
+import com.openelements.hedera.spring.ContractVerificationClient;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera.implementation;
+package com.openelements.hedera.spring.implementation;
 
 import com.openelements.hedera.base.implementation.HederaNode;
 import java.util.List;

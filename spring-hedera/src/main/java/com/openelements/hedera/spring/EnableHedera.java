@@ -1,9 +1,9 @@
-package com.openelements.spring.hedera.api;
+package com.openelements.hedera.spring;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import com.openelements.spring.hedera.implementation.HederaAutoConfiguration;
+import com.openelements.hedera.spring.implementation.HederaAutoConfiguration;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

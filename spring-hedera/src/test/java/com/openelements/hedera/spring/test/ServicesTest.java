@@ -1,9 +1,9 @@
-package com.openelements.spring.hedera.test;
+package com.openelements.hedera.spring.test;
 
 import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.SmartContractClient;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
-import com.openelements.spring.hedera.api.ContractVerificationClient;
+import com.openelements.hedera.spring.ContractVerificationClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

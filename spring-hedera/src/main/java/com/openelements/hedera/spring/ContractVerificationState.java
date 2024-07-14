@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera.api;
+package com.openelements.hedera.spring;
 
 /**
  * Enumerates the possible states of contract verification.

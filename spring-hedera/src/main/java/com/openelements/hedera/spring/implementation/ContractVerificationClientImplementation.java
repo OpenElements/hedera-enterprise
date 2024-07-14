@@ -1,13 +1,12 @@
-package com.openelements.spring.hedera.implementation;
+package com.openelements.hedera.spring.implementation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.HederaException;
-import com.openelements.spring.hedera.api.ContractVerificationState;
+import com.openelements.hedera.spring.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
-import com.openelements.spring.hedera.api.ContractVerificationClient;
+import com.openelements.hedera.spring.ContractVerificationClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

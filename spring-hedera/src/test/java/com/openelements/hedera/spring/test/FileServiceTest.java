@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera.test;
+package com.openelements.hedera.spring.test;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Status;

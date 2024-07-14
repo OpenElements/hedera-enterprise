@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera.test;
+package com.openelements.hedera.spring.test;
 
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;

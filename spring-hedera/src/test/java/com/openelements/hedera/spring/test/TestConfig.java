@@ -1,6 +1,6 @@
-package com.openelements.spring.hedera.test;
+package com.openelements.hedera.spring.test;
 
-import com.openelements.spring.hedera.api.EnableHedera;
+import com.openelements.hedera.spring.EnableHedera;
 import org.springframework.boot.SpringBootConfiguration;
 
 @EnableHedera

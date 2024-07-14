@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera.api;
+package com.openelements.hedera.spring;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.HederaException;

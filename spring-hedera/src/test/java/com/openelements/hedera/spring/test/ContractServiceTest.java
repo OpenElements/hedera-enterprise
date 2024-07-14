@@ -1,4 +1,4 @@
-package com.openelements.spring.hedera.test;
+package com.openelements.hedera.spring.test;
 
 import static com.openelements.hedera.base.ContractParam.int256;
 import static com.openelements.hedera.base.ContractParam.string;
