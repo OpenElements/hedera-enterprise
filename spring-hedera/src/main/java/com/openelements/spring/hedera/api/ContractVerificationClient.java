@@ -38,5 +38,13 @@ public interface ContractVerificationClient {
         return verify(contractId, contractName, Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata));
     }
 
+    /**
+     * Try to verify a contract.
+     * @param contractId contract to verify
+     * @param contractName contract name
+     * @param files contract files
+     * @return verification state
+     * @throws IllegalStateException if contract is already verified
+     */
     ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files);
 }
