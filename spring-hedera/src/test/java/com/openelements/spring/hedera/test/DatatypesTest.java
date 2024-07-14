@@ -1,10 +1,9 @@
 package com.openelements.spring.hedera.test;
 
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.openelements.hedera.base.ContractCallResult;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.SmartContractClient;
-import com.openelements.hedera.base.implementation.SmartContractClientImpl;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.function.Function;
@@ -44,7 +43,7 @@ public class DatatypesTest {
         final String expected = "Hello, World!";
 
         //when
-        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, "checkString",
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, "checkString",
                 ContractParam.string(expected));
 
         //then
@@ -58,7 +57,7 @@ public class DatatypesTest {
         final String expected = contract.toString();
 
         //when
-        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, "checkString",
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, "checkString",
                 ContractParam.address(expected));
 
         //then
@@ -67,12 +66,12 @@ public class DatatypesTest {
 
     @ParameterizedTest
     @MethodSource("provideIntArguments")
-    public <T> void testLongTypes(String functionName, long value, ContractParam inputParam, Function<ContractFunctionResult, Long> resultExtractor) throws Exception {
+    public <T> void testLongTypes(String functionName, long value, ContractParam inputParam, Function<ContractCallResult, Long> resultExtractor) throws Exception {
         //given
         final ContractId contract = getOrCreateContractId();
 
         //when
-        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, functionName, inputParam);
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, functionName, inputParam);
 
         //then
         Assertions.assertEquals(value, resultExtractor.apply(result));
@@ -80,12 +79,12 @@ public class DatatypesTest {
 
     @ParameterizedTest
     @MethodSource("provideBigIntegerArguments")
-    public <T> void testBigIntegerTypes(String functionName, BigInteger value, ContractParam inputParam, Function<ContractFunctionResult, BigInteger> resultExtractor) throws Exception {
+    public <T> void testBigIntegerTypes(String functionName, BigInteger value, ContractParam inputParam, Function<ContractCallResult, BigInteger> resultExtractor) throws Exception {
         //given
         final ContractId contract = getOrCreateContractId();
 
         //when
-        final ContractFunctionResult result = smartContractClient.callContractFunction(contract, functionName, inputParam);
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, functionName, inputParam);
 
         //then
         Assertions.assertEquals(value, resultExtractor.apply(result));
@@ -93,18 +92,18 @@ public class DatatypesTest {
 
     static Stream<Arguments> provideIntArguments() {
         return Stream.of(
-                Arguments.of("checkInt8", 7, ContractParam.int8((byte)7), (Function<ContractFunctionResult, Long>) r -> (long) r.getInt8(0)),
-                Arguments.of("checkUint8", 7, ContractParam.uint8((byte)7), (Function<ContractFunctionResult, Long>) r -> (long) r.getUint8(0)),
-                Arguments.of("checkInt32", 123456789, ContractParam.int32(123456789), (Function<ContractFunctionResult, Long>) r -> (long) r.getInt32(0)),
-                Arguments.of("checkUint32", 123456789L, ContractParam.uint32(123456789L), (Function<ContractFunctionResult, Long>) r -> (long) r.getUint32(0)),
-                Arguments.of("checkInt64", 1234567890123456789L, ContractParam.int64(1234567890123456789L), (Function<ContractFunctionResult, Long>) r -> (long) r.getInt64(0))
+                Arguments.of("checkInt8", 7, ContractParam.int8((byte)7), (Function<ContractCallResult, Long>) r -> (long) r.getInt8(0)),
+                Arguments.of("checkUint8", 7, ContractParam.uint8((byte)7), (Function<ContractCallResult, Long>) r -> (long) r.getUint8(0)),
+                Arguments.of("checkInt32", 123456789, ContractParam.int32(123456789), (Function<ContractCallResult, Long>) r -> (long) r.getInt32(0)),
+                Arguments.of("checkUint32", 123456789L, ContractParam.uint32(123456789L), (Function<ContractCallResult, Long>) r -> (long) r.getUint32(0)),
+                Arguments.of("checkInt64", 1234567890123456789L, ContractParam.int64(1234567890123456789L), (Function<ContractCallResult, Long>) r -> (long) r.getInt64(0))
         );
     }
 
     static Stream<Arguments> provideBigIntegerArguments() {
         return Stream.of(
-                Arguments.of("checkInt256", new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890"), ContractParam.int256(new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890")), (Function<ContractFunctionResult, BigInteger>) r -> r.getInt256(0)),
-                Arguments.of("checkUint256", new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890"), ContractParam.uint256(new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890")), (Function<ContractFunctionResult, BigInteger>) r -> r.getUint256(0))
+                Arguments.of("checkInt256", new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890"), ContractParam.int256(new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890")), (Function<ContractCallResult, BigInteger>) r -> r.getInt256(0)),
+                Arguments.of("checkUint256", new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890"), ContractParam.uint256(new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890")), (Function<ContractCallResult, BigInteger>) r -> r.getUint256(0))
         );
     }
 }

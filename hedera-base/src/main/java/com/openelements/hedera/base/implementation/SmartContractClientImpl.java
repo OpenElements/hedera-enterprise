@@ -3,6 +3,7 @@ package com.openelements.hedera.base.implementation;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
+import com.openelements.hedera.base.ContractCallResult;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.HederaException;
@@ -81,11 +82,12 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractFunctionResult callContractFunction(@NonNull ContractId contractId, @NonNull String functionName,
+    public ContractCallResult callContractFunction(@NonNull ContractId contractId, @NonNull String functionName,
             @Nullable ContractParam<?>... params) throws HederaException {
         try {
             final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
-            return protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
+            ContractFunctionResult result = protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
+            return new ContractCallResultImpl(result);
         } catch (Exception e) {
             throw new HederaException("Failed to call function '" + functionName + "' on contract with id " + contractId, e);
         }

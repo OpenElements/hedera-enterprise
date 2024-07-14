@@ -63,7 +63,7 @@ public interface SmartContractClient {
      * @throws HederaException if the function could not be called
      */
     @NonNull
-    default ContractFunctionResult callContractFunction(@NonNull String contractId, @NonNull String functionName, @Nullable ContractParam<?>... params) throws HederaException {
+    default ContractCallResult callContractFunction(@NonNull String contractId, @NonNull String functionName, @Nullable ContractParam<?>... params) throws HederaException {
         return callContractFunction(ContractId.fromString(contractId), functionName, params);
     }
 
@@ -76,6 +76,6 @@ public interface SmartContractClient {
      * @throws HederaException if the function could not be called
      */
     @NonNull
-    ContractFunctionResult callContractFunction(@NonNull ContractId contractId, @NonNull String functionName, @Nullable ContractParam<?>... params) throws HederaException;
+    ContractCallResult callContractFunction(@NonNull ContractId contractId, @NonNull String functionName, @Nullable ContractParam<?>... params) throws HederaException;
 
 }
