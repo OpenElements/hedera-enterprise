@@ -2,7 +2,7 @@ package com.openelements.spring.hedera.test;
 
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
-import com.openelements.hedera.base.protocol.ProtocolLevelClient;
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class AccountBalanceTest {
 
     @Autowired
-    private ProtocolLevelClient protocolLevelClient;
+    private ProtocolLayerClient protocolLayerClient;
 
     @Value("${spring.hedera.accountId}")
     private String accountId;
@@ -24,7 +24,7 @@ public class AccountBalanceTest {
         AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
 
         //when
-        final AccountBalanceResponse accountBalanceResult = protocolLevelClient.executeAccountBalanceQuery(
+        final AccountBalanceResponse accountBalanceResult = protocolLayerClient.executeAccountBalanceQuery(
                 accountBalanceRequest);
 
         //then

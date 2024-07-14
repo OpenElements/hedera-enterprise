@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.openelements.hedera.base.HederaException;
 import com.openelements.spring.hedera.api.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
@@ -37,9 +38,9 @@ public class ContractVerificationClientImplementation implements ContractVerific
         restClient = RestClient.create();
     }
 
-    private String getChainId() {
+    private String getChainId() throws HederaException {
         if(hederaNetwork == HederaNetwork.CUSTOM) {
-            throw new IllegalArgumentException("Custom network is not supported");
+            throw new HederaException("A custom Hedera network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
         }
         return hederaNetwork.getChainId() + "";
     }
@@ -71,7 +72,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     @Override
-    public ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files) {
+    public ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files) throws HederaException {
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.NONE) {
            throw new IllegalStateException("Contract is already verified");
@@ -84,14 +85,8 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 "",
                 files
                 );
-
         try {
-            final String valueAsString = objectMapper.writerFor(VerifyRequest.class).writeValueAsString(verifyRequest);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        final String resultBody = restClient.post()
+            final String resultBody = restClient.post()
                 .uri(CONTRACT_VERIFICATION_URL + "/verify")
                 .header("Content-Type", "application/json")
                 .header("accept", "application/json")
@@ -100,7 +95,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     handleError(request, response);
                 }).body(String.class);
-        try {
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             final JsonNode resultNode = rootNode.get("result");
             if(resultNode != null) {
@@ -131,23 +125,24 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 throw new RuntimeException("No result in response");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error in ready response", e);
+            throw new HederaException("Error verification step", e);
         }
     }
 
     @Override
-    public ContractVerificationState checkVerification(ContractId contractId) {
+    public ContractVerificationState checkVerification(ContractId contractId) throws HederaException{
 
         final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + getChainId();
 
-        final String resultBody = restClient.get()
+        try {
+            final String resultBody = restClient.get()
                 .uri(uri)
                 .header("accept", "application/json")
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     handleError(request, response);
                 }).body(String.class);
-        try {
+
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             if (rootNode.isArray()) {
                 final List<JsonNode> results = StreamSupport
@@ -173,12 +168,12 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 throw new RuntimeException("Result is not an array");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error in ready response", e);
+            throw new HederaException("Error verification step", e);
         }
     }
 
     @Override
-    public boolean checkVerification(ContractId contractId, String fileName, String fileContent) {
+    public boolean checkVerification(ContractId contractId, String fileName, String fileContent) throws HederaException {
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.FULL) {
             throw new IllegalStateException("Contract is not verified");
@@ -186,14 +181,15 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
         final String uri = CONTRACT_VERIFICATION_URL + "/files/" + getChainId() + "/" + contractId.toSolidityAddress();
 
-        final String resultBody = restClient.get()
+        try {
+            final String resultBody = restClient.get()
                 .uri(uri)
                 .header("accept", "application/json")
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     handleError(request, response);
                 }).body(String.class);
-        try {
+
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             if (rootNode.isArray()) {
                 final List<JsonNode> results = StreamSupport
@@ -214,7 +210,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 throw new RuntimeException("Result is not an array");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error in ready response", e);
+            throw new HederaException("Error verification step", e);
         }
     }
 }

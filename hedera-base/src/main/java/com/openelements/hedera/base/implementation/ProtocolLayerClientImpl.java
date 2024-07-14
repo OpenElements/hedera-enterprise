@@ -32,7 +32,7 @@ import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
-import com.openelements.hedera.base.protocol.ProtocolLevelClient;
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
 import java.util.Objects;
@@ -40,16 +40,16 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProtocolLevelClientImpl implements ProtocolLevelClient {
+public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
 
-    private final static Logger log = LoggerFactory.getLogger(ProtocolLevelClientImpl.class);
+    private final static Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
 
     public static final int DEFAULT_GAS = 1_000_000;
 
     private final Client client;
 
-    public ProtocolLevelClientImpl(@NonNull final Client client) {
+    public ProtocolLayerClientImpl(@NonNull final Client client) {
         this.client = Objects.requireNonNull(client, "client must not be null");
     }
 

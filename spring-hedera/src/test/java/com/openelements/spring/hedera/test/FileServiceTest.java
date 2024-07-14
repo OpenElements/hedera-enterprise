@@ -9,7 +9,7 @@ import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
-import com.openelements.hedera.base.protocol.ProtocolLevelClient;
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class FileServiceTest {
 
     @Autowired
-    private ProtocolLevelClient protocolLevelClient;
+    private ProtocolLayerClient protocolLayerClient;
 
     @Autowired
     private FileClient fileClient;
@@ -32,7 +32,7 @@ public class FileServiceTest {
         final FileCreateRequest request = FileCreateRequest.of(contents);
 
         //when
-        final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
+        final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
 
         //then
         Assertions.assertNotNull(result);
@@ -46,12 +46,12 @@ public class FileServiceTest {
         //given
         final byte[] contents = "Hello, Hedera!".getBytes();
         final FileCreateRequest request = FileCreateRequest.of(contents);
-        final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
+        final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
         final FileId fileId = result.fileId();
         final FileContentsRequest contentsRequest = FileContentsRequest.of(fileId);
 
         //when
-        final FileContentsResponse fileContentsResponse = protocolLevelClient.executeFileContentsQuery(contentsRequest);
+        final FileContentsResponse fileContentsResponse = protocolLayerClient.executeFileContentsQuery(contentsRequest);
 
         //then
         Assertions.assertNotNull(fileContentsResponse);
@@ -63,12 +63,12 @@ public class FileServiceTest {
         //given
         final byte[] contents = "Hello, Hedera!".getBytes();
         final FileCreateRequest request = FileCreateRequest.of(contents);
-        final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
+        final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
         final FileId fileId = result.fileId();
         final FileDeleteRequest deleteRequest = FileDeleteRequest.of(fileId);
 
         //when
-        final FileDeleteResult deleteResponse = protocolLevelClient.executeFileDeleteTransaction(deleteRequest);
+        final FileDeleteResult deleteResponse = protocolLayerClient.executeFileDeleteTransaction(deleteRequest);
 
         //then
         Assertions.assertNotNull(deleteResponse);

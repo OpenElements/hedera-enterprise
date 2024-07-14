@@ -6,7 +6,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 /**
  * Interface for interacting with the Hedera network at the protocol level.
  */
-public interface ProtocolLevelClient {
+public interface ProtocolLayerClient {
 
 
     /**

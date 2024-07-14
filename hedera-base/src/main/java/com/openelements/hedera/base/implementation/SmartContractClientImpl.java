@@ -10,7 +10,7 @@ import com.openelements.hedera.base.SmartContractClient;
 import com.openelements.hedera.base.protocol.ContractCallRequest;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
-import com.openelements.hedera.base.protocol.ProtocolLevelClient;
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.nio.charset.StandardCharsets;
@@ -25,12 +25,12 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     private final static Logger log = LoggerFactory.getLogger(SmartContractClientImpl.class);
 
-    private final ProtocolLevelClient protocolLevelClient;
+    private final ProtocolLayerClient protocolLayerClient;
 
     private final FileClient fileClient;
 
-    public SmartContractClientImpl(@NonNull final ProtocolLevelClient protocolLevelClient, FileClient fileClient) {
-        this.protocolLevelClient = Objects.requireNonNull(protocolLevelClient, "protocolLevelClient must not be null");
+    public SmartContractClientImpl(@NonNull final ProtocolLayerClient protocolLayerClient, FileClient fileClient) {
+        this.protocolLayerClient = Objects.requireNonNull(protocolLayerClient, "protocolLevelClient must not be null");
         this.fileClient = Objects.requireNonNull(fileClient, "fileClient must not be null");
     }
 
@@ -45,7 +45,7 @@ public class SmartContractClientImpl implements SmartContractClient {
             } else {
                 request = ContractCreateRequest.of(fileId, Arrays.asList(constructorParams));
             }
-            final ContractCreateResult result = protocolLevelClient.executeContractCreateTransaction(request);
+            final ContractCreateResult result = protocolLayerClient.executeContractCreateTransaction(request);
             return result.contractId();
         } catch (Exception e) {
             throw new HederaException("Failed to create contract with fileId " + fileId, e);
@@ -85,7 +85,7 @@ public class SmartContractClientImpl implements SmartContractClient {
             @Nullable ContractParam<?>... params) throws HederaException {
         try {
             final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
-            return protocolLevelClient.executeContractCallTransaction(request).contractFunctionResult();
+            return protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
         } catch (Exception e) {
             throw new HederaException("Failed to call function '" + functionName + "' on contract with id " + contractId, e);
         }

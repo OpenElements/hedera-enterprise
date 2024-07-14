@@ -12,7 +12,7 @@ import com.openelements.hedera.base.protocol.ContractCallRequest;
 import com.openelements.hedera.base.protocol.ContractCallResult;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
-import com.openelements.hedera.base.protocol.ProtocolLevelClient;
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,7 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class ContractServiceTest {
 
     @Autowired
-    private ProtocolLevelClient protocolLevelClient;
+    private ProtocolLayerClient protocolLayerClient;
 
     @Autowired
     private FileClient fileClient;
@@ -44,7 +44,7 @@ public class ContractServiceTest {
         final ContractCreateRequest request = ContractCreateRequest.of(fileId);
 
         //when
-        final ContractCreateResult contractCreateResult = protocolLevelClient.executeContractCreateTransaction(request);
+        final ContractCreateResult contractCreateResult = protocolLayerClient.executeContractCreateTransaction(request);
 
         //then
         Assertions.assertNotNull(contractCreateResult);
@@ -124,7 +124,7 @@ public class ContractServiceTest {
         final ContractCallRequest request = ContractCallRequest.of(contract, "get");
 
         //when
-        final ContractCallResult result = protocolLevelClient.executeContractCallTransaction(request);
+        final ContractCallResult result = protocolLayerClient.executeContractCallTransaction(request);
 
         //then
         Assertions.assertNotNull(result);
@@ -138,7 +138,7 @@ public class ContractServiceTest {
 
         //when
         final ContractCallRequest request = ContractCallRequest.of(contract, "set", int256(123));
-        final ContractCallResult result = protocolLevelClient.executeContractCallTransaction(request);
+        final ContractCallResult result = protocolLayerClient.executeContractCallTransaction(request);
 
         //then
         Assertions.assertNotNull(result);
@@ -157,11 +157,11 @@ public class ContractServiceTest {
 
 
 
-        final ContractCallResult setResult = protocolLevelClient.executeContractCallTransaction(setRequest);
+        final ContractCallResult setResult = protocolLayerClient.executeContractCallTransaction(setRequest);
         final ContractCallRequest getRequest = ContractCallRequest.of(contract, "get");
 
         //when
-        final ContractCallResult getResult = protocolLevelClient.executeContractCallTransaction(getRequest);
+        final ContractCallResult getResult = protocolLayerClient.executeContractCallTransaction(getRequest);
 
         //then
         Assertions.assertNotNull(getResult);

@@ -10,7 +10,7 @@ import com.openelements.hedera.base.protocol.FileContentsResponse;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
-import com.openelements.hedera.base.protocol.ProtocolLevelClient;
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Arrays;
 import java.util.Objects;
@@ -21,17 +21,17 @@ public class FileClientImpl implements FileClient {
 
     private final static Logger log = LoggerFactory.getLogger(FileClientImpl.class);
 
-    private final ProtocolLevelClient protocolLevelClient;
+    private final ProtocolLayerClient protocolLayerClient;
 
-    public FileClientImpl(@NonNull final ProtocolLevelClient protocolLevelClient) {
-        this.protocolLevelClient = Objects.requireNonNull(protocolLevelClient, "protocolLevelClient must not be null");
+    public FileClientImpl(@NonNull final ProtocolLayerClient protocolLayerClient) {
+        this.protocolLayerClient = Objects.requireNonNull(protocolLayerClient, "protocolLevelClient must not be null");
     }
 
     @Override
     public FileId createFile(byte[] contents) throws HederaException {
         if(contents.length <= FileCreateRequest.FILE_CREATE_MAX_BYTES) {
             final FileCreateRequest request = FileCreateRequest.of(contents);
-            final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
+            final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
             return result.fileId();
         } else {
             if(log.isDebugEnabled()) {
@@ -40,14 +40,14 @@ public class FileClientImpl implements FileClient {
             }
             byte[] start = Arrays.copyOf(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES);
             final FileCreateRequest request = FileCreateRequest.of(start);
-            final FileCreateResult result = protocolLevelClient.executeFileCreateTransaction(request);
+            final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
             FileId fileId = result.fileId();
             byte[] remaining = Arrays.copyOfRange(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES, contents.length);
             while(remaining.length > 0) {
                 final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_BYTES);
                 byte[] next = Arrays.copyOf(remaining, length);
                 final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
-                final FileAppendResult appendResult = protocolLevelClient.executeFileAppendRequestTransaction(appendRequest);
+                final FileAppendResult appendResult = protocolLayerClient.executeFileAppendRequestTransaction(appendRequest);
                 remaining = Arrays.copyOfRange(remaining, length, remaining.length);
             }
             return fileId;
@@ -59,7 +59,7 @@ public class FileClientImpl implements FileClient {
     public byte[] readFile(@NonNull FileId fileId) throws HederaException {
         try {
             final FileContentsRequest request = FileContentsRequest.of(fileId);
-            final FileContentsResponse response = protocolLevelClient.executeFileContentsQuery(request);
+            final FileContentsResponse response = protocolLayerClient.executeFileContentsQuery(request);
             return response.contents();
         } catch (Exception e) {
             throw new HederaException("Failed to read file with fileId " + fileId, e);
@@ -70,7 +70,7 @@ public class FileClientImpl implements FileClient {
     public void deleteFile(@NonNull FileId fileId) throws HederaException {
         try {
             final FileDeleteRequest request = FileDeleteRequest.of(fileId);
-            protocolLevelClient.executeFileDeleteTransaction(request);
+            protocolLayerClient.executeFileDeleteTransaction(request);
         } catch (Exception e) {
             throw new HederaException("Failed to delete file with fileId " + fileId, e);
         }
