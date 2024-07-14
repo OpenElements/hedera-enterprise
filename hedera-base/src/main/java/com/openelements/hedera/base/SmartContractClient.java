@@ -8,7 +8,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.nio.file.Path;
 
-public interface SmartContractServiceClient {
+public interface SmartContractClient {
 
     @NonNull
     default ContractId createContract(@NonNull String fileId, @Nullable ContractParam<?>... constructorParams) throws HederaException {

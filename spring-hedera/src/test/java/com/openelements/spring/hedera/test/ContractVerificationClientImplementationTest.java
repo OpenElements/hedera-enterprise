@@ -1,7 +1,7 @@
 package com.openelements.spring.hedera.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hedera.base.HederaClient;
+import com.openelements.hedera.base.SmartContractClient;
 import com.openelements.hedera.base.data.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
@@ -17,15 +17,14 @@ import org.junit.jupiter.api.condition.DisabledIf;
 @SpringBootTest(classes = TestConfig.class)
 class ContractVerificationClientImplementationTest {
 
-
-    @Autowired
-    private HederaClient hederaClient;
-
     @Autowired
     private HederaNetwork hederaNetwork;
 
     @Autowired
-    private ContractVerificationClient contractVerificationClient;
+    private SmartContractClient smartContractClient;
+
+    @Autowired
+    private ContractVerificationClient verificationClient;
 
     private Path getResource(String resource) {
         return Path.of(ContractVerificationClientImplementationTest.class.getResource(resource).getPath());
@@ -45,10 +44,10 @@ class ContractVerificationClientImplementationTest {
         final String contractSource = Files.readString(solPath, StandardCharsets.UTF_8);
         final Path metadataPath = getResource("/HelloWorld.metadata.json");
         final String contractMetadata = Files.readString(metadataPath, StandardCharsets.UTF_8);
-        final ContractId contractId = hederaClient.createContract(binPath);
+        final ContractId contractId = smartContractClient.createContract(binPath);
 
         //when
-        final ContractVerificationState state = contractVerificationClient.verify(
+        final ContractVerificationState state = verificationClient.verify(
                 contractId, contractName, contractSource, contractMetadata);
 
         //then

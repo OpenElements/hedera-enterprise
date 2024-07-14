@@ -1,8 +1,8 @@
 package com.openelements.spring.hedera.test;
 
-import com.openelements.hedera.base.FileServiceClient;
+import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.HederaClient;
-import com.openelements.hedera.base.SmartContractServiceClient;
+import com.openelements.hedera.base.SmartContractClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ public class ServicesTest {
     //private ContractVerificationClient contractVerificationClient;
 
     @Autowired
-    private FileServiceClient fileServiceClient;
+    private FileClient fileServiceClient;
 
     @Autowired
-    private SmartContractServiceClient smartContractServiceClient;
+    private SmartContractClient smartContractServiceClient;
 
     @Test
     void testServices() throws Exception {

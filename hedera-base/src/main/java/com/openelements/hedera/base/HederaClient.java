@@ -21,7 +21,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 /**
  * Interface for interacting with the Hedera network.
  */
-public interface HederaClient extends FileServiceClient, SmartContractServiceClient {
+public interface HederaClient extends FileClient, SmartContractClient {
 
     @NonNull
     AccountBalanceResponse executeAccountBalanceQuery(@NonNull AccountBalanceRequest request) throws HederaException;

@@ -3,7 +3,7 @@ package com.openelements.hedera.base;
 import com.hedera.hashgraph.sdk.FileId;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
-public interface FileServiceClient {
+public interface FileClient {
 
     @NonNull
     FileId createFile(@NonNull byte[] contents) throws HederaException;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.data.ContractVerificationState;
-import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -140,7 +139,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     handleError(request, response);
                 }).body(String.class);
-        System.out.println(resultBody);
         try {
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             if (rootNode.isArray()) {
@@ -187,7 +185,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     handleError(request, response);
                 }).body(String.class);
-        System.out.println(resultBody);
         try {
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             if (rootNode.isArray()) {
