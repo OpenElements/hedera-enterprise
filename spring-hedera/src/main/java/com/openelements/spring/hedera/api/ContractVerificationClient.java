@@ -5,6 +5,11 @@ import com.openelements.hedera.base.HederaException;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
+/**
+ * Client for verifying contracts on the Hedera network.
+ * This client is used to check the verification state of a smart contract and to verify a smart contract.
+ * Currently only the Hedera mainnet, testnet and previewnet is supported.
+ */
 @Service
 public interface ContractVerificationClient {
 

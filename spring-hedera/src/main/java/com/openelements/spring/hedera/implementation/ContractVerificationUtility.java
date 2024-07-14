@@ -1,6 +1,7 @@
 package com.openelements.spring.hedera.implementation;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import com.openelements.hedera.base.HederaException;
 import com.openelements.spring.hedera.api.ContractVerificationState;
 import com.openelements.spring.hedera.api.ContractVerificationClient;
 import java.util.Map;
@@ -26,8 +27,10 @@ public class ContractVerificationUtility {
      * @param contractName contract name
      * @param contractSource contract source code
      * @param contractMetadata contract metadata
+     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws IllegalStateException if the contract is not fully verified
      */
-    void doFullVerification(ContractId contractId, String contractName, String contractSource, String contractMetadata) {
+    void doFullVerification(ContractId contractId, String contractName, String contractSource, String contractMetadata) throws HederaException {
         doFullVerification(contractId, contractName, Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata));
     }
 
@@ -36,8 +39,10 @@ public class ContractVerificationUtility {
      * @param contractId contract to verify
      * @param contractName contract name
      * @param files map of file names to file contents
+     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws IllegalStateException if the contract is not fully verified
      */
-    void doFullVerification(ContractId contractId, String contractName, Map<String, String> files) {
+    void doFullVerification(ContractId contractId, String contractName, Map<String, String> files) throws HederaException {
         final ContractVerificationState state = verificationClient.checkVerification(contractId);
         if(state == ContractVerificationState.FULL) {
             log.debug("Contract {} is already fully verified", contractId);
@@ -50,11 +55,11 @@ public class ContractVerificationUtility {
                 throw new IllegalStateException("Contract " + contractId + " is not fully verified, state is " + newState);
             }
         }
-        files.forEach((fileName, fileContent) -> {
-            if(!verificationClient.checkVerification(contractId, fileName, fileContent)) {
-                throw new IllegalStateException("file " + fileName + " is invalid");
+        for(Map.Entry<String, String> entry : files.entrySet()) {
+            if(!verificationClient.checkVerification(contractId, entry.getKey(), entry.getValue())) {
+                throw new IllegalStateException("file " + entry.getKey() + " is invalid");
             }
-        });
+        }
     }
 
 }
