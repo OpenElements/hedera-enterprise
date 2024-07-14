@@ -37,10 +37,11 @@ public class ContractVerificationClientImplementation implements ContractVerific
         restClient = RestClient.create();
     }
 
-    private void checkSupportedNetwork() {
+    private String getChainId() {
         if(hederaNetwork == HederaNetwork.CUSTOM) {
             throw new IllegalArgumentException("Custom network is not supported");
         }
+        return hederaNetwork.getChainId() + "";
     }
 
     private void handleError(HttpRequest request, ClientHttpResponse response) throws IOException {
@@ -80,7 +81,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
         final VerifyRequest verifyRequest = new VerifyRequest(
                 contractId.toSolidityAddress(),
-                hederaNetwork.getChainId(),
+                getChainId(),
                 "",
                 "",
                 files
@@ -140,7 +141,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     public ContractVerificationState checkVerification(ContractId contractId) {
         checkSupportedNetwork();
 
-        final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + hederaNetwork.getChainId();
+        final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + getChainId();
 
         final String resultBody = restClient.get()
                 .uri(uri)
@@ -188,7 +189,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
             throw new IllegalStateException("Contract is not verified");
         }
 
-        final String uri = CONTRACT_VERIFICATION_URL + "/files/" + hederaNetwork.getChainId() + "/" + contractId.toSolidityAddress();
+        final String uri = CONTRACT_VERIFICATION_URL + "/files/" + getChainId() + "/" + contractId.toSolidityAddress();
 
         final String resultBody = restClient.get()
                 .uri(uri)
