@@ -2,7 +2,10 @@ package com.openelements.hedera.spring.test;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Status;
-import com.openelements.hedera.base.FileClient;
+import com.openelements.hedera.base.protocol.AccountBalanceRequest;
+import com.openelements.hedera.base.protocol.AccountBalanceResponse;
+import com.openelements.hedera.base.protocol.ContractCreateRequest;
+import com.openelements.hedera.base.protocol.ContractCreateResult;
 import com.openelements.hedera.base.protocol.FileContentsRequest;
 import com.openelements.hedera.base.protocol.FileContentsResponse;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
@@ -10,20 +13,39 @@ import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
-import java.util.stream.IntStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = TestConfig.class)
-public class FileServiceTest {
+public class ProtocolLayerClientTests {
 
     @Autowired
     private ProtocolLayerClient protocolLayerClient;
 
-    @Autowired
-    private FileClient fileClient;
+    @Value("${spring.hedera.accountId}")
+    private String accountId;
+
+    @Test
+    void testGetBalance() throws Exception {
+        //given
+        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
+
+        //when
+        final AccountBalanceResponse accountBalanceResult = protocolLayerClient.executeAccountBalanceQuery(
+                accountBalanceRequest);
+
+        //then
+        Assertions.assertNotNull(accountBalanceResult);
+        Assertions.assertNotNull(accountBalanceResult.hbars());
+        Assertions.assertTrue(accountBalanceResult.hbars().toTinybars() > 0);
+        System.out.println("Balance: " + accountBalanceResult.hbars().toString() + " HBARs");
+    }
 
     @Test
     void testCreateFile() throws Exception {
@@ -75,17 +97,21 @@ public class FileServiceTest {
     }
 
     @Test
-    void testSimpleUpload() throws Exception {
+    void testContractCreate() throws Exception {
         //given
-        final byte[] contents = IntStream.range(0, 500).mapToObj(i -> "Hello, Hedera!")
-                .reduce((a, b) -> a + b)
-                .get()
-                .getBytes();
+        final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+        final String content = Files.readString(path, StandardCharsets.UTF_8);
+        final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        final FileCreateRequest fileCreateRequest = FileCreateRequest.of(bytes);
+        final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(fileCreateRequest);
+        final FileId fileId = result.fileId();
+        final ContractCreateRequest request = ContractCreateRequest.of(fileId);
 
         //when
-        final FileId fileId = fileClient.createFile(contents);
+        final ContractCreateResult contractCreateResult = protocolLayerClient.executeContractCreateTransaction(request);
 
         //then
-        Assertions.assertNotNull(fileId);
+        Assertions.assertNotNull(contractCreateResult);
+        Assertions.assertNotNull(contractCreateResult.transactionId());
     }
 }

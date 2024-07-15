@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = TestConfig.class)
-public class DatatypesTest {
+public class SmartContractDatatypesTests {
 
     @Autowired
     private SmartContractClient smartContractClient;

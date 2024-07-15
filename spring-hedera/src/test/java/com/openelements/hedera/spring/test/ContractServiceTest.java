@@ -12,6 +12,8 @@ import com.openelements.hedera.base.protocol.ContractCallRequest;
 import com.openelements.hedera.base.protocol.ContractCallResult;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
+import com.openelements.hedera.base.protocol.FileCreateRequest;
+import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -33,23 +35,6 @@ public class ContractServiceTest {
 
     @Autowired
     private SmartContractClient smartContractClient;
-
-    @Test
-    void testContractCreate() throws Exception {
-        //given
-        final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
-        final String content = Files.readString(path, StandardCharsets.UTF_8);
-        final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-        final FileId fileId = fileClient.createFile(bytes);
-        final ContractCreateRequest request = ContractCreateRequest.of(fileId);
-
-        //when
-        final ContractCreateResult contractCreateResult = protocolLayerClient.executeContractCreateTransaction(request);
-
-        //then
-        Assertions.assertNotNull(contractCreateResult);
-        Assertions.assertNotNull(contractCreateResult.transactionId());
-    }
 
     @Test
     void testContractCreateByFileId() throws Exception {

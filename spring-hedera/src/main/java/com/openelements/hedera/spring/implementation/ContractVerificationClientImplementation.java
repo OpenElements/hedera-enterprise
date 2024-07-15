@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.HederaException;
-import com.openelements.hedera.spring.ContractVerificationState;
+import com.openelements.hedera.base.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
-import com.openelements.hedera.spring.ContractVerificationClient;
+import com.openelements.hedera.base.ContractVerificationClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +31,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     private final RestClient restClient;
 
-    public ContractVerificationClientImplementation(@NonNull HederaNetwork hederaNetwork) {
+    public ContractVerificationClientImplementation(@NonNull final HederaNetwork hederaNetwork) {
         this.hederaNetwork = Objects.requireNonNull(hederaNetwork, "hederaNetwork must not be null");
         objectMapper = new ObjectMapper();
         restClient = RestClient.create();
@@ -44,7 +44,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
         return hederaNetwork.getChainId() + "";
     }
 
-    private void handleError(HttpRequest request, ClientHttpResponse response) throws IOException {
+    private void handleError(@NonNull final HttpRequest request, @NonNull final ClientHttpResponse response) throws IOException {
         final String error;
         try {
             final String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
@@ -71,7 +71,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     @Override
-    public ContractVerificationState verify(ContractId contractId, String contractName, Map<String, String> files) throws HederaException {
+    public ContractVerificationState verify(@NonNull final ContractId contractId, @NonNull final String contractName, @NonNull final Map<String, String> files) throws HederaException {
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.NONE) {
            throw new IllegalStateException("Contract is already verified");
@@ -129,7 +129,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     @Override
-    public ContractVerificationState checkVerification(ContractId contractId) throws HederaException{
+    public ContractVerificationState checkVerification(@NonNull final ContractId contractId) throws HederaException{
 
         final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + getChainId();
 
@@ -172,7 +172,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     @Override
-    public boolean checkVerification(ContractId contractId, String fileName, String fileContent) throws HederaException {
+    public boolean checkVerification(@NonNull final ContractId contractId, @NonNull final String fileName, @NonNull final String fileContent) throws HederaException {
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.FULL) {
             throw new IllegalStateException("Contract is not verified");

@@ -29,6 +29,7 @@ public class FileClientImpl implements FileClient {
 
     @Override
     public FileId createFile(byte[] contents) throws HederaException {
+        Objects.requireNonNull(contents, "fileId must not be null");
         if(contents.length <= FileCreateRequest.FILE_CREATE_MAX_BYTES) {
             final FileCreateRequest request = FileCreateRequest.of(contents);
             final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
@@ -57,6 +58,7 @@ public class FileClientImpl implements FileClient {
     @NonNull
     @Override
     public byte[] readFile(@NonNull FileId fileId) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
         try {
             final FileContentsRequest request = FileContentsRequest.of(fileId);
             final FileContentsResponse response = protocolLayerClient.executeFileContentsQuery(request);
@@ -68,6 +70,7 @@ public class FileClientImpl implements FileClient {
 
     @Override
     public void deleteFile(@NonNull FileId fileId) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
         try {
             final FileDeleteRequest request = FileDeleteRequest.of(fileId);
             protocolLayerClient.executeFileDeleteTransaction(request);

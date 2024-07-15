@@ -2,6 +2,7 @@ package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.FileId;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.Objects;
 
 /**
  * A client for interacting with the file service on the Hedera network.
@@ -25,6 +26,7 @@ public interface FileClient {
      */
     @NonNull
     default byte[] readFile(@NonNull String fileId) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
         return readFile(FileId.fromString(fileId));
     }
 
