@@ -6,15 +6,10 @@ import static com.openelements.hedera.base.ContractParam.string;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 
+import com.openelements.hedera.base.ContractCallResult;
 import com.openelements.hedera.base.FileClient;
+import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.SmartContractClient;
-import com.openelements.hedera.base.protocol.ContractCallRequest;
-import com.openelements.hedera.base.protocol.ContractCallResult;
-import com.openelements.hedera.base.protocol.ContractCreateRequest;
-import com.openelements.hedera.base.protocol.ContractCreateResult;
-import com.openelements.hedera.base.protocol.FileCreateRequest;
-import com.openelements.hedera.base.protocol.FileCreateResult;
-import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,8 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = TestConfig.class)
 public class ContractServiceTest {
 
-    @Autowired
-    private ProtocolLayerClient protocolLayerClient;
 
     @Autowired
     private FileClient fileClient;
@@ -90,6 +83,15 @@ public class ContractServiceTest {
     }
 
     @Test
+    void testContractCreateSimpleInvalidContent() throws Exception {
+        //given
+        final byte[] content = "invalid".getBytes(StandardCharsets.UTF_8);
+
+        //then
+        Assertions.assertThrows(HederaException.class, () -> smartContractClient.createContract(content));
+    }
+
+    @Test
     void testContractWithConstructorParam() throws Exception {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/string_param_constructor_contract.bin").getPath());
@@ -102,17 +104,35 @@ public class ContractServiceTest {
     }
 
     @Test
+    void testContractWithInvalidConstructorParam() throws Exception {
+        //given
+        final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+
+        //when
+        Assertions.assertThrows(HederaException.class, () -> smartContractClient.createContract(path, string("Hello")));
+    }
+
+    @Test
     void testCallFunction() throws Exception {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
         final ContractId contract = smartContractClient.createContract(path);
-        final ContractCallRequest request = ContractCallRequest.of(contract, "get");
 
         //when
-        final ContractCallResult result = protocolLayerClient.executeContractCallTransaction(request);
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, "get");
 
         //then
         Assertions.assertNotNull(result);
+    }
+
+    @Test
+    void testCallInvalidFunction() throws Exception {
+        //given
+        final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+        final ContractId contract = smartContractClient.createContract(path);
+
+        //when
+        Assertions.assertThrows(HederaException.class, () -> smartContractClient.callContractFunction(contract, "invalid"));
     }
 
     @Test
@@ -122,11 +142,20 @@ public class ContractServiceTest {
         final ContractId contract = smartContractClient.createContract(path);
 
         //when
-        final ContractCallRequest request = ContractCallRequest.of(contract, "set", int256(123));
-        final ContractCallResult result = protocolLayerClient.executeContractCallTransaction(request);
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, "set", int256(123));
 
         //then
         Assertions.assertNotNull(result);
+    }
+
+    @Test
+    void testCallFunctionWithInvalidParam() throws Exception {
+        //given
+        final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+        final ContractId contract = smartContractClient.createContract(path);
+
+        //then
+        Assertions.assertThrows(HederaException.class, () -> smartContractClient.callContractFunction(contract, "get", int256(123)));
     }
 
     @Test
@@ -134,23 +163,14 @@ public class ContractServiceTest {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
         final ContractId contract = smartContractClient.createContract(path);
-
-
-        final ContractCallRequest setRequest = ContractCallRequest.of(contract, "set", int256(123));
-
-
-
-
-
-        final ContractCallResult setResult = protocolLayerClient.executeContractCallTransaction(setRequest);
-        final ContractCallRequest getRequest = ContractCallRequest.of(contract, "get");
+        smartContractClient.callContractFunction(contract, "set", int256(123));
 
         //when
-        final ContractCallResult getResult = protocolLayerClient.executeContractCallTransaction(getRequest);
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, "get");
 
         //then
-        Assertions.assertNotNull(getResult);
-        Assertions.assertEquals(BigInteger.valueOf(123), getResult.contractFunctionResult().getInt256(0));
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(BigInteger.valueOf(123), result.getInt256(0));
     }
 
 }
