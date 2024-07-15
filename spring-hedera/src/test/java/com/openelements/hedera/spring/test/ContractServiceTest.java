@@ -159,7 +159,7 @@ public class ContractServiceTest {
     }
 
     @Test
-    void testCallFunctionResult() throws Exception {
+    void testCallFunctionWithResult() throws Exception {
         //given
         final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
         final ContractId contract = smartContractClient.createContract(path);
@@ -171,6 +171,34 @@ public class ContractServiceTest {
         //then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(BigInteger.valueOf(123), result.getInt256(0));
+    }
+
+    @Test
+    void testCallFunctionWithWrongResult() throws Exception {
+        //given
+        final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+        final ContractId contract = smartContractClient.createContract(path);
+        smartContractClient.callContractFunction(contract, "set", int256(123));
+
+        //when
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, "get");
+
+        //then
+        Assertions.assertThrows(IllegalArgumentException.class, () -> result.getString(0));
+    }
+
+    @Test
+    void testCallFunctionWithWrongResultCount() throws Exception {
+        //given
+        final Path path = Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+        final ContractId contract = smartContractClient.createContract(path);
+        smartContractClient.callContractFunction(contract, "set", int256(123));
+
+        //when
+        final ContractCallResult result = smartContractClient.callContractFunction(contract, "get");
+
+        //then
+        Assertions.assertThrows(IllegalArgumentException.class, () -> result.getString(1));
     }
 
 }
