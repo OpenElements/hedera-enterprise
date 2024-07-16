@@ -17,8 +17,8 @@
 
   <modules>
     <module>hedera-base</module>
-    <module>spring-hedera</module>
-    <module>micoprofile-hedera</module>
+    <module>hedera-spring</module>
+    <module>hedera-microprofile</module>
   </modules>
 
 </project>

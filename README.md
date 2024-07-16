@@ -12,7 +12,7 @@ To use this module, you need to add the following dependency to your project:
 ```xml 
 <dependency>
     <groupId>com.open-elements.hedera</groupId>
-    <artifactId>spring-hedera</artifactId>
+    <artifactId>hedera-spring</artifactId>
     <version>VERSION</version> 
 </dependency>
 ```
