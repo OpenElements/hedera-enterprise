@@ -1,23 +1,23 @@
-# spring-hedera
-Module for Spring that adds support to communicate with the [Hedera network](https://hedera.com). 
-This module is based on the [Hedera Java SDK](https://github.com/hashgraph/hedera-sdk-java) and [Spring Boot](https://spring.io/projects/spring-boot).
+# Hedera Enterprise
+This project provides Java modules to integrate [Hedera network](https://hedera.com) smoothless in a Spring Boot or Microprofile (like Quarkus) application.
+This module is based on the [Hedera Java SDK](https://github.com/hashgraph/hedera-sdk-java).
 
 > [!WARNING]  
 > This project has just been started and is not yet ready for production use.
 
-## Getting Started
+## Spring Boot support
 
 To use this module, you need to add the following dependency to your project:
 
 ```xml 
 <dependency>
-    <groupId>com.open-elements.spring</groupId>
+    <groupId>com.open-elements.hedera</groupId>
     <artifactId>spring-hedera</artifactId>
     <version>VERSION</version> 
 </dependency>
 ```
 
-## Configuration
+### Configuration
 
 To configure the module, you need to add the following properties to your application.properties file:
 
@@ -31,7 +31,7 @@ The account information (accountId, privateKey, publicKey) can all be found at t
 [Hedera portal](https://portal.hedera.com/) for a testnet or previewnet account.
 Today only the "DER Encoded Private Key" of the "ECDSA" key type is supported for the `spring.hedera.privateKey` property.
 
-## Usage
+### Usage
 
 To use the module, you need to add the `@EnableHedera` annotation to your Spring Boot application class.
 
@@ -47,7 +47,7 @@ public class Application {
 }
 ```
  
-Once that is done you can autowire the `HederaClient` class and call the methods to interact with the Hedera network.
+Once that is done you can for example autowire the `FileClient` class and call the methods to interact with the Hedera network.
 
 ```java
 
@@ -55,12 +55,12 @@ Once that is done you can autowire the `HederaClient` class and call the methods
 public class HederaAccountService {
 
     @Autowired
-    private HederaClient hederaClient;
+    private FileClient fileClient;
 
-    public HBars getBalance(String accountId) {
-        AccountBalanceRequest request = AccountBalanceRequest.of("0.0.2237621");
-        AccountBalanceResult result = hederaClient.execute(request);
-        return result.hbars();
+    public String readFile(String id) {
+        FileId fileId = FileId.of(id);
+        byte[] content = fileClient.readFile(fileId);
+        return new String(content);
     }
 }
 ```
