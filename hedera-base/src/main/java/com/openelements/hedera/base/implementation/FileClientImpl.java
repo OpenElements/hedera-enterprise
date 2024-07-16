@@ -10,8 +10,14 @@ import com.openelements.hedera.base.protocol.FileContentsResponse;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
+import com.openelements.hedera.base.protocol.FileInfoRequest;
+import com.openelements.hedera.base.protocol.FileInfoResponse;
+import com.openelements.hedera.base.protocol.FileUpdateRequest;
+import com.openelements.hedera.base.protocol.FileUpdateResult;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -29,26 +35,46 @@ public class FileClientImpl implements FileClient {
 
     @Override
     public FileId createFile(byte[] contents) throws HederaException {
+        return createFileImpl(contents, null);
+    }
+
+    @Override
+    public FileId createFile(@NonNull byte[] contents, @NonNull Instant expirationTime) throws HederaException {
+        return createFileImpl(contents, expirationTime);
+    }
+
+    private FileId createFileImpl(@NonNull byte[] contents, @Nullable Instant expirationTime) throws HederaException {
         Objects.requireNonNull(contents, "fileId must not be null");
-        if(contents.length <= FileCreateRequest.FILE_CREATE_MAX_BYTES) {
-            final FileCreateRequest request = FileCreateRequest.of(contents);
+        if(contents.length > FileCreateRequest.FILE_MAX_SIZE) {
+            throw new HederaException("File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
+        }
+        if(expirationTime != null && expirationTime.isBefore(Instant.now())) {
+            throw new IllegalArgumentException("Expiration time must be in the future");
+        }
+        if(contents.length <= FileCreateRequest.FILE_CREATE_MAX_SIZE) {
+            final FileCreateRequest request;
+            if(expirationTime != null) {
+                request = FileCreateRequest.of(contents, expirationTime);
+            } else {
+                request = FileCreateRequest.of(contents);
+            }
             final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
             return result.fileId();
         } else {
             if(log.isDebugEnabled()) {
-                final int appendCount = Math.floorDiv(contents.length, FileCreateRequest.FILE_CREATE_MAX_BYTES);
+                final int appendCount = Math.floorDiv(contents.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
                 log.debug("Content of size {} is to big for 1 FileCreate transaction. Will append {} FileAppend transactions", contents.length, appendCount);
             }
-            byte[] start = Arrays.copyOf(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES);
+            byte[] start = Arrays.copyOf(contents, FileCreateRequest.FILE_CREATE_MAX_SIZE);
             final FileCreateRequest request = FileCreateRequest.of(start);
             final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
             FileId fileId = result.fileId();
-            byte[] remaining = Arrays.copyOfRange(contents, FileCreateRequest.FILE_CREATE_MAX_BYTES, contents.length);
+            byte[] remaining = Arrays.copyOfRange(contents, FileCreateRequest.FILE_CREATE_MAX_SIZE, contents.length);
             while(remaining.length > 0) {
-                final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_BYTES);
+                final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
                 byte[] next = Arrays.copyOf(remaining, length);
                 final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
-                final FileAppendResult appendResult = protocolLayerClient.executeFileAppendRequestTransaction(appendRequest);
+                protocolLayerClient.executeFileAppendRequestTransaction(appendRequest);
                 remaining = Arrays.copyOfRange(remaining, length, remaining.length);
             }
             return fileId;
@@ -77,5 +103,70 @@ public class FileClientImpl implements FileClient {
         } catch (Exception e) {
             throw new HederaException("Failed to delete file with fileId " + fileId, e);
         }
+    }
+
+    @Override
+    public void updateFile(@NonNull FileId fileId, byte[] content) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
+        Objects.requireNonNull(content, "content must not be null");
+        if(content.length > FileCreateRequest.FILE_MAX_SIZE) {
+            throw new HederaException("File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
+        }
+        if(content.length <= FileCreateRequest.FILE_CREATE_MAX_SIZE) {
+            final FileUpdateRequest request = FileUpdateRequest.of(fileId, content);
+            protocolLayerClient.executeFileUpdateRequestTransaction(request);
+        } else {
+            if(log.isDebugEnabled()) {
+                final int appendCount = Math.floorDiv(content.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
+                log.debug("Content of size {} is to big for 1 FileUpdate transaction. Will append {} FileAppend transactions", content.length, appendCount);
+            }
+            byte[] start = Arrays.copyOf(content, FileCreateRequest.FILE_CREATE_MAX_SIZE);
+            final FileUpdateRequest request = FileUpdateRequest.of(fileId, start);
+            protocolLayerClient.executeFileUpdateRequestTransaction(request);
+            byte[] remaining = Arrays.copyOfRange(content, FileCreateRequest.FILE_CREATE_MAX_SIZE, content.length);
+            while(remaining.length > 0) {
+                final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
+                byte[] next = Arrays.copyOf(remaining, length);
+                final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
+                protocolLayerClient.executeFileAppendRequestTransaction(appendRequest);
+                remaining = Arrays.copyOfRange(remaining, length, remaining.length);
+            }
+        }
+    }
+
+    @Override
+    public void updateExpirationTime(@NonNull FileId fileId, @NonNull Instant expirationTime) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
+        Objects.requireNonNull(expirationTime, "expirationTime must not be null");
+
+        if(expirationTime.isBefore(Instant.now())) {
+            throw new IllegalArgumentException("Expiration time must be in the future");
+        }
+        final FileUpdateRequest request = FileUpdateRequest.of(fileId, expirationTime);
+        protocolLayerClient.executeFileUpdateRequestTransaction(request);
+    }
+
+    @Override
+    public boolean isDeleted(@NonNull FileId fileId) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
+        final FileInfoRequest request = FileInfoRequest.of(fileId);
+        final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
+        return infoResponse.deleted();
+    }
+
+    @Override
+    public int getSize(@NonNull FileId fileId) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
+        final FileInfoRequest request = FileInfoRequest.of(fileId);
+        final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
+        return infoResponse.size();
+    }
+
+    @Override
+    public Instant getExpirationTime(@NonNull FileId fileId) throws HederaException {
+        Objects.requireNonNull(fileId, "fileId must not be null");
+        final FileInfoRequest request = FileInfoRequest.of(fileId);
+        final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
+        return infoResponse.expirationTime();
     }
 }

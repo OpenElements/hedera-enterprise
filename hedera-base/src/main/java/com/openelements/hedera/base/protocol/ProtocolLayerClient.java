@@ -11,6 +11,7 @@ public interface ProtocolLayerClient {
 
     /**
      * Execute an account balance query.
+     *
      * @param request the request
      * @return the response
      * @throws HederaException if the query could not be executed
@@ -20,6 +21,7 @@ public interface ProtocolLayerClient {
 
     /**
      * Execute a file contents query.
+     *
      * @param request the request
      * @return the response
      * @throws HederaException if the query could not be executed
@@ -29,6 +31,7 @@ public interface ProtocolLayerClient {
 
     /**
      * Execute a file append transaction.
+     *
      * @param request the request
      * @return the result
      * @throws HederaException if the transaction could not be executed
@@ -38,6 +41,7 @@ public interface ProtocolLayerClient {
 
     /**
      * Execute a file delete transaction.
+     *
      * @param request the request
      * @return the result
      * @throws HederaException if the transaction could not be executed
@@ -47,6 +51,7 @@ public interface ProtocolLayerClient {
 
     /**
      * Execute a file create transaction.
+     *
      * @param request the request
      * @return the result
      * @throws HederaException if the transaction could not be executed
@@ -54,17 +59,22 @@ public interface ProtocolLayerClient {
     @NonNull
     FileCreateResult executeFileCreateTransaction(@NonNull FileCreateRequest request) throws HederaException;
 
+    FileUpdateResult executeFileUpdateRequestTransaction(FileUpdateRequest request) throws HederaException;
+
     /**
      * Execute a contract create transaction.
+     *
      * @param request the request
      * @return the result
      * @throws HederaException if the transaction could not be executed
      */
     @NonNull
-    ContractCreateResult executeContractCreateTransaction(@NonNull ContractCreateRequest request) throws HederaException;
+    ContractCreateResult executeContractCreateTransaction(@NonNull ContractCreateRequest request)
+            throws HederaException;
 
     /**
      * Execute a contract call transaction.
+     *
      * @param request the request
      * @return the result
      * @throws HederaException if the transaction could not be executed
@@ -72,4 +82,5 @@ public interface ProtocolLayerClient {
     @NonNull
     ContractCallResult executeContractCallTransaction(@NonNull ContractCallRequest request) throws HederaException;
 
+    public FileInfoResponse executeFileInfoQuery(FileInfoRequest request) throws HederaException;
 }

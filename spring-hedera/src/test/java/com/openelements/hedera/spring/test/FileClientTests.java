@@ -3,6 +3,10 @@ package com.openelements.hedera.spring.test;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.HederaException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -116,6 +120,21 @@ public class FileClientTests {
     }
 
     @Test
+    void testUpdateFileByFileId() throws Exception {
+        //given
+        final byte[] contents = "Hello, Hedera!".getBytes();
+        final FileId fileId = fileClient.createFile(contents);
+        final String newContent = "Hello, Hedera! Updated";
+
+        //when
+        fileClient.updateFile(fileId, newContent.getBytes());
+
+        //then
+        final byte[] readContents = fileClient.readFile(fileId);
+        Assertions.assertArrayEquals(newContent.getBytes(), readContents);
+    }
+
+    @Test
     void testDeleteFileByStringId() throws Exception {
         //given
         final byte[] contents = "Hello, Hedera!".getBytes();
@@ -150,5 +169,65 @@ public class FileClientTests {
 
         //when
         Assertions.assertThrows(HederaException.class, () -> fileClient.deleteFile(fileId));
+    }
+
+    @Test
+    void testDeleteState() throws Exception {
+        //given
+        final byte[] contents = "Hello, Hedera!".getBytes();
+        final FileId fileId = fileClient.createFile(contents);
+        fileClient.deleteFile(fileId);
+
+        //when
+        final boolean deleted = fileClient.isDeleted(fileId);
+
+        //when
+        Assertions.assertTrue(deleted);
+    }
+
+    @Test
+    void testGetExpirationTime() throws Exception {
+        //given
+        final byte[] contents = "Hello, Hedera!".getBytes();
+        final Instant definedExpirationTime = Instant.now().plus(Duration.ofDays(2));
+        final FileId fileId = fileClient.createFile(contents, definedExpirationTime);
+
+        //when
+        final Instant expirationTime = fileClient.getExpirationTime(fileId);
+
+        //then
+        Assertions.assertTrue(expirationTime.isAfter(definedExpirationTime.minusSeconds(1)));
+        Assertions.assertTrue(expirationTime.isBefore(definedExpirationTime.plusSeconds(1)));
+    }
+
+    @Test
+    void testUpdateExpirationTime() throws Exception {
+        //given
+        final byte[] contents = "Hello, Hedera!".getBytes();
+        final Instant definedExpirationTime = Instant.now().plus(Duration.of(20, ChronoUnit.MINUTES));
+        final FileId fileId = fileClient.createFile(contents);
+        fileClient.updateExpirationTime(fileId, definedExpirationTime);
+
+        //when
+        final Instant expirationTime = fileClient.getExpirationTime(fileId);
+
+        //then
+        Assertions.assertTrue(expirationTime.isAfter(definedExpirationTime.minusSeconds(1)));
+        Assertions.assertTrue(expirationTime.isBefore(definedExpirationTime.plusSeconds(1)));
+    }
+
+    @Test
+    void testUpdateExpirationTimeDoesNotChangeContent() throws Exception {
+        //given
+        final byte[] contents = "Hello, Hedera!".getBytes();
+        final Instant definedExpirationTime = Instant.now().plus(Duration.of(20, ChronoUnit.MINUTES));
+        final FileId fileId = fileClient.createFile(contents);
+        fileClient.updateExpirationTime(fileId, definedExpirationTime);
+
+
+        final byte[] result = fileClient.readFile(fileId);
+
+        //then
+        Assertions.assertArrayEquals(contents, result);
     }
 }

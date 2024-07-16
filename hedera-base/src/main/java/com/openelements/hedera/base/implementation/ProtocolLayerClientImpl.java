@@ -11,6 +11,9 @@ import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.FileInfo;
+import com.hedera.hashgraph.sdk.FileInfoQuery;
+import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.Query;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
@@ -32,6 +35,10 @@ import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
+import com.openelements.hedera.base.protocol.FileInfoRequest;
+import com.openelements.hedera.base.protocol.FileInfoResponse;
+import com.openelements.hedera.base.protocol.FileUpdateRequest;
+import com.openelements.hedera.base.protocol.FileUpdateResult;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
@@ -68,24 +75,69 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
                 .setMaxQueryPayment(request.maxQueryPayment());
         final ByteString byteString = executeQueryAndWait(query);
         final byte[] bytes = byteString.toByteArray();
-        return new FileContentsResponse(bytes);
+        return new FileContentsResponse(request.fileId(), bytes);
+    }
+
+    public FileInfoResponse executeFileInfoQuery(FileInfoRequest request) throws HederaException {
+        final FileInfoQuery query = new FileInfoQuery().setFileId(request.fileId())
+                .setQueryPayment(request.queryPayment())
+                .setMaxQueryPayment(request.maxQueryPayment());
+        final FileInfo fileInfo = executeQueryAndWait(query);
+        if(fileInfo.size > Integer.MAX_VALUE) {
+            throw new HederaException("File size is too large to be represented as an integer");
+        }
+        return new FileInfoResponse(request.fileId(), (int) fileInfo.size, fileInfo.isDeleted, fileInfo.expirationTime);
     }
 
     @Override
     public FileCreateResult executeFileCreateTransaction(FileCreateRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        Objects.requireNonNull(request.contents(), "content must not be null");
+        if(request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
+            throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use FileAppend for larger files.");
+        }
         final FileCreateTransaction transaction = new FileCreateTransaction()
                 .setContents(request.contents())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration())
                 .setTransactionMemo(request.fileMemo())
                 .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()));
+        if(request.expirationTime() != null) {
+            transaction.setExpirationTime(request.expirationTime());
+        }
 
         final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         return new FileCreateResult(receipt.transactionId, receipt.status, receipt.fileId);
     }
 
     @Override
+    public FileUpdateResult executeFileUpdateRequestTransaction(FileUpdateRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        if(request.contents() != null && request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
+            throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use FileAppend for larger files.");
+        }
+        final FileUpdateTransaction transaction = new FileUpdateTransaction()
+                .setFileId(request.fileId())
+                .setMaxTransactionFee(request.maxTransactionFee())
+                .setTransactionValidDuration(request.transactionValidDuration())
+                .setTransactionMemo(request.fileMemo());
+        if(request.contents() != null) {
+            transaction.setContents(request.contents());
+        }
+        if(request.expirationTime() != null) {
+            transaction.setExpirationTime(request.expirationTime());
+        }
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+        return new FileUpdateResult(receipt.transactionId, receipt.status);
+    }
+
+    @Override
     public FileAppendResult executeFileAppendRequestTransaction(FileAppendRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        Objects.requireNonNull(request.contents(), "content must not be null");
+        if(request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
+            throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use multiple FileAppend for larger files.");
+        }
         final FileAppendTransaction transaction = new FileAppendTransaction()
                 .setFileId(request.fileId())
                 .setContents(request.contents())

@@ -2,6 +2,7 @@ package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.FileId;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -17,6 +18,8 @@ public interface FileClient {
      */
     @NonNull
     FileId createFile(@NonNull byte[] contents) throws HederaException;
+
+    FileId createFile(@NonNull byte[] contents, @NonNull Instant expirationTime) throws HederaException;
 
     /**
      * Create a new file with the given contents.
@@ -54,4 +57,14 @@ public interface FileClient {
      * @throws HederaException if the file could not be deleted
      */
     void deleteFile(@NonNull FileId fileId) throws HederaException;
+
+    void updateFile(@NonNull FileId fileId, byte[] content) throws HederaException;
+
+    void updateExpirationTime(@NonNull FileId fileId, @NonNull Instant expirationTime) throws HederaException;
+
+    boolean isDeleted(@NonNull FileId fileId) throws HederaException;
+
+    int getSize(@NonNull FileId fileId) throws HederaException;
+
+    Instant getExpirationTime(@NonNull FileId fileId) throws HederaException;
 }

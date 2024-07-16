@@ -6,13 +6,18 @@ import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
+import com.openelements.hedera.base.protocol.FileAppendRequest;
 import com.openelements.hedera.base.protocol.FileContentsRequest;
 import com.openelements.hedera.base.protocol.FileContentsResponse;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
+import com.openelements.hedera.base.protocol.FileInfoRequest;
+import com.openelements.hedera.base.protocol.FileInfoResponse;
+import com.openelements.hedera.base.protocol.FileUpdateRequest;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -81,6 +86,23 @@ public class ProtocolLayerClientTests {
     }
 
     @Test
+    void testFileInfo() throws Exception {
+        //given
+        final byte[] contents = "Hello, Hedera!".getBytes();
+        final FileCreateRequest request = FileCreateRequest.of(contents);
+        final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
+        final FileId fileId = result.fileId();
+        final FileInfoRequest infoRequest = FileInfoRequest.of(fileId);
+
+        //when
+        final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(infoRequest);
+
+        //then
+        Assertions.assertNotNull(infoResponse);
+        Assertions.assertEquals(contents.length, infoResponse.size());
+    }
+
+    @Test
     void testFileDelete() throws Exception {
         //given
         final byte[] contents = "Hello, Hedera!".getBytes();
@@ -94,6 +116,8 @@ public class ProtocolLayerClientTests {
 
         //then
         Assertions.assertNotNull(deleteResponse);
+        Assertions.assertEquals(Status.SUCCESS, deleteResponse.status());
+        Assertions.assertNotNull(deleteResponse.transactionId());
     }
 
     @Test
@@ -112,6 +136,32 @@ public class ProtocolLayerClientTests {
 
         //then
         Assertions.assertNotNull(contractCreateResult);
+        Assertions.assertEquals(Status.SUCCESS, contractCreateResult.status());
         Assertions.assertNotNull(contractCreateResult.transactionId());
+        Assertions.assertNotNull(contractCreateResult.contractId());
+    }
+
+    @Test
+    void testTooLargeFile() {
+        //given
+        final byte[] contents = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
+        final FileId fakeId = FileId.fromString("1.2.3");
+
+        //then
+        Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileCreateTransaction(FileCreateRequest.of(contents)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileAppendRequestTransaction(FileAppendRequest.of(fakeId, contents)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileUpdateRequestTransaction(FileUpdateRequest.of(fakeId, contents)));
+    }
+
+    @Test
+    void testTooLargeFileForOneTransaction() {
+        //given
+        final byte[] contents = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE + 1];
+        final FileId fakeId = FileId.fromString("1.2.3");
+
+        //then
+        Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileCreateTransaction(FileCreateRequest.of(contents)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileAppendRequestTransaction(FileAppendRequest.of(fakeId, contents)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileUpdateRequestTransaction(FileUpdateRequest.of(fakeId, contents)));
     }
 }
