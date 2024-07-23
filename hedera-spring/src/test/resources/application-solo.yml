@@ -6,11 +6,5 @@ spring:
         - ip: 127.0.0.1
           port: 50211
           account: 0.0.3
-        - ip: 127.0.0.1
-          port: 50212
-          account: 0.0.4
-        - ip: 127.0.0.1
-          port: 50213
-          account: 0.0.5
       mirrornode: localhost:8080
 
