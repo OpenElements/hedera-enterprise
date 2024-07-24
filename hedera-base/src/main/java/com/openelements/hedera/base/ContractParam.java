@@ -43,20 +43,25 @@ public record ContractParam<T>(@NonNull T value, @NonNull String nativeType, @No
     }
 
     @NonNull
-    public static ContractParam<String> address(String value) {
+    public static ContractParam<String> addressBySolidty(String value) {
         return of(value, StringBasedDatatype.ADDRESS);
+    }
+
+    @NonNull
+    public static ContractParam<String> address(String value) {
+        return addressBySolidty(AccountId.fromString(value).toSolidityAddress());
     }
 
     @NonNull
     public static ContractParam<String> address(@NonNull AccountId value) {
         Objects.requireNonNull(value, "value must not be null");
-        return of(value.toString(), StringBasedDatatype.ADDRESS);
+        return of(value.toSolidityAddress(), StringBasedDatatype.ADDRESS);
     }
 
     @NonNull
     public static ContractParam<String> address(@NonNull ContractId value) {
         Objects.requireNonNull(value, "value must not be null");
-        return of(value.toString(), StringBasedDatatype.ADDRESS);
+        return of(value.toSolidityAddress(), StringBasedDatatype.ADDRESS);
     }
 
     @NonNull

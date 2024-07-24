@@ -267,4 +267,136 @@ contract Datatypes {
     function checkUint256(uint256 data) public pure returns (uint256) {
         return data;
     }
+
+    function checkBytes1(bytes1 data) public pure returns (bytes1) {
+        return data;
+    }
+
+    function checkBytes2(bytes2 data) public pure returns (bytes2) {
+        return data;
+    }
+
+    function checkBytes3(bytes3 data) public pure returns (bytes3) {
+        return data;
+    }
+
+    function checkBytes4(bytes4 data) public pure returns (bytes4) {
+        return data;
+    }
+
+    function checkBytes5(bytes5 data) public pure returns (bytes5) {
+        return data;
+    }
+
+    function checkBytes6(bytes6 data) public pure returns (bytes6) {
+        return data;
+    }
+
+    function checkBytes7(bytes7 data) public pure returns (bytes7) {
+        return data;
+    }
+
+    function checkBytes8(bytes8 data) public pure returns (bytes8) {
+        return data;
+    }
+
+    function checkBytes9(bytes9 data) public pure returns (bytes9) {
+        return data;
+    }
+
+    function checkBytes10(bytes10 data) public pure returns (bytes10) {
+        return data;
+    }
+
+    function checkBytes11(bytes11 data) public pure returns (bytes11) {
+        return data;
+    }
+
+    function checkBytes12(bytes12 data) public pure returns (bytes12) {
+        return data;
+    }
+
+    function checkBytes13(bytes13 data) public pure returns (bytes13) {
+        return data;
+    }
+
+    function checkBytes14(bytes14 data) public pure returns (bytes14) {
+        return data;
+    }
+
+    function checkBytes15(bytes15 data) public pure returns (bytes15) {
+        return data;
+    }
+
+    function checkBytes16(bytes16 data) public pure returns (bytes16) {
+        return data;
+    }
+
+    function checkBytes17(bytes17 data) public pure returns (bytes17) {
+        return data;
+    }
+
+    function checkBytes18(bytes18 data) public pure returns (bytes18) {
+        return data;
+    }
+
+    function checkBytes19(bytes19 data) public pure returns (bytes19) {
+        return data;
+    }
+
+    function checkBytes20(bytes20 data) public pure returns (bytes20) {
+        return data;
+    }
+
+    function checkBytes21(bytes21 data) public pure returns (bytes21) {
+        return data;
+    }
+
+    function checkBytes22(bytes22 data) public pure returns (bytes22) {
+        return data;
+    }
+
+    function checkBytes23(bytes23 data) public pure returns (bytes23) {
+        return data;
+    }
+
+    function checkBytes24(bytes24 data) public pure returns (bytes24) {
+        return data;
+    }
+
+    function checkBytes25(bytes25 data) public pure returns (bytes25) {
+        return data;
+    }
+
+    function checkBytes26(bytes26 data) public pure returns (bytes26) {
+        return data;
+    }
+
+    function checkBytes27(bytes27 data) public pure returns (bytes27) {
+        return data;
+    }
+
+    function checkBytes28(bytes28 data) public pure returns (bytes28) {
+        return data;
+    }
+
+    function checkBytes29(bytes29 data) public pure returns (bytes29) {
+        return data;
+    }
+
+    function checkBytes30(bytes30 data) public pure returns (bytes30) {
+        return data;
+    }
+
+    function checkBytes31(bytes31 data) public pure returns (bytes31) {
+        return data;
+    }
+
+    function checkBytes32(bytes32 data) public pure returns (bytes32) {
+        return data;
+    }
+
+    function checkBool(bool data) public pure returns (bool) {
+        return data;
+    }
 }

@@ -29,3 +29,4 @@ replay_pid*
 
 **/.env
 **/target/
+/out
