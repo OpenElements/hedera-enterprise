@@ -30,3 +30,4 @@ replay_pid*
 **/.env
 **/target/
 /out
+**/pom.xml.versionsBackup
