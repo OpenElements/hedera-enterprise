@@ -43,6 +43,7 @@
     <module>hedera-base</module>
     <module>hedera-spring</module>
     <module>hedera-microprofile</module>
+    <module>hedera-spring-sample</module>
   </modules>
 
   <build>
