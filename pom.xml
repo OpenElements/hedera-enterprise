@@ -170,6 +170,8 @@
                         <url>https://s01.oss.sonatype.org/service/local</url>
                         <snapshotUrl>https://s01.oss.sonatype.org/content/repositories/snapshots/</snapshotUrl>
                         <stagingRepositories>target/staging-deploy</stagingRepositories>
+                        <closeRepository>true</closeRepository>
+                        <releaseRepository>true</releaseRepository>
                       </maven-central>
                     </nexus2>
                   </maven>
