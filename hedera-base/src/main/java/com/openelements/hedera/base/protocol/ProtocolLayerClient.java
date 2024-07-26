@@ -8,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  */
 public interface ProtocolLayerClient {
 
-
     /**
      * Execute an account balance query.
      *
@@ -61,6 +60,9 @@ public interface ProtocolLayerClient {
 
     FileUpdateResult executeFileUpdateRequestTransaction(FileUpdateRequest request) throws HederaException;
 
+    @NonNull
+    FileInfoResponse executeFileInfoQuery(@NonNull FileInfoRequest request) throws HederaException;
+
     /**
      * Execute a contract create transaction.
      *
@@ -82,5 +84,12 @@ public interface ProtocolLayerClient {
     @NonNull
     ContractCallResult executeContractCallTransaction(@NonNull ContractCallRequest request) throws HederaException;
 
-    public FileInfoResponse executeFileInfoQuery(FileInfoRequest request) throws HederaException;
+    @NonNull
+    ContractDeleteResult executeContractDeleteTransaction(@NonNull final ContractDeleteRequest request) throws HederaException;
+
+    @NonNull
+    AccountCreateResult executeAccountCreateTransaction() throws HederaException;
+
+    @NonNull
+    AccountDeleteResult executeAccountDeleteTransaction(@NonNull AccountDeleteRequest request) throws HederaException;
 }

@@ -3,8 +3,11 @@ package com.openelements.hedera.base.implementation;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
+import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
@@ -14,19 +17,27 @@ import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfo;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.Query;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopic;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
+import com.openelements.hedera.base.protocol.AccountCreateResult;
+import com.openelements.hedera.base.protocol.AccountDeleteRequest;
+import com.openelements.hedera.base.protocol.AccountDeleteResult;
 import com.openelements.hedera.base.protocol.ContractCallRequest;
 import com.openelements.hedera.base.protocol.ContractCallResult;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
+import com.openelements.hedera.base.protocol.ContractDeleteRequest;
+import com.openelements.hedera.base.protocol.ContractDeleteResult;
 import com.openelements.hedera.base.protocol.FileAppendRequest;
 import com.openelements.hedera.base.protocol.FileAppendResult;
 import com.openelements.hedera.base.protocol.FileContentsRequest;
@@ -49,7 +60,6 @@ import org.slf4j.LoggerFactory;
 
 public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
-
     private final static Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
 
     public static final int DEFAULT_GAS = 1_000_000;
@@ -61,7 +71,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public AccountBalanceResponse executeAccountBalanceQuery(AccountBalanceRequest request) throws HederaException {
+    public AccountBalanceResponse executeAccountBalanceQuery(final AccountBalanceRequest request) throws HederaException {
         final AccountBalanceQuery query = new AccountBalanceQuery().setAccountId(request.accountId())
                 .setQueryPayment(request.queryPayment())
                 .setMaxQueryPayment(request.maxQueryPayment());
@@ -69,7 +79,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         return new AccountBalanceResponse(balance.hbars);
     }
 
-    public FileContentsResponse executeFileContentsQuery(FileContentsRequest request) throws HederaException {
+    @Override
+    public FileContentsResponse executeFileContentsQuery(final FileContentsRequest request) throws HederaException {
         final FileContentsQuery query = new FileContentsQuery().setFileId(request.fileId())
                 .setQueryPayment(request.queryPayment())
                 .setMaxQueryPayment(request.maxQueryPayment());
@@ -78,7 +89,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         return new FileContentsResponse(request.fileId(), bytes);
     }
 
-    public FileInfoResponse executeFileInfoQuery(FileInfoRequest request) throws HederaException {
+    @Override
+    public FileInfoResponse executeFileInfoQuery(final FileInfoRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
         final FileInfoQuery query = new FileInfoQuery().setFileId(request.fileId())
                 .setQueryPayment(request.queryPayment())
                 .setMaxQueryPayment(request.maxQueryPayment());
@@ -90,7 +103,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileCreateResult executeFileCreateTransaction(FileCreateRequest request) throws HederaException {
+    public FileCreateResult executeFileCreateTransaction(final FileCreateRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         Objects.requireNonNull(request.contents(), "content must not be null");
         if(request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
@@ -111,7 +124,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileUpdateResult executeFileUpdateRequestTransaction(FileUpdateRequest request) throws HederaException {
+    public FileUpdateResult executeFileUpdateRequestTransaction(final FileUpdateRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         if(request.contents() != null && request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
             throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use FileAppend for larger files.");
@@ -132,7 +145,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileAppendResult executeFileAppendRequestTransaction(FileAppendRequest request) throws HederaException {
+    public FileAppendResult executeFileAppendRequestTransaction(final FileAppendRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         Objects.requireNonNull(request.contents(), "content must not be null");
         if(request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
@@ -150,8 +163,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileDeleteResult executeFileDeleteTransaction(FileDeleteRequest request) throws HederaException {
-        FileDeleteTransaction transaction = new FileDeleteTransaction()
+    public FileDeleteResult executeFileDeleteTransaction(final FileDeleteRequest request) throws HederaException {
+        final FileDeleteTransaction transaction = new FileDeleteTransaction()
                 .setFileId(request.fileId())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration());
@@ -160,9 +173,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public ContractCreateResult executeContractCreateTransaction(ContractCreateRequest request) throws HederaException {
-        ContractFunctionParameters constructorParams = createParameters(request.constructorParams());
-        ContractCreateTransaction transaction = new ContractCreateTransaction()
+    public ContractCreateResult executeContractCreateTransaction(final ContractCreateRequest request) throws HederaException {
+        final ContractFunctionParameters constructorParams = createParameters(request.constructorParams());
+        final ContractCreateTransaction transaction = new ContractCreateTransaction()
                 .setBytecodeFileId(request.fileId())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setGas(DEFAULT_GAS)
@@ -173,9 +186,28 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public ContractCallResult executeContractCallTransaction(ContractCallRequest request) throws HederaException {
-        ContractFunctionParameters functionParams = createParameters(request.constructorParams());
-        ContractExecuteTransaction transaction = new ContractExecuteTransaction()
+    public ContractDeleteResult executeContractDeleteTransaction(@NonNull final ContractDeleteRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        final ContractDeleteTransaction transaction = new ContractDeleteTransaction()
+                .setContractId(request.contractId())
+                .setMaxTransactionFee(request.maxTransactionFee())
+                .setTransactionValidDuration(request.transactionValidDuration());
+        if(request.transferFeeToContractId() != null) {
+            transaction.setTransferContractId(request.transferFeeToContractId());
+        }
+        if(request.transferFeeToAccountId() != null) {
+            transaction.setTransferAccountId(request.transferFeeToAccountId());
+        }
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+        return new ContractDeleteResult(receipt.transactionId, receipt.status);
+    }
+
+    @Override
+    @NonNull
+    public ContractCallResult executeContractCallTransaction(@NonNull final ContractCallRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        final ContractFunctionParameters functionParams = createParameters(request.constructorParams());
+        final ContractExecuteTransaction transaction = new ContractExecuteTransaction()
                 .setContractId(request.contractId())
                 .setFunction(request.functionName(), functionParams)
                 .setMaxTransactionFee(request.maxTransactionFee())
@@ -185,7 +217,31 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         return new ContractCallResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.contractFunctionResult);
     }
 
-    private ContractFunctionParameters createParameters(List<ContractParam<?>> params) {
+    @Override
+    @NonNull
+    public AccountCreateResult executeAccountCreateTransaction() throws HederaException {
+        final PrivateKey privateKey = PrivateKey.generateED25519();
+        final PublicKey publicKey = privateKey.getPublicKey();
+        final AccountCreateTransaction transaction = new AccountCreateTransaction();
+        final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
+        return new AccountCreateResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.receipt.accountId, publicKey, privateKey);
+    }
+
+    @Override
+    @NonNull
+    public AccountDeleteResult executeAccountDeleteTransaction(@NonNull final AccountDeleteRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        final AccountDeleteTransaction transaction = new AccountDeleteTransaction();
+        transaction.setAccountId(request.accountId());
+        if(request.transferFoundsToAccount() != null) {
+            transaction.setTransferAccountId(request.transferFoundsToAccount());
+        }
+        final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
+        return new AccountDeleteResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee);
+    }
+
+    @NonNull
+    private ContractFunctionParameters createParameters(@NonNull List<ContractParam<?>> params) {
         Objects.requireNonNull(params, "params must not be null");
         final ContractFunctionParameters constructorParams = new ContractFunctionParameters();
         final Consumer<ContractParam> consumer = param -> param.supplier().addParam(param.value(), constructorParams);
@@ -193,7 +249,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         return constructorParams;
     }
 
-    private <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(T transaction) throws HederaException {
+    @NonNull
+    private <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(@NonNull final T transaction) throws HederaException {
+        Objects.requireNonNull(transaction, "transaction must not be null");
         try {
             log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
             final TransactionResponse response = transaction.execute(client);
@@ -203,27 +261,31 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             } catch (Exception e) {
                 throw new HederaException("Failed to receive receipt of transaction '" + response.transactionId + "' of type " + transaction.getClass(), e);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new HederaException("Failed to execute transaction of type " + transaction.getClass().getSimpleName(), e);
         }
     }
 
-    private <T extends Transaction<T>> TransactionRecord executeTransactionAndWaitOnRecord(T transaction) throws HederaException {
+    @NonNull
+    private <T extends Transaction<T>> TransactionRecord executeTransactionAndWaitOnRecord(@NonNull final T transaction) throws HederaException {
+        Objects.requireNonNull(transaction, "transaction must not be null");
         try {
             log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
             final TransactionResponse response = transaction.execute(client);
             try {
                 log.debug("Waiting for record of transaction '{}' of type {}", response.transactionId, transaction.getClass().getSimpleName());
                 return response.getRecord(client);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new HederaException("Failed to receive record of transaction '" + response.transactionId + "' of type " + transaction.getClass(), e);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new HederaException("Failed to execute transaction of type " + transaction.getClass().getSimpleName(), e);
         }
     }
 
-    private <R, Q extends Query<R, Q>> R executeQueryAndWait(Q query) throws HederaException {
+    @NonNull
+    private <R, Q extends Query<R, Q>> R executeQueryAndWait(@NonNull final Q query) throws HederaException {
+        Objects.requireNonNull(query, "query must not be null");
         try {
             log.debug("Sending query of type {}", query.getClass().getSimpleName());
             return query.execute(client);
