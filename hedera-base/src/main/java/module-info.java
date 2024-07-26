@@ -1,5 +1,8 @@
 module com.openelements.hedera.base {
     exports com.openelements.hedera.base;
+    exports com.openelements.hedera.base.protocol;
+    exports com.openelements.hedera.base.implementation.data to com.openelements.hedera.base.test;
+    exports com.openelements.hedera.base.implementation to com.openelements.hedera.base.test;
 
     requires sdk; //Hedera SDK
     requires org.slf4j;
