@@ -88,7 +88,7 @@ public interface ProtocolLayerClient {
     ContractDeleteResult executeContractDeleteTransaction(@NonNull final ContractDeleteRequest request) throws HederaException;
 
     @NonNull
-    AccountCreateResult executeAccountCreateTransaction() throws HederaException;
+    AccountCreateResult executeAccountCreateTransaction(@NonNull final AccountCreateRequest request) throws HederaException;
 
     @NonNull
     AccountDeleteResult executeAccountDeleteTransaction(@NonNull AccountDeleteRequest request) throws HederaException;

@@ -3,8 +3,10 @@ package com.openelements.hedera.spring.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.openelements.hedera.base.AccountClient;
 import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.SmartContractClient;
+import com.openelements.hedera.base.implementation.AccountClientImpl;
 import com.openelements.hedera.base.implementation.FileClientImpl;
 import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
@@ -124,6 +126,11 @@ public class HederaAutoConfiguration {
     @Bean
     SmartContractClient smartContractClient(final ProtocolLayerClient protocolLayerClient, FileClient fileClient) {
         return new SmartContractClientImpl(protocolLayerClient, fileClient);
+    }
+
+    @Bean
+    AccountClient accountClient(final ProtocolLayerClient protocolLayerClient) {
+        return new AccountClientImpl(protocolLayerClient);
     }
 
     @Bean

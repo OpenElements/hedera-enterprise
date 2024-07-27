@@ -3,9 +3,11 @@ package com.openelements.hedera.microprofile;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.openelements.hedera.base.AccountClient;
 import com.openelements.hedera.base.ContractVerificationClient;
 import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.SmartContractClient;
+import com.openelements.hedera.base.implementation.AccountClientImpl;
 import com.openelements.hedera.base.implementation.FileClientImpl;
 import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
@@ -82,6 +84,12 @@ public class ClientProvider {
     @ApplicationScoped
     SmartContractClient createSmartContractClient(@NonNull final ProtocolLayerClient protocolLayerClient, @NonNull final FileClient fileClient) {
         return new SmartContractClientImpl(protocolLayerClient, fileClient);
+    }
+
+    @Produces
+    @ApplicationScoped
+    AccountClient createAccountClient(@NonNull final ProtocolLayerClient protocolLayerClient) {
+        return new AccountClientImpl(protocolLayerClient);
     }
 
     @Produces

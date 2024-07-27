@@ -29,6 +29,7 @@ import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
+import com.openelements.hedera.base.protocol.AccountCreateRequest;
 import com.openelements.hedera.base.protocol.AccountCreateResult;
 import com.openelements.hedera.base.protocol.AccountDeleteRequest;
 import com.openelements.hedera.base.protocol.AccountDeleteResult;
@@ -219,10 +220,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
     @Override
     @NonNull
-    public AccountCreateResult executeAccountCreateTransaction() throws HederaException {
+    public AccountCreateResult executeAccountCreateTransaction(@NonNull final AccountCreateRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
         final PrivateKey privateKey = PrivateKey.generateED25519();
         final PublicKey publicKey = privateKey.getPublicKey();
         final AccountCreateTransaction transaction = new AccountCreateTransaction();
+        transaction.setInitialBalance(request.initialBalance());
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         return new AccountCreateResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.receipt.accountId, publicKey, privateKey);
     }
