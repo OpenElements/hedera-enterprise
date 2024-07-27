@@ -65,6 +65,24 @@ public class HederaAccountService {
 All APIs of the client are synchronous and return the result of the operation. For asynchronous operations, you can
 easily wrap calls by use the [`@Async` annotation of spring](https://spring.io/guides/gs/async-method).
 
+### Hedera Spring Sample
+
+A sample application that uses the Hedera Spring module can be found in the `hedera-spring-sample` module.
+The sample application is a simple Spring Boot application that reads has a REST endpoint at `localhost:8080/` and 
+shows the hbar balance of the account `0.0.100`.
+To use the application, you need to have created a Hedera testnet account at the [Hedera portal](https://portal.hedera.com/).
+The account information can be added to the `application.properties` file in the `hedera-spring-sample` module:
+```properties
+spring.hedera.accountId=0.0.3447271
+spring.hedera.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+```
+
+Alternatively, you can provide the account information as environment variables:
+```shell
+export HEDERA_ACCOUNT_ID=0.0.3447271
+export HEDERA_PRIVATE_KEY=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+```
+
 ## Microservice support
 
 The support for Microprofile is still in development and can not be used yet.
