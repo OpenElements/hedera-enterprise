@@ -88,10 +88,19 @@ The project is based on [Maven](https://maven.apache.org/). To build the project
 ```
 
 The tests in the project are working against the Hedera testnet.
-To run the tests, you need to provide the "DER Encoded Private Key" of the "ECDSA" testnet account in a `.env` file in
-the root of the project. The file should look like this:
+To run the tests, you need to provide the account id and the "DER Encoded Private Key" of the "ECDSA" testnet account.
+That information can be provided as environemt variables:
+ 
+```shell
+export HEDERA_ACCOUNT_ID=0.0.3447271
+export HEDERA_PRIVATE_KEY=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+```
+
+As an alternative you can define the information in a `.env` file in each sub-module that contains tests.
+The file should look like this:
 
 ```
+spring.hedera.accountId=0.0.3447271
 spring.hedera.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
 ```
 
