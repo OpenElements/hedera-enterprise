@@ -2,9 +2,6 @@
 This project provides Java modules to integrate [Hedera network](https://hedera.com) smoothless in a Spring Boot or Microprofile (like Quarkus) application.
 This module is based on the [Hedera Java SDK](https://github.com/hashgraph/hedera-sdk-java).
 
-> [!WARNING]  
-> This project has just been started and is not yet ready for production use.
-
 ## Spring Boot support
 
 To use this module, you need to add the following dependency to your project:
@@ -67,6 +64,10 @@ public class HederaAccountService {
 
 All APIs of the client are synchronous and return the result of the operation. For asynchronous operations, you can
 easily wrap calls by use the [`@Async` annotation of spring](https://spring.io/guides/gs/async-method).
+
+## Microservice support
+
+The support for Microprofile is still in development and can not be used yet.
 
 ## Managed services
 
