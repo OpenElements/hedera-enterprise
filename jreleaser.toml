@@ -6,9 +6,9 @@ armored = true
 active = "ALWAYS"
 url = "https://s01.oss.sonatype.org/service/local"
 snapshotUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+stagingRepositories = ["target/staging-deploy"]
 closeRepository = true
 releaseRepository = true
-stagingRepositories = ["target/staging-deploy"]
 
 [release.github]
 enabled = true
