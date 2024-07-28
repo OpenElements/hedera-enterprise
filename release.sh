@@ -10,18 +10,18 @@ if [ -z "$2" ]; then
   exit 1
 fi
 
-NEW_VERSION="$1"
-NEXT_VERSION="$2"
-
-if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+if ! [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "The release version must be in the format A.B.C. Example: 0.1.0"
   exit 1
 fi
 
-if ! [[ "$NEXT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+if ! [[ "$2" =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
   echo "The next snapshot version must be in the format A.B.C-SNAPSHOT. Example: 0.2.0-SNAPSHOT"
   exit 1
 fi
+
+NEW_VERSION="$1"
+NEXT_VERSION="$2"
 
 echo "Releasing version $NEW_VERSION"
 ./mvnw versions:set -DnewVersion=$NEW_VERSION
