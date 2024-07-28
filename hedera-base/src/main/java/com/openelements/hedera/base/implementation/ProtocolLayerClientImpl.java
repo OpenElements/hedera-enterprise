@@ -20,11 +20,13 @@ import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.Query;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopic;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
@@ -52,6 +54,11 @@ import com.openelements.hedera.base.protocol.FileInfoResponse;
 import com.openelements.hedera.base.protocol.FileUpdateRequest;
 import com.openelements.hedera.base.protocol.FileUpdateResult;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
+import com.openelements.hedera.base.protocol.TopicCreateResult;
+import com.openelements.hedera.base.protocol.TopicDeleteRequest;
+import com.openelements.hedera.base.protocol.TopicDeleteResult;
+import com.openelements.hedera.base.protocol.TopicSubmitMessageRequest;
+import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
 import java.util.Objects;
@@ -241,6 +248,44 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         }
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         return new AccountDeleteResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee);
+    }
+
+    public TopicCreateResult executeTopicCreateTransaction() throws HederaException {
+        try {
+            final TopicCreateTransaction transaction = new TopicCreateTransaction();
+            final TransactionResponse response = transaction.execute(client);
+            final TransactionReceipt receipt = response.getReceipt(client);
+            return new TopicCreateResult(receipt.transactionId, receipt.status, receipt.topicId);
+        } catch (final Exception e) {
+            throw new HederaException("Failed to execute create topic transaction", e);
+        }
+    }
+
+    public TopicDeleteResult executeTopicDeleteTransaction(@NonNull final TopicDeleteRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        try {
+            final TopicDeleteTransaction transaction = new TopicDeleteTransaction();
+            transaction.setTopicId(request.topicId());
+            final TransactionResponse response = transaction.execute(client);
+            final TransactionReceipt receipt = response.getReceipt(client);
+            return new TopicDeleteResult(receipt.transactionId, receipt.status);
+        } catch (final Exception e) {
+            throw new HederaException("Failed to execute create topic transaction", e);
+        }
+    }
+
+    public TopicSubmitMessageResult executeTopicMessageSubmitTransaction(@NonNull final TopicSubmitMessageRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        try {
+            final TopicMessageSubmitTransaction transaction = new TopicMessageSubmitTransaction();
+            transaction.setTopicId(request.topicId());
+            transaction.setMessage(request.message());
+            final TransactionResponse response = transaction.execute(client);
+            final TransactionReceipt receipt = response.getReceipt(client);
+            return new TopicSubmitMessageResult(receipt.transactionId, receipt.status);
+        } catch (final Exception e) {
+            throw new HederaException("Failed to execute create topic transaction", e);
+        }
     }
 
     @NonNull
