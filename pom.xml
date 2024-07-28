@@ -95,6 +95,11 @@
           <version>3.4.0</version>
         </plugin>
         <plugin>
+          <groupId>org.cyclonedx</groupId>
+          <artifactId>cyclonedx-maven-plugin</artifactId>
+          <version>2.8.0</version>
+        </plugin>
+        <plugin>
           <groupId>org.jreleaser</groupId>
           <artifactId>jreleaser-maven-plugin</artifactId>
           <version>1.9.0</version>
@@ -140,6 +145,18 @@
             </executions>
           </plugin>
           <plugin>
+            <groupId>org.cyclonedx</groupId>
+            <artifactId>cyclonedx-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>makeBom</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
             <configuration>
@@ -151,33 +168,6 @@
           <plugin>
             <groupId>org.jreleaser</groupId>
             <artifactId>jreleaser-maven-plugin</artifactId>
-            <version>1.9.0</version>
-          </plugin>
-          <plugin>
-            <groupId>org.jreleaser</groupId>
-            <artifactId>jreleaser-maven-plugin</artifactId>
-            <configuration>
-              <jreleaser>
-                <signing>
-                  <active>ALWAYS</active>
-                  <armored>true</armored>
-                </signing>
-                <deploy>
-                  <maven>
-                    <nexus2>
-                      <maven-central>
-                        <active>ALWAYS</active>
-                        <url>https://s01.oss.sonatype.org/service/local</url>
-                        <snapshotUrl>https://s01.oss.sonatype.org/content/repositories/snapshots/</snapshotUrl>
-                        <stagingRepositories>target/staging-deploy</stagingRepositories>
-                        <closeRepository>true</closeRepository>
-                        <releaseRepository>true</releaseRepository>
-                      </maven-central>
-                    </nexus2>
-                  </maven>
-                </deploy>
-              </jreleaser>
-            </configuration>
           </plugin>
         </plugins>
       </build>
