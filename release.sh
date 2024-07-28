@@ -23,6 +23,8 @@ fi
 NEW_VERSION="$1"
 NEXT_VERSION="$2"
 
+export $(grep -v '^#' .env | xargs)
+
 echo "Releasing version $NEW_VERSION"
 ./mvnw versions:set -DnewVersion=$NEW_VERSION
 ./mvnw clean verify
