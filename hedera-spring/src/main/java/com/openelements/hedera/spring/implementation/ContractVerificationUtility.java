@@ -4,7 +4,9 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.ContractVerificationState;
 import com.openelements.hedera.base.ContractVerificationClient;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +19,8 @@ public class ContractVerificationUtility {
 
     private final ContractVerificationClient verificationClient;
 
-    public ContractVerificationUtility(ContractVerificationClient verificationClient) {
-        this.verificationClient = verificationClient;
+    public ContractVerificationUtility(@NonNull final ContractVerificationClient verificationClient) {
+        this.verificationClient = Objects.requireNonNull(verificationClient, "verificationClient must not be null");
     }
 
     /**

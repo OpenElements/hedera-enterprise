@@ -96,7 +96,13 @@ The following services are available in spring and microprofile:
 - `com.openelements.hedera.base.FileClient`: to interact with Hedera files
 - `com.openelements.hedera.base.SmartContractClient`: to interact with Hedera smart contracts
 - `com.openelements.hedera.base.ContractVerificationClient`: to verify smart contracts
+- `com.openelements.hedera.base.NftClient`: to interact with Hedera NFTs
+- `com.openelements.hedera.base.NftRepository`: to query NFTs
+
+Next to that the following low-level services are available:
+
 - `com.openelements.hedera.base.protocol.ProtocolLayerClient`: to interact with the Hedera protocol layer
+- `com.openelements.hedera.base.mirrornode.MirrorNodeClient`: to query the Hedera mirror node 
 
 ## Built the project
 

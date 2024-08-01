@@ -9,10 +9,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 )
 public class HederaNetworkProperties {
 
+    /**
+     * Network name (must be mainnet, testnet or previewnet). Default is mainnet.
+     * Will be ignored if nodes are provided.
+     */
     private String name = "mainnet";
 
+    /**
+     * List of nodes to connect to. If provided, network name will be ignored.
+     * This can be used to connect to a custom network (like Hedera Solo).
+     */
     private List<HederaNode> nodes;
 
+    /**
+     * Mirror node endpoint to connect to.
+     */
     private String mirrorNode;
 
     public String getName() {

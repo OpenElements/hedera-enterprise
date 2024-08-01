@@ -17,9 +17,14 @@ import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfo;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
+import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.Query;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
@@ -27,8 +32,10 @@ import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.HederaException;
+import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
 import com.openelements.hedera.base.protocol.AccountCreateRequest;
@@ -53,15 +60,29 @@ import com.openelements.hedera.base.protocol.FileInfoRequest;
 import com.openelements.hedera.base.protocol.FileInfoResponse;
 import com.openelements.hedera.base.protocol.FileUpdateRequest;
 import com.openelements.hedera.base.protocol.FileUpdateResult;
+import com.openelements.hedera.base.mirrornode.NftQuery;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
+import com.openelements.hedera.base.protocol.TokenAssociateRequest;
+import com.openelements.hedera.base.protocol.TokenAssociateResult;
+import com.openelements.hedera.base.protocol.TokenCreateRequest;
+import com.openelements.hedera.base.protocol.TokenCreateResult;
+import com.openelements.hedera.base.protocol.TokenMintRequest;
+import com.openelements.hedera.base.protocol.TokenMintResult;
+import com.openelements.hedera.base.protocol.TokenTransferRequest;
+import com.openelements.hedera.base.protocol.TokenTransferResult;
+import com.openelements.hedera.base.protocol.TopicCreateRequest;
 import com.openelements.hedera.base.protocol.TopicCreateResult;
 import com.openelements.hedera.base.protocol.TopicDeleteRequest;
 import com.openelements.hedera.base.protocol.TopicDeleteResult;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageRequest;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
+import com.openelements.hedera.base.protocol.TransactionListener;
+import com.openelements.hedera.base.protocol.TransactionType;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,8 +95,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
     private final Client client;
 
+    private final List<TransactionListener> listeners;
+
     public ProtocolLayerClientImpl(@NonNull final Client client) {
         this.client = Objects.requireNonNull(client, "client must not be null");
+        listeners = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -118,9 +142,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use FileAppend for larger files.");
         }
         final FileCreateTransaction transaction = new FileCreateTransaction()
-                .setContents(request.contents())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration())
+                .setContents(request.contents())
                 .setTransactionMemo(request.fileMemo())
                 .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()));
         if(request.expirationTime() != null) {
@@ -138,9 +162,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use FileAppend for larger files.");
         }
         final FileUpdateTransaction transaction = new FileUpdateTransaction()
-                .setFileId(request.fileId())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration())
+                .setFileId(request.fileId())
                 .setTransactionMemo(request.fileMemo());
         if(request.contents() != null) {
             transaction.setContents(request.contents());
@@ -160,10 +184,10 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use multiple FileAppend for larger files.");
         }
         final FileAppendTransaction transaction = new FileAppendTransaction()
-                .setFileId(request.fileId())
-                .setContents(request.contents())
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration())
+                .setFileId(request.fileId())
+                .setContents(request.contents())
                 .setTransactionMemo(request.fileMemo());
 
         final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
@@ -173,9 +197,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     @Override
     public FileDeleteResult executeFileDeleteTransaction(final FileDeleteRequest request) throws HederaException {
         final FileDeleteTransaction transaction = new FileDeleteTransaction()
-                .setFileId(request.fileId())
                 .setMaxTransactionFee(request.maxTransactionFee())
-                .setTransactionValidDuration(request.transactionValidDuration());
+                .setTransactionValidDuration(request.transactionValidDuration())
+                .setFileId(request.fileId());
         final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         return new FileDeleteResult(receipt.transactionId, receipt.status);
     }
@@ -184,10 +208,10 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     public ContractCreateResult executeContractCreateTransaction(final ContractCreateRequest request) throws HederaException {
         final ContractFunctionParameters constructorParams = createParameters(request.constructorParams());
         final ContractCreateTransaction transaction = new ContractCreateTransaction()
-                .setBytecodeFileId(request.fileId())
                 .setMaxTransactionFee(request.maxTransactionFee())
-                .setGas(DEFAULT_GAS)
                 .setTransactionValidDuration(request.transactionValidDuration())
+                .setBytecodeFileId(request.fileId())
+                .setGas(DEFAULT_GAS)
                 .setConstructorParameters(constructorParams);
         final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         return new ContractCreateResult(receipt.transactionId, receipt.status, receipt.contractId);
@@ -197,9 +221,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     public ContractDeleteResult executeContractDeleteTransaction(@NonNull final ContractDeleteRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         final ContractDeleteTransaction transaction = new ContractDeleteTransaction()
-                .setContractId(request.contractId())
                 .setMaxTransactionFee(request.maxTransactionFee())
-                .setTransactionValidDuration(request.transactionValidDuration());
+                .setTransactionValidDuration(request.transactionValidDuration())
+                .setContractId(request.contractId());
         if(request.transferFeeToContractId() != null) {
             transaction.setTransferContractId(request.transferFeeToContractId());
         }
@@ -216,11 +240,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         Objects.requireNonNull(request, "request must not be null");
         final ContractFunctionParameters functionParams = createParameters(request.constructorParams());
         final ContractExecuteTransaction transaction = new ContractExecuteTransaction()
+                .setMaxTransactionFee(request.maxTransactionFee())
+                .setTransactionValidDuration(request.transactionValidDuration())
                 .setContractId(request.contractId())
                 .setFunction(request.functionName(), functionParams)
-                .setMaxTransactionFee(request.maxTransactionFee())
-                .setGas(DEFAULT_GAS)
-                .setTransactionValidDuration(request.transactionValidDuration());
+                .setGas(DEFAULT_GAS);
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         return new ContractCallResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.contractFunctionResult);
     }
@@ -231,8 +255,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         Objects.requireNonNull(request, "request must not be null");
         final PrivateKey privateKey = PrivateKey.generateED25519();
         final PublicKey publicKey = privateKey.getPublicKey();
-        final AccountCreateTransaction transaction = new AccountCreateTransaction();
-        transaction.setInitialBalance(request.initialBalance());
+        final AccountCreateTransaction transaction = new AccountCreateTransaction()
+                .setMaxTransactionFee(request.maxTransactionFee())
+                .setTransactionValidDuration(request.transactionValidDuration())
+                .setKey(publicKey)
+                .setInitialBalance(request.initialBalance());
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         return new AccountCreateResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.receipt.accountId, publicKey, privateKey);
     }
@@ -241,8 +268,10 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     @NonNull
     public AccountDeleteResult executeAccountDeleteTransaction(@NonNull final AccountDeleteRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
-        final AccountDeleteTransaction transaction = new AccountDeleteTransaction();
-        transaction.setAccountId(request.accountId());
+        final AccountDeleteTransaction transaction = new AccountDeleteTransaction()
+                .setMaxTransactionFee(request.maxTransactionFee())
+                .setTransactionValidDuration(request.transactionValidDuration())
+                .setAccountId(request.accountId());
         if(request.transferFoundsToAccount() != null) {
             transaction.setTransferAccountId(request.transferFoundsToAccount());
         }
@@ -250,11 +279,13 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         return new AccountDeleteResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee);
     }
 
-    public TopicCreateResult executeTopicCreateTransaction() throws HederaException {
+    public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
         try {
-            final TopicCreateTransaction transaction = new TopicCreateTransaction();
-            final TransactionResponse response = transaction.execute(client);
-            final TransactionReceipt receipt = response.getReceipt(client);
+            final TopicCreateTransaction transaction = new TopicCreateTransaction()
+                    .setMaxTransactionFee(request.maxTransactionFee())
+                    .setTransactionValidDuration(request.transactionValidDuration());
+            final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TopicCreateResult(receipt.transactionId, receipt.status, receipt.topicId);
         } catch (final Exception e) {
             throw new HederaException("Failed to execute create topic transaction", e);
@@ -264,10 +295,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     public TopicDeleteResult executeTopicDeleteTransaction(@NonNull final TopicDeleteRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         try {
-            final TopicDeleteTransaction transaction = new TopicDeleteTransaction();
-            transaction.setTopicId(request.topicId());
-            final TransactionResponse response = transaction.execute(client);
-            final TransactionReceipt receipt = response.getReceipt(client);
+            final TopicDeleteTransaction transaction = new TopicDeleteTransaction()
+                    .setMaxTransactionFee(request.maxTransactionFee())
+                    .setTransactionValidDuration(request.transactionValidDuration())
+                    .setTopicId(request.topicId());
+            final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TopicDeleteResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
             throw new HederaException("Failed to execute create topic transaction", e);
@@ -277,19 +309,102 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     public TopicSubmitMessageResult executeTopicMessageSubmitTransaction(@NonNull final TopicSubmitMessageRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         try {
-            final TopicMessageSubmitTransaction transaction = new TopicMessageSubmitTransaction();
-            transaction.setTopicId(request.topicId());
-            transaction.setMessage(request.message());
-            final TransactionResponse response = transaction.execute(client);
-            final TransactionReceipt receipt = response.getReceipt(client);
+            final TopicMessageSubmitTransaction transaction = new TopicMessageSubmitTransaction()
+                    .setMaxTransactionFee(request.maxTransactionFee())
+                    .setTransactionValidDuration(request.transactionValidDuration())
+                    .setTopicId(request.topicId())
+                    .setMessage(request.message());
+            final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TopicSubmitMessageResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
             throw new HederaException("Failed to execute create topic transaction", e);
         }
     }
 
+    public TokenCreateResult executeTokenCreateTransaction(@NonNull final TokenCreateRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        try {
+            final TokenCreateTransaction transaction = new TokenCreateTransaction()
+                    .setMaxTransactionFee(request.maxTransactionFee())
+                    .setTransactionValidDuration(request.transactionValidDuration())
+                    .setTokenName(request.name())
+                    .setTokenSymbol(request.symbol())
+                    .setTreasuryAccountId(request.treasuryAccountId())
+                    .setTokenType(request.tokenType())
+                    .setSupplyKey(request.supplyKey());
+            sign(transaction, request.treasuryKey(), request.supplyKey());
+            final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+            return new TokenCreateResult(receipt.transactionId, receipt.status, receipt.tokenId);
+        } catch (final Exception e) {
+            throw new HederaException("Failed to execute create topic transaction", e);
+        }
+    }
+
+    public TokenAssociateResult executeTokenAssociateTransaction(@NonNull final TokenAssociateRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        try {
+            final TokenAssociateTransaction transaction = new TokenAssociateTransaction()
+                    .setMaxTransactionFee(request.maxTransactionFee())
+                    .setTransactionValidDuration(request.transactionValidDuration())
+                    .setTokenIds(List.of(request.tokenId()))
+                    .setAccountId(request.accountId());
+            sign(transaction, request.accountPrivateKey());
+            final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+            return new TokenAssociateResult(receipt.transactionId, receipt.status);
+        } catch (final Exception e) {
+            throw new HederaException("Failed to execute create topic transaction", e);
+        }
+    }
+
+    public TokenMintResult executeMintTokenTransaction(@NonNull final TokenMintRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        try {
+            TokenMintTransaction transaction = new TokenMintTransaction()
+                    .setMaxTransactionFee(request.maxTransactionFee())
+                    .setTransactionValidDuration(request.transactionValidDuration())
+                    .setTokenId(request.tokenId());
+            if(request.amount() != null) {
+                transaction.setAmount(request.amount());
+            }
+            if(request.metadata() != null) {
+                transaction.setMetadata(request.metadata());
+            }
+            sign(transaction, request.supplyKey());
+            final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+            return new TokenMintResult(receipt.transactionId, receipt.status, receipt.serials);
+        } catch (final Exception e) {
+            throw new HederaException("Failed to execute create topic transaction", e);
+        }
+    }
+
+    public TokenTransferResult executeTransferTransactionForNft(@NonNull final TokenTransferRequest request) throws HederaException {
+        Objects.requireNonNull(request, "request must not be null");
+        try {
+            final TransferTransaction transaction = new TransferTransaction()
+                    .setMaxTransactionFee(request.maxTransactionFee())
+                    .setTransactionValidDuration(request.transactionValidDuration());
+            request.serials().forEach(serial -> transaction.addNftTransfer(new NftId(request.tokenId(), serial), request.sender(), request.receiver()));
+            sign(transaction, request.senderKey());
+            final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+            return new TokenTransferResult(receipt.transactionId, receipt.status);
+        } catch (final Exception e) {
+            throw new HederaException("Failed to execute create topic transaction", e);
+        }
+    }
+
     @NonNull
-    private ContractFunctionParameters createParameters(@NonNull List<ContractParam<?>> params) {
+    private <T extends Transaction<T>> Transaction<T> sign(Transaction<T> transaction, final PrivateKey... keys) {
+        if(keys != null) {
+         transaction.freezeWith(client);
+            for (PrivateKey key : keys) {
+                transaction.sign(key);
+            }
+        }
+        return transaction;
+    }
+
+    @NonNull
+    private ContractFunctionParameters createParameters(@NonNull final List<ContractParam<?>> params) {
         Objects.requireNonNull(params, "params must not be null");
         final ContractFunctionParameters constructorParams = new ContractFunctionParameters();
         final Consumer<ContractParam> consumer = param -> param.supplier().addParam(param.value(), constructorParams);
@@ -303,9 +418,24 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         try {
             log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
             final TransactionResponse response = transaction.execute(client);
+            listeners.forEach(listener -> {
+                try {
+                    listener.transactionSubmitted(TransactionType.ACCOUNT_CREATE, response.transactionId);
+                } catch (Exception e) {
+                    log.error("Failed to notify listener", e);
+                }
+            });
             try {
                 log.debug("Waiting for receipt of transaction '{}' of type {}", response.transactionId, transaction.getClass().getSimpleName());
-                return response.getReceipt(client);
+                TransactionReceipt receipt = response.getReceipt(client);
+                listeners.forEach(listener -> {
+                    try {
+                        listener.transactionHandled(TransactionType.ACCOUNT_CREATE, response.transactionId, receipt.status);
+                    } catch (Exception e) {
+                        log.error("Failed to notify listener", e);
+                    }
+                });
+                return receipt;
             } catch (Exception e) {
                 throw new HederaException("Failed to receive receipt of transaction '" + response.transactionId + "' of type " + transaction.getClass(), e);
             }
@@ -316,18 +446,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
     @NonNull
     private <T extends Transaction<T>> TransactionRecord executeTransactionAndWaitOnRecord(@NonNull final T transaction) throws HederaException {
-        Objects.requireNonNull(transaction, "transaction must not be null");
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
         try {
-            log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
-            final TransactionResponse response = transaction.execute(client);
-            try {
-                log.debug("Waiting for record of transaction '{}' of type {}", response.transactionId, transaction.getClass().getSimpleName());
-                return response.getRecord(client);
-            } catch (final Exception e) {
-                throw new HederaException("Failed to receive record of transaction '" + response.transactionId + "' of type " + transaction.getClass(), e);
-            }
+            log.debug("Waiting for record of transaction '{}' of type {}", receipt.transactionId, transaction.getClass().getSimpleName());
+            return receipt.transactionId.getRecord(client);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute transaction of type " + transaction.getClass().getSimpleName(), e);
+            throw new HederaException("Failed to receive record of transaction '" + receipt.transactionId + "' of type " + transaction.getClass(), e);
         }
     }
 
@@ -340,5 +464,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         } catch (Exception e) {
             throw new HederaException("Failed to execute query", e);
         }
+    }
+
+    @NonNull
+    @Override
+    public Runnable addTransactionListener(@NonNull TransactionListener listener) {
+        listeners.add(listener);
+        return () -> listeners.remove(listener);
     }
 }

@@ -8,8 +8,14 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 )
 public class HederaProperties {
 
+    /**
+     * Hedera account ID to use for transactions.
+     */
     private String accountId;
 
+    /**
+     * Hedera private key to use for transactions.
+     */
     private String privateKey;
 
     @NestedConfigurationProperty

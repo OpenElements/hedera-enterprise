@@ -1,6 +1,7 @@
 package com.openelements.hedera.base.protocol;
 
 import com.openelements.hedera.base.HederaException;
+import com.openelements.hedera.base.mirrornode.NftQuery;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -85,11 +86,30 @@ public interface ProtocolLayerClient {
     ContractCallResult executeContractCallTransaction(@NonNull ContractCallRequest request) throws HederaException;
 
     @NonNull
-    ContractDeleteResult executeContractDeleteTransaction(@NonNull final ContractDeleteRequest request) throws HederaException;
+    ContractDeleteResult executeContractDeleteTransaction(@NonNull final ContractDeleteRequest request)
+            throws HederaException;
 
     @NonNull
-    AccountCreateResult executeAccountCreateTransaction(@NonNull final AccountCreateRequest request) throws HederaException;
+    AccountCreateResult executeAccountCreateTransaction(@NonNull final AccountCreateRequest request)
+            throws HederaException;
 
     @NonNull
     AccountDeleteResult executeAccountDeleteTransaction(@NonNull AccountDeleteRequest request) throws HederaException;
+
+    @NonNull
+    TokenCreateResult executeTokenCreateTransaction(@NonNull final TokenCreateRequest request) throws HederaException;
+
+    @NonNull
+    TokenAssociateResult executeTokenAssociateTransaction(@NonNull final TokenAssociateRequest request)
+            throws HederaException;
+
+    @NonNull
+    TokenMintResult executeMintTokenTransaction(@NonNull final TokenMintRequest request) throws HederaException;
+
+    @NonNull
+    TokenTransferResult executeTransferTransactionForNft(@NonNull final TokenTransferRequest request)
+            throws HederaException;
+
+    @NonNull
+    Runnable addTransactionListener(@NonNull TransactionListener listener);
 }

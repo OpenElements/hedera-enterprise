@@ -5,12 +5,17 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.openelements.hedera.base.AccountClient;
 import com.openelements.hedera.base.FileClient;
+import com.openelements.hedera.base.NftClient;
+import com.openelements.hedera.base.NftRepository;
 import com.openelements.hedera.base.SmartContractClient;
 import com.openelements.hedera.base.implementation.AccountClientImpl;
 import com.openelements.hedera.base.implementation.FileClientImpl;
 import com.openelements.hedera.base.implementation.HederaNetwork;
+import com.openelements.hedera.base.implementation.NftClientImpl;
+import com.openelements.hedera.base.implementation.NftRepositoryImpl;
 import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hedera.base.implementation.SmartContractClientImpl;
+import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import com.openelements.hedera.base.ContractVerificationClient;
 import java.util.Arrays;
@@ -21,6 +26,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -131,6 +137,25 @@ public class HederaAutoConfiguration {
     @Bean
     AccountClient accountClient(final ProtocolLayerClient protocolLayerClient) {
         return new AccountClientImpl(protocolLayerClient);
+    }
+
+    @Bean
+    NftClient nftClient(final ProtocolLayerClient protocolLayerClient, AccountId adminAccount, PrivateKey adminSupplyKey) {
+        return new NftClientImpl(protocolLayerClient, adminAccount, adminSupplyKey);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+            havingValue="true", matchIfMissing=true)
+    MirrorNodeClient mirrorNodeClient(Client client) {
+        return new MirrorNodeClientImpl(client);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+            havingValue="true", matchIfMissing=true)
+    NftRepository nftRepository(MirrorNodeClient mirrorNodeClient) {
+        return new NftRepositoryImpl(mirrorNodeClient);
     }
 
     @Bean
