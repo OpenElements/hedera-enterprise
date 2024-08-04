@@ -59,8 +59,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     public List<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId) throws HederaException {
         Objects.requireNonNull(accountId, "accountId must not be null");
         Objects.requireNonNull(tokenId, "tokenId must not be null");
+        final String host = mirrorNodeEndpoint.substring(8).split("\\:")[0];
+        final String port = mirrorNodeEndpoint.substring(8).split("\\:")[1];
         final String body = restClient.get()
-                .uri(uriBuilder -> uriBuilder.path(mirrorNodeEndpoint + "/api/v1/tokens/" + tokenId + "/nfts")
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("https")
+                                .host(host)
+                                .port(port)
+                        .path("/api/v1/tokens/" + tokenId + "/nfts")
                         .queryParam("account.id", accountId)
                         .build())
                 .header("accept", "application/json")
@@ -68,9 +74,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     throw new RuntimeException("Client error: " + response.getStatusText());
                 }).body(String.class);
-        System.out.println(body);
-        //TODO: JSON PARSING
-        return List.of();
+        return fromJson(body);
     }
 
     @Override
@@ -83,26 +87,27 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     throw new RuntimeException("Client error: " + response.getStatusText());
                 }).body(String.class);
+        return fromJson(body);
+    }
+
+    private List<Nft> fromJson(final String json) {
         try {
-            final JsonNode rootNode = objectMapper.readTree(body);
+            final JsonNode rootNode = objectMapper.readTree(json);
             return StreamSupport.stream(
                     Spliterators.spliteratorUnknownSize(rootNode.get("nfts").iterator(), Spliterator.ORDERED),
                     false).map(nftNode -> {
-                        try {
-                            final TokenId parsedTokenId = TokenId.fromString(nftNode.get("token_id").asText());
-                            if (!tokenId.equals(parsedTokenId)) {
-                                throw new RuntimeException("Token ID mismatch: " + tokenId + " != " + parsedTokenId);
-                            }
-                            final AccountId account = AccountId.fromString(nftNode.get("account_id").asText());
-                            final long serial = nftNode.get("serial_number").asLong();
-                            final byte[] metadata = nftNode.get("metadata").binaryValue();
-                            return new Nft(tokenId, serial, account, metadata);
-                        } catch (final Exception e) {
-                            throw new RuntimeException("Error parsing NFT", e);
-                        }
+                try {
+                    final TokenId parsedTokenId = TokenId.fromString(nftNode.get("token_id").asText());
+                    final AccountId account = AccountId.fromString(nftNode.get("account_id").asText());
+                    final long serial = nftNode.get("serial_number").asLong();
+                    final byte[] metadata = nftNode.get("metadata").binaryValue();
+                    return new Nft(parsedTokenId, serial, account, metadata);
+                } catch (final Exception e) {
+                    throw new RuntimeException("Error parsing NFT", e);
+                }
             }).toList();
         } catch (final Exception e) {
-            throw new HederaException("Error parsing body as JSON: " + body, e);
+            throw new IllegalArgumentException("Error parsing body as JSON: " + json, e);
         }
     }
 

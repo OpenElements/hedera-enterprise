@@ -1,5 +1,6 @@
 package com.openelements.hedera.spring.test;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.AccountClient;
@@ -27,6 +28,9 @@ public class NftRepositoryTests {
     @Autowired
     private HederaTestUtils hederaTestUtils;
 
+    @Value("${spring.hedera.accountId}")
+    private String accountId;
+
     @Test
     void findByTokenId() throws Exception {
         //given
@@ -40,6 +44,28 @@ public class NftRepositoryTests {
 
         //when
         final List<Nft> result = nftRepository.findByType(tokenId);
+
+        //then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(0)));
+        Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(1)));
+    }
+
+    @Test
+    void findByTokenIdAndAccountId() throws Exception {
+        //given
+        final String name = "Tokemon cards";
+        final String symbol = "TOK";
+        final String metadata1 = "https://example.com/metadata1";
+        final String metadata2 = "https://example.com/metadata2";
+        final TokenId tokenId = nftClient.createNftType(name, symbol);
+        final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata1, metadata2));
+        final AccountId owner = AccountId.fromString(accountId);
+        hederaTestUtils.waitForMirrorNodeRecords();
+
+        //when
+        final List<Nft> result = nftRepository.findByOwnerAndType(owner, tokenId);
 
         //then
         Assertions.assertNotNull(result);
