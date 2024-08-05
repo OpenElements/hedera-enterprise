@@ -2,6 +2,7 @@ package com.openelements.hedera.spring.test;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Status;
+import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
@@ -33,13 +34,13 @@ public class ProtocolLayerClientTests {
     @Autowired
     private ProtocolLayerClient protocolLayerClient;
 
-    @Value("${spring.hedera.accountId}")
-    private String accountId;
+    @Autowired
+    private Account adminAccount;
 
     @Test
     void testGetBalance() throws Exception {
         //given
-        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
+        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(adminAccount.accountId());
 
         //when
         final AccountBalanceResponse accountBalanceResult = protocolLayerClient.executeAccountBalanceQuery(

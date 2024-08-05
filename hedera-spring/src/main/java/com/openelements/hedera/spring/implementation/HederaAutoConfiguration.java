@@ -3,6 +3,7 @@ package com.openelements.hedera.spring.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.AccountClient;
 import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.NftClient;
@@ -82,6 +83,11 @@ public class HederaAutoConfiguration {
         } catch (Exception e) {
             throw new IllegalArgumentException("Can not parse 'spring.hedera.accountId' property", e);
         }
+    }
+
+    @Bean
+    Account account(final AccountId accountId, final PrivateKey privateKey) {
+        return new Account(accountId, privateKey.getPublicKey(), privateKey);
     }
 
     @Bean

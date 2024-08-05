@@ -13,7 +13,6 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 public class TestConfig {
 
-
     @Bean
     HederaTestUtils hederaTestUtils(MirrorNodeClient mirrorNodeClient, ProtocolLayerClient protocolLayerClient) {
         HederaTestUtils testUtils = new HederaTestUtils(mirrorNodeClient, protocolLayerClient);

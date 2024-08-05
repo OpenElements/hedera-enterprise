@@ -1,6 +1,7 @@
 package com.openelements.hedera.spring.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.ContractCallResult;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.SmartContractClient;
@@ -24,10 +25,9 @@ public class SmartContractDatatypesTests {
     @Autowired
     private SmartContractClient smartContractClient;
 
-    private static ContractId contractId;
+    private Account adminAccount;
 
-    @Value("${spring.hedera.accountId}")
-    private String accountId;
+    private static ContractId contractId;
 
     private synchronized ContractId getOrCreateContractId() {
         if(contractId == null) {
@@ -63,10 +63,10 @@ public class SmartContractDatatypesTests {
 
         //when
         final ContractCallResult result = smartContractClient.callContractFunction(contract, "checkString",
-                ContractParam.address(accountId));
+                ContractParam.address(adminAccount.accountId()));
 
         //then
-        Assertions.assertEquals(accountId, result.getAddress(0));
+        Assertions.assertEquals(adminAccount.accountId(), result.getAddress(0));
     }
 
     @ParameterizedTest

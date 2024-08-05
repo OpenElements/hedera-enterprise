@@ -22,9 +22,6 @@ public class NftClientTests {
     @Autowired
     private AccountClient accountClient;
 
-    @Value("${spring.hedera.privateKey}")
-    private String privateKeyForAdminAccount;
-
     @Test
     void createNftType() throws Exception {
         //given

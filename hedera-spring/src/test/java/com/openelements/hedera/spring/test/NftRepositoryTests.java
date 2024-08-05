@@ -35,11 +35,8 @@ public class NftRepositoryTests {
     @Autowired
     private AccountClient accountClient;
 
-    @Value("${spring.hedera.accountId}")
-    private String accountId;
-
-    @Value("${spring.hedera.privateKey}")
-    private String accountPrivateKey;
+    @Autowired
+    private Account adminAccount;
 
     @Test
     void findByTokenId() throws Exception {
@@ -87,14 +84,14 @@ public class NftRepositoryTests {
         final String metadata2 = "https://example.com/metadata2";
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata1, metadata2));
-        final AccountId adminAccount = AccountId.fromString(accountId);
-        final PrivateKey adminAccountPrivateKey = PrivateKey.fromString(accountPrivateKey);
+        final AccountId adminAccountId = adminAccount.accountId();
+        final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
-        nftClient.transferNft(tokenId, serial.get(0), adminAccount, adminAccountPrivateKey, newOwner);
-        nftClient.transferNft(tokenId, serial.get(1), adminAccount, adminAccountPrivateKey, newOwner);
+        nftClient.transferNft(tokenId, serial.get(0), adminAccountId, adminAccountPrivateKey, newOwner);
+        nftClient.transferNft(tokenId, serial.get(1), adminAccountId, adminAccountPrivateKey, newOwner);
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
@@ -137,14 +134,14 @@ public class NftRepositoryTests {
         final String metadata2 = "https://example.com/metadata2";
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata1, metadata2));
-        final AccountId adminAccount = AccountId.fromString(accountId);
-        final PrivateKey adminAccountPrivateKey = PrivateKey.fromString(accountPrivateKey);
+        final AccountId adminAccountId = adminAccount.accountId();
+        final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
-        nftClient.transferNft(tokenId, serial.get(0), adminAccount, adminAccountPrivateKey, newOwner);
-        nftClient.transferNft(tokenId, serial.get(1), adminAccount, adminAccountPrivateKey, newOwner);
+        nftClient.transferNft(tokenId, serial.get(0), adminAccountId, adminAccountPrivateKey, newOwner);
+        nftClient.transferNft(tokenId, serial.get(1), adminAccountId, adminAccountPrivateKey, newOwner);
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
@@ -223,13 +220,13 @@ public class NftRepositoryTests {
         final String metadata = "https://example.com/metadata1";
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata));
-        final AccountId adminAccount = AccountId.fromString(accountId);
-        final PrivateKey adminAccountPrivateKey = PrivateKey.fromString(accountPrivateKey);
+        final AccountId adminAccountId = adminAccount.accountId();
+        final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
-        nftClient.transferNft(tokenId, serial.get(0), adminAccount, adminAccountPrivateKey, newOwner);
+        nftClient.transferNft(tokenId, serial.get(0), adminAccountId, adminAccountPrivateKey, newOwner);
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
