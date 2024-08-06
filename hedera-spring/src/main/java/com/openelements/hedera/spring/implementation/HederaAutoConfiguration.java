@@ -86,7 +86,7 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    Account account(final AccountId accountId, final PrivateKey privateKey) {
+    Account operationalAccount(final AccountId accountId, final PrivateKey privateKey) {
         return new Account(accountId, privateKey.getPublicKey(), privateKey);
     }
 

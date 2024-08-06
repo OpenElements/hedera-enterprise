@@ -28,6 +28,9 @@ The account information (accountId, privateKey, publicKey) can all be found at t
 [Hedera portal](https://portal.hedera.com/) for a testnet or previewnet account.
 Today only the "DER Encoded Private Key" of the "ECDSA" key type is supported for the `spring.hedera.privateKey` property.
 
+The 2 properties `spring.hedera.accountId` and `spring.hedera.privateKey` define the so called "operation account".
+The operational account is used as the account that sends all transactions against the Hedera network.
+
 ### Usage
 
 To use the module, you need to add the `@EnableHedera` annotation to your Spring Boot application class.

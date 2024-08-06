@@ -6,36 +6,225 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
+/**
+ * Interface for interacting with a Hedera network.
+ * This interface provides methods for interacting with Hedera NFTs, like creating and deleting NFTs.
+ * An implementation of this interface is using an internal account to interact with the Hedera network.
+ * That account is the account that is used to pay for the transactions that are sent to the Hedera network and called 'operator account'.
+ */
 public interface NftClient {
 
+    /**
+     * Create a new NFT type. That type is 'owned' by the operator account.
+     * The operator account is used as suppler account and as treasury account for the NFT type.
+     *
+     * @param name the name of the NFT type
+     * @param symbol the symbol of the NFT type
+     * @return the ID of the new NFT type
+     * @throws HederaException if the NFT type could not be created
+     */
     @NonNull
-    TokenId createNftType(String name, String symbol) throws HederaException;
+    TokenId createNftType(@NonNull String name, @NonNull String symbol) throws HederaException;
 
+    /**
+     * Create a new NFT type.
+     * The operator account is used as treasury account for the NFT type.
+     *
+     * @param name the name of the NFT type
+     * @param symbol the symbol of the NFT type
+     * @param supplierKey the private key of the supplier account
+     * @return the ID of the new NFT type
+     * @throws HederaException if the NFT type could not be created
+     */
     @NonNull
-    TokenId createNftType(String name, String symbol, PrivateKey supplierKey) throws HederaException;
+    TokenId createNftType(@NonNull String name, @NonNull String symbol, @NonNull PrivateKey supplierKey) throws HederaException;
 
+    /**
+     * Create a new NFT type.
+     * The operator account is used as supplier account for the NFT type.
+     *
+     * @param name the name of the NFT type
+     * @param symbol the symbol of the NFT type
+     * @param treasuryAccountId the ID of the treasury account
+     * @param treasuryKey the private key of the treasury account
+     * @return the ID of the new NFT type
+     * @throws HederaException if the NFT type could not be created
+     */
     @NonNull
-    TokenId createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey) throws HederaException;
+    TokenId createNftType(@NonNull String name, @NonNull String symbol, @NonNull AccountId treasuryAccountId, @NonNull PrivateKey treasuryKey) throws HederaException;
 
+    /**
+     * Create a new NFT type.
+     * The operator account is used as supplier account for the NFT type.
+     *
+     * @param name the name of the NFT type
+     * @param symbol the symbol of the NFT type
+     * @param treasuryAccount the treasury account
+     * @return the ID of the new NFT type
+     * @throws HederaException if the NFT type could not be created
+     */
     @NonNull
-    TokenId createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey) throws HederaException;
+    default TokenId createNftType(@NonNull String name, @NonNull String symbol, @NonNull Account treasuryAccount) throws HederaException {
+        Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
+        return createNftType(name, symbol, treasuryAccount.accountId(), treasuryAccount.privateKey());
+    }
 
-    void associateNft(TokenId tokenId, AccountId accountId, PrivateKey accountKey) throws HederaException;
 
-    long mintNft(TokenId tokenId, String metadata) throws HederaException;
-
-    long mintNft(TokenId tokenId, String metadata, PrivateKey supplyKey) throws HederaException;
-
+    /**
+     * Create a new NFT type.
+     *
+     * @param name the name of the NFT type
+     * @param symbol the symbol of the NFT type
+     * @param treasuryAccountId the ID of the treasury account
+     * @param treasuryKey the private key of the treasury account
+     * @param supplierKey the private key of the supplier account
+     * @return the ID of the new NFT type
+     * @throws HederaException if the NFT type could not be created
+     */
     @NonNull
-    List<Long> mintNfts(TokenId tokenId, List<String> metadata) throws HederaException;
+    TokenId createNftType(@NonNull String name, @NonNull String symbol, @NonNull AccountId treasuryAccountId, @NonNull PrivateKey treasuryKey, @NonNull PrivateKey supplierKey) throws HederaException;
 
+    /**
+     * Create a new NFT type.
+     *
+     * @param name the name of the NFT type
+     * @param symbol the symbol of the NFT type
+     * @param treasuryAccount the treasury account
+     * @param supplierKey the private key of the supplier account
+     * @return the ID of the new NFT type
+     * @throws HederaException if the NFT type could not be created
+     */
     @NonNull
-    List<Long> mintNfts(TokenId tokenId, List<String> metadata, PrivateKey supplyKey) throws HederaException;
+    default TokenId createNftType(@NonNull String name, @NonNull String symbol, @NonNull Account treasuryAccount, @NonNull PrivateKey supplierKey) throws HederaException {
+        Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
+        return createNftType(name, symbol, treasuryAccount.accountId(), treasuryAccount.privateKey(), supplierKey);
+    }
 
-    void transferNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId) throws HederaException;
 
-    void transferNfts(TokenId tokenId, List<Long> serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId) throws HederaException;
+    /**
+     * Associate an account with an NFT type.
+     * If an account is associated with an NFT type, the account can hold NFTs of that type.
+     * Otherwise, the account cannot hold NFTs of that type and tranfer NFTs of that type will fail.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param accountId the ID of the account
+     * @param accountKey the private key of the account
+     * @throws HederaException if the account could not be associated with the NFT type
+     */
+    void associateNft(@NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey accountKey) throws HederaException;
 
+    /**
+     * Associate an account with an NFT type.
+     * If an account is associated with an NFT type, the account can hold NFTs of that type.
+     * Otherwise, the account cannot hold NFTs of that type and tranfer NFTs of that type will fail.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param account the  account
+     * @throws HederaException if the account could not be associated with the NFT type
+     */
+    default void associateNft(@NonNull TokenId tokenId, @NonNull Account account) throws HederaException {
+        Objects.requireNonNull(account, "account must not be null");
+        associateNft(tokenId, account.accountId(), account.privateKey());
+    }
+
+    /**
+     * Mint a new NFT of the given type. The NFT is minted by the operator account.
+     * The operator account is used as supply account for the NFT.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param metadata the metadata of the NFT
+     * @return the serial number of the new NFT
+     * @throws HederaException if the NFT could not be minted
+     */
+    long mintNft(@NonNull TokenId tokenId, @NonNull String metadata) throws HederaException;
+
+    /**
+     * Mint a new NFT of the given type.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param metadata the metadata of the NFT
+     * @param supplyKey the private key of the supply account
+     * @return the serial number of the new NFT
+     * @throws HederaException if the NFT could not be minted
+     */
+    long mintNft(@NonNull TokenId tokenId, @NonNull String metadata, @NonNull PrivateKey supplyKey) throws HederaException;
+
+    /**
+     * Mint new NFTs of the given type. The NFTs are minted by the operator account.
+     * The operator account is used as supply account for the NFTs.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param metadata the metadata of the NFTs
+     * @return the serial numbers of the new NFTs
+     * @throws HederaException if the NFTs could not be minted
+     */
+    @NonNull
+    List<Long> mintNfts(@NonNull TokenId tokenId, @NonNull List<String> metadata) throws HederaException;
+
+    /**
+     * Mint new NFTs of the given type.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param metadata the metadata of the NFTs
+     * @param supplyKey the private key of the supply account
+     * @return the serial numbers of the new NFTs
+     * @throws HederaException if the NFTs could not be minted
+     */
+    @NonNull
+    List<Long> mintNfts(@NonNull TokenId tokenId, @NonNull List<String> metadata, @NonNull PrivateKey supplyKey) throws HederaException;
+
+    /**
+     * Transfer an NFT to another account.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param serialNumber the serial number of the NFT
+     * @param fromAccountId the ID of the account that holds the NFT
+     * @param fromAccountKey the private key of the account that holds the NFT
+     * @param toAccountId the ID of the account that should receive the NFT
+     * @throws HederaException if the NFT could not be transferred
+     */
+    void transferNft(@NonNull TokenId tokenId, long serialNumber, @NonNull AccountId fromAccountId, @NonNull PrivateKey fromAccountKey, @NonNull AccountId toAccountId) throws HederaException;
+
+    /**
+     * Transfer an NFT to another account.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param serialNumber the serial number of the NFT
+     * @param fromAccount the account that holds the NFT
+     * @param toAccountId the ID of the account that should receive the NFT
+     * @throws HederaException if the NFT could not be transferred
+     */
+    default void transferNft(@NonNull TokenId tokenId, long serialNumber, @NonNull Account fromAccount, @NonNull AccountId toAccountId) throws HederaException {
+        Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+        transferNft(tokenId, serialNumber, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
+    }
+
+    /**
+     * Transfer NFTs to another account.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param serialNumbers the serial numbers of the NFTs
+     * @param fromAccountId the ID of the account that holds the NFTs
+     * @param fromAccountKey the private key of the account that holds the NFTs
+     * @param toAccountId the ID of the account that should receive the NFTs
+     * @throws HederaException if the NFTs could not be transferred
+     */
+    void transferNfts(@NonNull TokenId tokenId, @NonNull List<Long> serialNumbers, @NonNull AccountId fromAccountId, @NonNull PrivateKey fromAccountKey, @NonNull AccountId toAccountId) throws HederaException;
+
+    /**
+     * Transfer NFTs to another account.
+     *
+     * @param tokenId the ID of the NFT type
+     * @param serialNumbers the serial numbers of the NFTs
+     * @param fromAccount the account that holds the NFTs
+     * @param toAccountId the ID of the account that should receive the NFTs
+     * @throws HederaException if the NFTs could not be transferred
+     */
+    default void transferNfts(@NonNull TokenId tokenId, @NonNull List<Long> serialNumbers, @NonNull Account fromAccount, @NonNull AccountId toAccountId) throws HederaException {
+        Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+        transferNfts(tokenId, serialNumbers, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
+    }
 }

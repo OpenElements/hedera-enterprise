@@ -97,4 +97,25 @@ public class NftClientTests {
             nftClient.transferNft(tokenId, serial, treasuryAccount.accountId(), treasuryAccount.privateKey(), userAccount.accountId());
         });
     }
+
+    @Test
+    void mintNftByNewUserAndTransferByAnotherUser() throws Exception {
+        //given
+        final String name = "Test NFT";
+        final String symbol = "TST";
+        final Account treasuryAccount = accountClient.createAccount();
+        final Account supplierAccount = accountClient.createAccount();
+        final TokenId tokenId = nftClient.createNftType(name, symbol, treasuryAccount, supplierAccount.privateKey());
+
+        final Account userAccount = accountClient.createAccount();
+        nftClient.associateNft(tokenId, userAccount);
+
+        final String metadata = "https://example.com/metadata";
+        final long serial = nftClient.mintNft(tokenId, metadata, supplierAccount.privateKey());
+
+        //then
+        Assertions.assertDoesNotThrow(() -> {
+            nftClient.transferNft(tokenId, serial, treasuryAccount, userAccount.accountId());
+        });
+    }
 }

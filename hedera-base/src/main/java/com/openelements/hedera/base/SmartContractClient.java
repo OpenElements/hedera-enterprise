@@ -9,6 +9,8 @@ import java.nio.file.Path;
 
 /**
  * A client for interacting with the smart contract service on the Hedera network.
+ * An implementation of this interface is using an internal account to interact with the Hedera network.
+ * That account is the account that is used to pay for the transactions that are sent to the Hedera network and called 'operator account'.
  */
 public interface SmartContractClient {
 
