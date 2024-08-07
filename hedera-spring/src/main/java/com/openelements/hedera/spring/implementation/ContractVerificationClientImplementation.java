@@ -1,5 +1,7 @@
 package com.openelements.hedera.spring.implementation;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
@@ -23,7 +25,9 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     private final static String CONTRACT_VERIFICATION_URL = "https://server-verify.hashscan.io";
 
-    private record VerifyRequest(String address, String chain, String creatorTxHash, String chosenContract, Map<String, String> files) {}
+    private record VerifyRequest(String address, String chain, String creatorTxHash, String chosenContract,
+                                 Map<String, String> files) {
+    }
 
     private final HederaNetwork hederaNetwork;
 
@@ -37,14 +41,18 @@ public class ContractVerificationClientImplementation implements ContractVerific
         restClient = RestClient.create();
     }
 
+    @NonNull
     private String getChainId() throws HederaException {
-        if(hederaNetwork == HederaNetwork.CUSTOM) {
-            throw new HederaException("A custom Hedera network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
+        if (hederaNetwork == HederaNetwork.CUSTOM) {
+            throw new HederaException(
+                    "A custom Hedera network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
         }
         return hederaNetwork.getChainId() + "";
     }
 
-    private void handleError(@NonNull final HttpRequest request, @NonNull final ClientHttpResponse response) throws IOException {
+    private void handleError(@NonNull final HttpRequest request, @NonNull final ClientHttpResponse response)
+            throws IOException {
+        Objects.requireNonNull(response, "response must not be null");
         final String error;
         try {
             final String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
@@ -61,20 +69,25 @@ public class ContractVerificationClientImplementation implements ContractVerific
                         error = body;
                     }
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new IOException("Error parsing body as JSON: " + body, e);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new IOException("Error (" + response.getStatusCode() + "): " + response.getStatusText());
         }
         throw new IOException("Error (" + response.getStatusCode() + "): " + error);
     }
 
     @Override
-    public ContractVerificationState verify(@NonNull final ContractId contractId, @NonNull final String contractName, @NonNull final Map<String, String> files) throws HederaException {
+    public ContractVerificationState verify(@NonNull final ContractId contractId, @NonNull final String contractName,
+            @NonNull final Map<String, String> files) throws HederaException {
+        Objects.requireNonNull(contractId, "contractId must not be null");
+        Objects.requireNonNull(contractName, "contractName must not be null");
+        Objects.requireNonNull(files, "files must not be null");
+
         final ContractVerificationState state = checkVerification(contractId);
-        if(state != ContractVerificationState.NONE) {
-           throw new IllegalStateException("Contract is already verified");
+        if (state != ContractVerificationState.NONE) {
+            throw new IllegalStateException("Contract is already verified");
         }
 
         final VerifyRequest verifyRequest = new VerifyRequest(
@@ -83,35 +96,35 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 "",
                 "",
                 files
-                );
+        );
         try {
             final String resultBody = restClient.post()
-                .uri(CONTRACT_VERIFICATION_URL + "/verify")
-                .header("Content-Type", "application/json")
-                .header("accept", "application/json")
-                .body(verifyRequest)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    handleError(request, response);
-                }).body(String.class);
+                    .uri(CONTRACT_VERIFICATION_URL + "/verify")
+                    .contentType(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON)
+                    .body(verifyRequest)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        handleError(request, response);
+                    }).body(String.class);
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             final JsonNode resultNode = rootNode.get("result");
-            if(resultNode != null) {
+            if (resultNode != null) {
                 if (resultNode.isArray()) {
-                    final List<JsonNode> results =  StreamSupport
+                    final List<JsonNode> results = StreamSupport
                             .stream(resultNode.spliterator(), false)
                             .toList();
-                    if(results.size() != 1) {
+                    if (results.size() != 1) {
                         throw new RuntimeException("Expected exactly one result, got " + results.size());
                     }
                     final JsonNode result = results.get(0);
                     final JsonNode statusNode = result.get("status");
-                    if(statusNode != null) {
-                        if(statusNode.asText().equals("perfect")) {
+                    if (statusNode != null) {
+                        if (statusNode.asText().equals("perfect")) {
                             return ContractVerificationState.FULL;
-                        } else if(statusNode.asText().equals("false")) {
+                        } else if (statusNode.asText().equals("false")) {
                             return ContractVerificationState.NONE;
-                        }  else {
+                        } else {
                             throw new RuntimeException("Status is not success: " + statusNode.asText());
                         }
                     } else {
@@ -129,18 +142,21 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     @Override
-    public ContractVerificationState checkVerification(@NonNull final ContractId contractId) throws HederaException{
+    public ContractVerificationState checkVerification(@NonNull final ContractId contractId) throws HederaException {
+        Objects.requireNonNull(contractId, "contractId must not be null");
 
-        final String uri = CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress() + "&chainIds=" + getChainId();
+        final String uri =
+                CONTRACT_VERIFICATION_URL + "/check-by-addresses" + "?addresses=" + contractId.toSolidityAddress()
+                        + "&chainIds=" + getChainId();
 
         try {
             final String resultBody = restClient.get()
-                .uri(uri)
-                .header("accept", "application/json")
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    handleError(request, response);
-                }).body(String.class);
+                    .uri(uri)
+                    .accept(APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        handleError(request, response);
+                    }).body(String.class);
 
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             if (rootNode.isArray()) {
@@ -155,7 +171,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 if (statusNode != null) {
                     if (statusNode.asText().equals("perfect")) {
                         return ContractVerificationState.FULL;
-                    } else if(statusNode.asText().equals("false")) {
+                    } else if (statusNode.asText().equals("false")) {
                         return ContractVerificationState.NONE;
                     } else {
                         throw new RuntimeException("Status is not success: " + statusNode.asText());
@@ -172,9 +188,14 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     @Override
-    public boolean checkVerification(@NonNull final ContractId contractId, @NonNull final String fileName, @NonNull final String fileContent) throws HederaException {
+    public boolean checkVerification(@NonNull final ContractId contractId, @NonNull final String fileName,
+            @NonNull final String fileContent) throws HederaException {
+        Objects.requireNonNull(contractId, "contractId must not be null");
+        Objects.requireNonNull(fileName, "fileName must not be null");
+        Objects.requireNonNull(fileContent, "fileContent must not be null");
+
         final ContractVerificationState state = checkVerification(contractId);
-        if(state != ContractVerificationState.FULL) {
+        if (state != ContractVerificationState.FULL) {
             throw new IllegalStateException("Contract is not verified");
         }
 
@@ -182,12 +203,12 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
         try {
             final String resultBody = restClient.get()
-                .uri(uri)
-                .header("accept", "application/json")
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    handleError(request, response);
-                }).body(String.class);
+                    .uri(uri)
+                    .header("accept", "application/json")
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        handleError(request, response);
+                    }).body(String.class);
 
             final JsonNode rootNode = objectMapper.readTree(resultBody);
             if (rootNode.isArray()) {
