@@ -1,7 +1,6 @@
 package com.openelements.hedera.base.protocol;
 
 import com.openelements.hedera.base.HederaException;
-import com.openelements.hedera.base.mirrornode.NftQuery;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
