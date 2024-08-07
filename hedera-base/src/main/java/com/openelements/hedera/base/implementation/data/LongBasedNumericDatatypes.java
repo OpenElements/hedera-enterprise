@@ -1,6 +1,7 @@
 package com.openelements.hedera.base.implementation.data;
 
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -36,13 +37,13 @@ public enum LongBasedNumericDatatypes implements ParamSupplier<Long> {
     }
 
     @Override
-    public void addParam(Long value, ContractFunctionParameters params) {
+    public void addParam(@NonNull final Long value, final ContractFunctionParameters params) {
         Objects.requireNonNull(value, "value must not be null");
         addParam.accept(value.longValue(), params);
     }
 
     @Override
-    public boolean isValidParam(Long value) {
+    public boolean isValidParam(final Long value) {
         if(value == null) {
             return false;
         }
@@ -54,7 +55,7 @@ public enum LongBasedNumericDatatypes implements ParamSupplier<Long> {
         return nativeType;
     }
 
-    public void addParam(long value, ContractFunctionParameters params) {
+    public void addParam(final long value, @NonNull final ContractFunctionParameters params) {
         Objects.requireNonNull(params, "params must not be null");
         if(value < minValue || value > maxValue) {
             throw new IllegalArgumentException("value out of range for type '" + this + "': " + value);

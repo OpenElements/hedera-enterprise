@@ -60,7 +60,6 @@ import com.openelements.hedera.base.protocol.FileInfoRequest;
 import com.openelements.hedera.base.protocol.FileInfoResponse;
 import com.openelements.hedera.base.protocol.FileUpdateRequest;
 import com.openelements.hedera.base.protocol.FileUpdateResult;
-import com.openelements.hedera.base.mirrornode.NftQuery;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import com.openelements.hedera.base.protocol.TokenAssociateRequest;
 import com.openelements.hedera.base.protocol.TokenAssociateResult;
@@ -103,7 +102,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public AccountBalanceResponse executeAccountBalanceQuery(final AccountBalanceRequest request) throws HederaException {
+    public AccountBalanceResponse executeAccountBalanceQuery(@NonNull final AccountBalanceRequest request) throws HederaException {
         final AccountBalanceQuery query = new AccountBalanceQuery().setAccountId(request.accountId())
                 .setQueryPayment(request.queryPayment())
                 .setMaxQueryPayment(request.maxQueryPayment());
@@ -112,7 +111,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileContentsResponse executeFileContentsQuery(final FileContentsRequest request) throws HederaException {
+    public FileContentsResponse executeFileContentsQuery(@NonNull final FileContentsRequest request) throws HederaException {
         final FileContentsQuery query = new FileContentsQuery().setFileId(request.fileId())
                 .setQueryPayment(request.queryPayment())
                 .setMaxQueryPayment(request.maxQueryPayment());
@@ -122,7 +121,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileInfoResponse executeFileInfoQuery(final FileInfoRequest request) throws HederaException {
+    public FileInfoResponse executeFileInfoQuery(@NonNull final FileInfoRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         final FileInfoQuery query = new FileInfoQuery().setFileId(request.fileId())
                 .setQueryPayment(request.queryPayment())
@@ -135,7 +134,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileCreateResult executeFileCreateTransaction(final FileCreateRequest request) throws HederaException {
+    public FileCreateResult executeFileCreateTransaction(@NonNull final FileCreateRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         Objects.requireNonNull(request.contents(), "content must not be null");
         if(request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
@@ -156,7 +155,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileUpdateResult executeFileUpdateRequestTransaction(final FileUpdateRequest request) throws HederaException {
+    public FileUpdateResult executeFileUpdateRequestTransaction(@NonNull final FileUpdateRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         if(request.contents() != null && request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
             throw new HederaException("File contents of 1 transaction must be less than " + FileCreateRequest.FILE_CREATE_MAX_SIZE + " bytes. Use FileAppend for larger files.");
@@ -177,7 +176,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileAppendResult executeFileAppendRequestTransaction(final FileAppendRequest request) throws HederaException {
+    public FileAppendResult executeFileAppendRequestTransaction(@NonNull final FileAppendRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         Objects.requireNonNull(request.contents(), "content must not be null");
         if(request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
@@ -195,7 +194,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public FileDeleteResult executeFileDeleteTransaction(final FileDeleteRequest request) throws HederaException {
+    public FileDeleteResult executeFileDeleteTransaction(@NonNull final FileDeleteRequest request) throws HederaException {
         final FileDeleteTransaction transaction = new FileDeleteTransaction()
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration())
@@ -205,7 +204,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     }
 
     @Override
-    public ContractCreateResult executeContractCreateTransaction(final ContractCreateRequest request) throws HederaException {
+    public ContractCreateResult executeContractCreateTransaction(@NonNull final ContractCreateRequest request) throws HederaException {
         final ContractFunctionParameters constructorParams = createParameters(request.constructorParams());
         final ContractCreateTransaction transaction = new ContractCreateTransaction()
                 .setMaxTransactionFee(request.maxTransactionFee())
@@ -359,7 +358,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     public TokenMintResult executeMintTokenTransaction(@NonNull final TokenMintRequest request) throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
         try {
-            TokenMintTransaction transaction = new TokenMintTransaction()
+            final TokenMintTransaction transaction = new TokenMintTransaction()
                     .setMaxTransactionFee(request.maxTransactionFee())
                     .setTransactionValidDuration(request.transactionValidDuration())
                     .setTokenId(request.tokenId());
@@ -427,7 +426,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             });
             try {
                 log.debug("Waiting for receipt of transaction '{}' of type {}", response.transactionId, transaction.getClass().getSimpleName());
-                TransactionReceipt receipt = response.getReceipt(client);
+                final TransactionReceipt receipt = response.getReceipt(client);
                 listeners.forEach(listener -> {
                     try {
                         listener.transactionHandled(TransactionType.ACCOUNT_CREATE, response.transactionId, receipt.status);

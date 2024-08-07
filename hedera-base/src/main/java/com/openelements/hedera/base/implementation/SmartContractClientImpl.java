@@ -37,7 +37,7 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractId createContract(@NonNull FileId fileId, @Nullable ContractParam<?>... constructorParams)
+    public ContractId createContract(@NonNull final FileId fileId, @Nullable final ContractParam<?>... constructorParams)
             throws HederaException {
         try {
             final ContractCreateRequest request;
@@ -55,7 +55,7 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractId createContract(@NonNull byte[] contents, @Nullable ContractParam<?>... constructorParams)
+    public ContractId createContract(@NonNull final byte[] contents, @Nullable final ContractParam<?>... constructorParams)
             throws HederaException {
         try {
             final FileId fileId = fileClient.createFile(contents);
@@ -69,10 +69,10 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractId createContract(@NonNull Path pathToBin, @Nullable ContractParam<?>... constructorParams)
+    public ContractId createContract(@NonNull final Path pathToBin, @Nullable final ContractParam<?>... constructorParams)
             throws HederaException {
         try {
-            String content = Files.readString(pathToBin, StandardCharsets.UTF_8);
+            final String content = Files.readString(pathToBin, StandardCharsets.UTF_8);
             final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
             return createContract(bytes, constructorParams);
         } catch (Exception e) {
@@ -82,11 +82,11 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractCallResult callContractFunction(@NonNull ContractId contractId, @NonNull String functionName,
+    public ContractCallResult callContractFunction(@NonNull final ContractId contractId, @NonNull final String functionName,
             @Nullable ContractParam<?>... params) throws HederaException {
         try {
             final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
-            ContractFunctionResult result = protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
+            final ContractFunctionResult result = protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
             return new ContractCallResultImpl(result);
         } catch (Exception e) {
             throw new HederaException("Failed to call function '" + functionName + "' on contract with id " + contractId, e);

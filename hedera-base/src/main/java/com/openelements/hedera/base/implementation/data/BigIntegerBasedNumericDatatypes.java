@@ -1,7 +1,9 @@
 package com.openelements.hedera.base.implementation.data;
 
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.math.BigInteger;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public enum BigIntegerBasedNumericDatatypes implements ParamSupplier<BigInteger> {
@@ -65,14 +67,15 @@ public enum BigIntegerBasedNumericDatatypes implements ParamSupplier<BigInteger>
     private final String nativeType;
 
     BigIntegerBasedNumericDatatypes(final String nativeType, BiConsumer<BigInteger, ContractFunctionParameters> addParam, BigInteger minValue, BigInteger maxValue) {
-       this.nativeType = nativeType;
+        this.nativeType = nativeType;
         this.addParam = addParam;
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
 
     @Override
-    public void addParam(BigInteger value, ContractFunctionParameters params) {
+    public void addParam(@NonNull final BigInteger value, final ContractFunctionParameters params) {
+        Objects.requireNonNull(value, "value must not be null");
         if(value.compareTo(minValue) < 0 || value.compareTo(maxValue) > 0) {
             throw new IllegalArgumentException("value out of range for type '" + this + "': " + value);
         }
@@ -80,7 +83,7 @@ public enum BigIntegerBasedNumericDatatypes implements ParamSupplier<BigInteger>
     }
 
     @Override
-    public boolean isValidParam(BigInteger value) {
+    public boolean isValidParam(final BigInteger value) {
         if(value == null) {
             return false;
         }

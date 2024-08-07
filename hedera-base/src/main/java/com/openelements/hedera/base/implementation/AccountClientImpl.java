@@ -32,7 +32,6 @@ public class AccountClientImpl implements AccountClient {
 
     @Override
     public void deleteAccount(@NonNull AccountId account) throws HederaException {
-        Objects.requireNonNull(account, "account must not be null");
         final AccountDeleteRequest request = AccountDeleteRequest.of(account);
         client.executeAccountDeleteTransaction(request);
     }
@@ -40,7 +39,6 @@ public class AccountClientImpl implements AccountClient {
     @NonNull
     @Override
     public Hbar getAccountBalance(@NonNull AccountId account) throws HederaException {
-        Objects.requireNonNull(account, "account must not be null");
         final AccountBalanceRequest request = AccountBalanceRequest.of(account);
         final AccountBalanceResponse response = client.executeAccountBalanceQuery(request);
         return response.hbars();
