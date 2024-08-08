@@ -14,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -33,7 +34,12 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     private final RestClient restClient;
 
-    private final String mirrorNodeEndpoint;
+    private final String mirrorNodeEndpointScheme = "https";
+
+    private final String mirrorNodeEndpointHost;
+
+    private final String mirrorNodeEndpointPort;
+
 
     public MirrorNodeClientImpl(@NonNull final Client client) {
         Objects.requireNonNull(client, "client must not be null");
@@ -41,14 +47,86 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         if (mirrorNetwork.isEmpty()) {
             throw new IllegalArgumentException("No mirror network is configured");
         }
-        mirrorNodeEndpoint = "https://" + mirrorNetwork.get(0);
+        mirrorNodeEndpointHost = mirrorNetwork.get(0).split("\\:")[0];
+        mirrorNodeEndpointPort = mirrorNetwork.get(0).split("\\:")[1];
         objectMapper = new ObjectMapper();
         restClient = RestClient.create();
     }
 
+    @Override
+    public List<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        final JsonNode jsonNode = doGetCall("/api/v1/accounts/" + accountId + "/nfts");
+        return jsonNodeToNftList(jsonNode);
+    }
+
+    @Override
+    public List<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
+            throws HederaException {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        final JsonNode jsonNode = doGetCall("/api/v1/tokens/" + tokenId + "/nfts", Map.of("account.id", accountId));
+        return jsonNodeToNftList(jsonNode);
+    }
+
+    @Override
+    public List<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        final JsonNode jsonNode = doGetCall("/api/v1/tokens/" + tokenId + "/nfts");
+        return jsonNodeToNftList(jsonNode);
+    }
+
+    @Override
+    public Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, @NonNull final long serialNumber)
+            throws HederaException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        if (serialNumber <= 0) {
+            throw new IllegalArgumentException("serialNumber must be positive");
+        }
+        final JsonNode jsonNode = doGetCall("/api/v1/tokens/" + tokenId + "/nfts/" + serialNumber);
+        return jsonNodeToOptionalNft(jsonNode);
+    }
+
+    @Override
+    public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId,
+            @NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
+                .filter(nft -> Objects.equals(nft.owner(), accountId));
+    }
+
+    @Override
+    public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HederaException {
+        Objects.requireNonNull(transactionId, "transactionId must not be null");
+        final JsonNode jsonNode = doGetCall("/api/v1/transactions/" + transactionId);
+        if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
+            return Optional.empty();
+        }
+        return Optional.of(new TransactionInfo(transactionId));
+    }
+
+    private JsonNode doGetCall(String path, Map<String, ?> params) throws HederaException {
+        return doGetCall(builder -> {
+            UriBuilder uriBuilder = builder.path(path);
+            for (Map.Entry<String, ?> entry : params.entrySet()) {
+                uriBuilder = uriBuilder.queryParam(entry.getKey(), entry.getValue());
+            }
+            return uriBuilder.build();
+        });
+    }
+
+    private JsonNode doGetCall(String path) throws HederaException {
+        return doGetCall(builder -> builder.path(path).build());
+    }
+
     private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HederaException {
         final ResponseEntity<String> responseEntity = restClient.get()
-                .uri(uriFunction)
+                .uri(uriBuilder -> {
+                    final UriBuilder withEndpoint = uriBuilder.scheme(mirrorNodeEndpointScheme)
+                            .host(mirrorNodeEndpointHost)
+                            .port(mirrorNodeEndpointPort);
+                    return uriFunction.apply(withEndpoint);
+                })
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
@@ -59,7 +137,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                 .toEntity(String.class);
         final String body = responseEntity.getBody();
         try {
-            if(HttpStatus.NOT_FOUND.equals(responseEntity.getStatusCode())) {
+            if (HttpStatus.NOT_FOUND.equals(responseEntity.getStatusCode())) {
                 return objectMapper.readTree("{}");
             }
             return objectMapper.readTree(body);
@@ -68,55 +146,8 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }
     }
 
-    @Override
-    public List<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
-        Objects.requireNonNull(accountId, "accountId must not be null");
-        final String host = mirrorNodeEndpoint.substring(8).split("\\:")[0];
-        final String port = mirrorNodeEndpoint.substring(8).split("\\:")[1];
-
-        final JsonNode jsonNode = doGetCall(builder ->
-            builder
-                    .scheme("https")
-                    .host(host)
-                    .port(port)
-                    .path("/api/v1/accounts/" + accountId + "/nfts")
-                    .build()
-        );
-        return parseJsonToList(jsonNode);
-    }
-
-    @Override
-    public List<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId) throws HederaException {
-        Objects.requireNonNull(accountId, "accountId must not be null");
-        Objects.requireNonNull(tokenId, "tokenId must not be null");
-        final String host = mirrorNodeEndpoint.substring(8).split("\\:")[0];
-        final String port = mirrorNodeEndpoint.substring(8).split("\\:")[1];
-        final JsonNode jsonNode = doGetCall(builder -> builder
-                        .scheme("https")
-                                .host(host)
-                                .port(port)
-                        .path("/api/v1/tokens/" + tokenId + "/nfts")
-                        .queryParam("account.id", accountId)
-                        .build());
-        return parseJsonToList(jsonNode);
-    }
-
-    @Override
-    public List<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException {
-        Objects.requireNonNull(tokenId, "tokenId must not be null");
-        final String host = mirrorNodeEndpoint.substring(8).split("\\:")[0];
-        final String port = mirrorNodeEndpoint.substring(8).split("\\:")[1];
-        final JsonNode jsonNode = doGetCall(builder -> builder
-                .scheme("https")
-                .host(host)
-                .port(port)
-                .path("/api/v1/tokens/" + tokenId + "/nfts")
-                .build());
-        return parseJsonToList(jsonNode);
-    }
-
-    private List<Nft> parseJsonToList(final JsonNode rootNode) {
-        if(rootNode == null || !rootNode.fieldNames().hasNext()) {
+    private List<Nft> jsonNodeToNftList(final JsonNode rootNode) {
+        if (rootNode == null || !rootNode.fieldNames().hasNext()) {
             return List.of();
         }
         return StreamSupport.stream(
@@ -130,64 +161,27 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }).toList();
     }
 
+    private Optional<Nft> jsonNodeToOptionalNft(final JsonNode jsonNode) throws HederaException {
+        if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(jsonNodeToNft(jsonNode));
+        } catch (final Exception e) {
+            throw new HederaException("Error parsing NFT from JSON '" + jsonNode + "'", e);
+        }
+    }
+
     private Nft jsonNodeToNft(final JsonNode jsonNode) throws IOException {
+        try {
             final TokenId parsedTokenId = TokenId.fromString(jsonNode.get("token_id").asText());
             final AccountId account = AccountId.fromString(jsonNode.get("account_id").asText());
             final long serial = jsonNode.get("serial_number").asLong();
             final byte[] metadata = jsonNode.get("metadata").binaryValue();
             return new Nft(parsedTokenId, serial, account, metadata);
-    }
-
-    @Override
-    public Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, @NonNull final long serialNumber) throws HederaException {
-        Objects.requireNonNull(tokenId, "tokenId must not be null");
-        if(serialNumber <= 0) {
-            throw new IllegalArgumentException("serialNumber must be positive");
-        }
-        final String body = restClient.get()
-                .uri(mirrorNodeEndpoint + "/api/v1/tokens/" + tokenId + "/nfts/" + serialNumber)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    if (!HttpStatus.NOT_FOUND.equals(response.getStatusCode())) {
-                        throw new RuntimeException("Client error: " + response.getStatusText());
-                    }
-                }).body(String.class);
-        if(body == null || body.equals("{\"_status\":{\"messages\":[{\"message\":\"Not found\"}]}}")) {
-            return Optional.empty();
-        }
-        try {
-            JsonNode jsonNode = objectMapper.readTree(body);
-            return Optional.ofNullable(jsonNodeToNft(jsonNode));
-        } catch (IOException e) {
-            throw new HederaException("Error parsing body as JSON: " + body, e);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException("Error parsing NFT from JSON '" + jsonNode + "'", e);
         }
     }
 
-    @Override
-    public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId, @NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
-        Objects.requireNonNull(accountId, "accountId must not be null");
-        return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
-                .filter(nft -> Objects.equals(nft.owner(), accountId));
-    }
-
-    @Override
-    public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HederaException {
-        Objects.requireNonNull(transactionId, "transactionId must not be null");
-        final ResponseEntity<String> entity = restClient.get()
-                .uri(mirrorNodeEndpoint + "/api/v1/transactions/" + transactionId)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    if (!HttpStatus.NOT_FOUND.equals(response.getStatusCode())) {
-                        throw new RuntimeException("Client error: " + response.getStatusText());
-                    }
-                }).toEntity(String.class);
-        if(HttpStatus.NOT_FOUND.equals(entity.getStatusCode())) {
-            return Optional.empty();
-        }
-        final String body = entity.getBody();
-        //TODO: JSON PARSING
-        return Optional.of(new TransactionInfo(transactionId));
-    }
 }
