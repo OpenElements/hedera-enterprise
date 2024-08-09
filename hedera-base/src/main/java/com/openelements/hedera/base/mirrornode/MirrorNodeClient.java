@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.Optional;
 

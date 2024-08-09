@@ -14,7 +14,7 @@ import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hedera.base.implementation.SmartContractClientImpl;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import com.openelements.hedera.microprofile.implementation.ContractVerificationClientImpl;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import java.util.Arrays;

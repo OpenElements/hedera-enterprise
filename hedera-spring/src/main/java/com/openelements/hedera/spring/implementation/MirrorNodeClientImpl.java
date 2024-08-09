@@ -10,7 +10,7 @@ import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.mirrornode.TransactionInfo;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;

@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.ContractVerificationState;
 import com.openelements.hedera.base.ContractVerificationClient;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;

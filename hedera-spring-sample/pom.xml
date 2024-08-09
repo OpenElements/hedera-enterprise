@@ -17,27 +17,22 @@
   <description>Sample for Hedera in Spring</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
 
-
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <version>3.3.0</version>
     </dependency>
   <dependency>
     <groupId>${project.groupId}</groupId>
     <artifactId>hedera-spring</artifactId>
-    <version>${project.version}</version>
   </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
       <artifactId>grpc-okhttp</artifactId>
-      <version>1.64.0</version>
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
       <artifactId>grpc-inprocess</artifactId>
-      <version>1.64.0</version>
     </dependency>
 </dependencies>
 

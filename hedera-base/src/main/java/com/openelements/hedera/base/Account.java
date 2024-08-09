@@ -3,8 +3,8 @@ package com.openelements.hedera.base;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a Hedera account.

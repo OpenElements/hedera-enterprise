@@ -5,7 +5,7 @@ import com.openelements.hedera.base.ContractVerificationClient;
 import com.openelements.hedera.base.ContractVerificationState;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.implementation.HederaNetwork;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;

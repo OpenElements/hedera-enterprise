@@ -3,9 +3,9 @@ package com.openelements.hedera.base;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import java.nio.file.Path;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A client for interacting with the smart contract service on the Hedera network.

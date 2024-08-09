@@ -11,7 +11,7 @@ import com.openelements.hedera.base.protocol.AccountCreateRequest;
 import com.openelements.hedera.base.protocol.AccountCreateResult;
 import com.openelements.hedera.base.protocol.AccountDeleteRequest;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.Objects;
 
 public class AccountClientImpl implements AccountClient {

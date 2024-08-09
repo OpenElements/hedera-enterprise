@@ -77,7 +77,7 @@ import com.openelements.hedera.base.protocol.TopicSubmitMessageRequest;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
 import com.openelements.hedera.base.protocol.TransactionListener;
 import com.openelements.hedera.base.protocol.TransactionType;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

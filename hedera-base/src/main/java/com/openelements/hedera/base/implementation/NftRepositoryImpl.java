@@ -6,7 +6,7 @@ import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.NftRepository;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

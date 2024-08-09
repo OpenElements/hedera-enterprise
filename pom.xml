@@ -32,14 +32,26 @@
     <tag>HEAD</tag>
   </scm>
 
-
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hedera-enterprise-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <modules>
+    <module>hedera-enterprise-bom</module>
     <module>hedera-base</module>
     <module>hedera-spring</module>
     <module>hedera-microprofile</module>

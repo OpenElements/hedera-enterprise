@@ -2,7 +2,7 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.time.Duration;
 import java.util.Objects;
 

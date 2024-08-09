@@ -1,7 +1,7 @@
 package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.Map;
 
 /**

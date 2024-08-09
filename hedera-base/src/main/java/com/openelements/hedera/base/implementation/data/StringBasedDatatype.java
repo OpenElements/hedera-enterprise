@@ -2,7 +2,7 @@ package com.openelements.hedera.base.implementation.data;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 

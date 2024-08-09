@@ -9,7 +9,7 @@ import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.ContractVerificationState;
 import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.hedera.base.ContractVerificationClient;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;

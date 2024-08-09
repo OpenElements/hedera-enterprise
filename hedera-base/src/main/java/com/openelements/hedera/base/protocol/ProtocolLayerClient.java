@@ -1,7 +1,7 @@
 package com.openelements.hedera.base.protocol;
 
 import com.openelements.hedera.base.HederaException;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface for interacting with the Hedera network at the protocol level.

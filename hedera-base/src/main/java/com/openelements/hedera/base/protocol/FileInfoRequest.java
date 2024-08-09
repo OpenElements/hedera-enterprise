@@ -2,8 +2,8 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 public record FileInfoRequest(@NonNull FileId fileId, @Nullable Hbar queryPayment, @Nullable Hbar maxQueryPayment) implements QueryRequest {

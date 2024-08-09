@@ -7,7 +7,7 @@ import com.openelements.hedera.base.implementation.data.BooleanDatatype;
 import com.openelements.hedera.base.implementation.data.LongBasedNumericDatatypes;
 import com.openelements.hedera.base.implementation.data.ParamSupplier;
 import com.openelements.hedera.base.implementation.data.StringBasedDatatype;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.math.BigInteger;
 import java.util.Objects;
 

@@ -1,6 +1,6 @@
 package com.openelements.hedera.base;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents an exception that occurred while interacting with the Hedera network.

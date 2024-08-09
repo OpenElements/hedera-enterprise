@@ -14,7 +14,7 @@ import com.openelements.hedera.base.protocol.TokenCreateResult;
 import com.openelements.hedera.base.protocol.TokenMintRequest;
 import com.openelements.hedera.base.protocol.TokenMintResult;
 import com.openelements.hedera.base.protocol.TokenTransferRequest;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
