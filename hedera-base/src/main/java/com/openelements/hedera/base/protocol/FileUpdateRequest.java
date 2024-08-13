@@ -17,7 +17,7 @@ public record FileUpdateRequest(Hbar maxTransactionFee,
                                 @Nullable byte[] contents,
 
                                 @Nullable Instant expirationTime,
-                                String fileMemo) implements TransactionRequest {
+                                @Nullable String fileMemo) implements TransactionRequest {
 
     private static final String DEFAULT_FILE_MEMO = "";
 

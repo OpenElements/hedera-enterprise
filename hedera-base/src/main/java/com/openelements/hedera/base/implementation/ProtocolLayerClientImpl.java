@@ -194,7 +194,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
                 .setTransactionMemo(request.fileMemo());
 
         final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
-        return new FileAppendResult(receipt.transactionId, receipt.status, receipt.fileId);
+        return new FileAppendResult(receipt.transactionId, receipt.status);
     }
 
     @Override
@@ -249,7 +249,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
                 .setFunction(request.functionName(), functionParams)
                 .setGas(DEFAULT_GAS);
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
-        return new ContractCallResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.contractFunctionResult);
+        return new ContractCallResult(record.transactionId, record.receipt.status, record.transactionHash.toByteArray(), record.consensusTimestamp, record.transactionFee, record.contractFunctionResult);
     }
 
     @Override
@@ -265,7 +265,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
                 .setInitialBalance(request.initialBalance());
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         final Account newAccount = Account.of(record.receipt.accountId, publicKey, privateKey);
-        return new AccountCreateResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, newAccount);
+        return new AccountCreateResult(record.transactionId, record.receipt.status, record.transactionHash.toByteArray(), record.consensusTimestamp, record.transactionFee, newAccount);
     }
 
     @Override
@@ -284,7 +284,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             sign(transaction, request.toDelete().privateKey(), operationalAccount.privateKey());
         }
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
-        return new AccountDeleteResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee);
+        return new AccountDeleteResult(record.transactionId, record.receipt.status, record.transactionHash.toByteArray(), record.consensusTimestamp, record.transactionFee);
     }
 
     public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request) throws HederaException {

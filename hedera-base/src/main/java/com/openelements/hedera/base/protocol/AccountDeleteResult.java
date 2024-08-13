@@ -1,14 +1,17 @@
 package com.openelements.hedera.base.protocol;
 
-import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
 import java.time.Instant;
+import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
-public record AccountDeleteResult(TransactionId transactionId, Status status, ByteString transactionHash, Instant consensusTimestamp, Hbar transactionFee) implements TransactionRecord {
+public record AccountDeleteResult(@NonNull TransactionId transactionId, @NonNull Status status, @NonNull byte[] transactionHash, Instant consensusTimestamp, Hbar transactionFee) implements TransactionRecord {
 
+    public AccountDeleteResult {
+        Objects.requireNonNull(transactionId, "transactionId must not be null");
+        Objects.requireNonNull(status, "status must not be null");
+        Objects.requireNonNull(transactionHash, "transactionHash must not be null");
+    }
 }

@@ -5,12 +5,13 @@ import com.hedera.hashgraph.sdk.Hbar;
 import org.jspecify.annotations.NonNull;
 import java.time.Duration;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 public record FileAppendRequest(Hbar maxTransactionFee,
                                 Duration transactionValidDuration,
                                 @NonNull FileId fileId,
                                 @NonNull byte[] contents,
-                                String fileMemo) implements TransactionRequest {
+                                @Nullable String fileMemo) implements TransactionRequest {
 
     private static final String DEFAULT_FILE_MEMO = "";
 

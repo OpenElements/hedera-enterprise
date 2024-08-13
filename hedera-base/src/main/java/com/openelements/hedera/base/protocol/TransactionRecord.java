@@ -1,6 +1,5 @@
 package com.openelements.hedera.base.protocol;
 
-import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
@@ -12,7 +11,7 @@ public interface TransactionRecord extends TransactionResult{
 
     Status status();
 
-    ByteString transactionHash();
+    byte[] transactionHash();
 
     Instant consensusTimestamp();
 

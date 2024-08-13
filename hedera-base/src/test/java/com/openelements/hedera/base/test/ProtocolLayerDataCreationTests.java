@@ -1,10 +1,8 @@
 package com.openelements.hedera.base.test;
 
-import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.openelements.hedera.base.Account;
@@ -13,14 +11,13 @@ import com.openelements.hedera.base.protocol.AccountBalanceResponse;
 import com.openelements.hedera.base.protocol.AccountCreateRequest;
 import com.openelements.hedera.base.protocol.AccountCreateResult;
 import com.openelements.hedera.base.protocol.AccountDeleteRequest;
+import com.openelements.hedera.base.protocol.AccountDeleteResult;
 import java.time.Duration;
 import java.time.Instant;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ProtocolLayerDataCreation {
+public class ProtocolLayerDataCreationTests {
 
     @Test
     void testAccountBalanceRequestCreation() {
@@ -80,7 +77,7 @@ public class ProtocolLayerDataCreation {
         final Account account = Account.of(accountId, privateKey);
         final TransactionId transactionId = TransactionId.generate(accountId);
         final Status status = Status.SUCCESS;
-        final ByteString transactionHash = ByteString.EMPTY;
+        final byte[] transactionHash = new byte[]{};
         final Instant consensusTimestamp = Instant.now();
         final Hbar transactionFee = Hbar.fromTinybars(1000);
 
@@ -119,5 +116,20 @@ public class ProtocolLayerDataCreation {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new AccountDeleteRequest(maxTransactionFee, Duration.ZERO, toDelete, transferFoundsToAccount));
         Assertions.assertThrows(IllegalArgumentException.class, () -> new AccountDeleteRequest(maxTransactionFee, Duration.ofSeconds(-10), toDelete, transferFoundsToAccount));
         Assertions.assertThrows(IllegalArgumentException.class, () -> new AccountDeleteRequest(maxTransactionFee, transactionValidDuration, toDelete, toDelete));
+    }
+
+    @Test
+    void testAccountDeleteResultCreation() {
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+        final byte[] transactionHash = new byte[]{};
+        final Instant consensusTimestamp = Instant.now();
+        final Hbar transactionFee = Hbar.fromTinybars(1000);
+
+        Assertions.assertDoesNotThrow(() -> new AccountDeleteResult(transactionId, status, transactionHash, consensusTimestamp, transactionFee));
+        Assertions.assertDoesNotThrow(() -> new AccountDeleteResult(transactionId, status, transactionHash, null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(null, status, transactionHash, consensusTimestamp, transactionFee));
+        Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, null, transactionHash, consensusTimestamp, transactionFee));
+        Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, status, null, consensusTimestamp, transactionFee));
     }
 }
