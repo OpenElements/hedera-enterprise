@@ -1,11 +1,9 @@
 package com.openelements.hedera.spring.test;
 
-import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
 import com.openelements.hedera.base.Account;
-import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
 import com.openelements.hedera.base.protocol.AccountCreateRequest;
@@ -24,15 +22,12 @@ import com.openelements.hedera.base.protocol.FileInfoRequest;
 import com.openelements.hedera.base.protocol.FileInfoResponse;
 import com.openelements.hedera.base.protocol.FileUpdateRequest;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = TestConfig.class)
@@ -183,7 +178,7 @@ public class ProtocolLayerClientTests {
         final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
 
         hederaTestUtils.waitForMirrorNodeRecords();
-        final AccountDeleteRequest request = AccountDeleteRequest.of(new Account(accountCreateResult.accountId(), accountCreateResult.publicKey(), accountCreateResult.privateKey()));
+        final AccountDeleteRequest request = AccountDeleteRequest.of(accountCreateResult.newAccount());
 
         //then
         Assertions.assertDoesNotThrow(() -> protocolLayerClient.executeAccountDeleteTransaction(request));
@@ -194,11 +189,11 @@ public class ProtocolLayerClientTests {
         //given
         final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of(Hbar.from(10));
         final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
-        final Account toDeleteAccount = new Account(accountCreateResult.accountId(), accountCreateResult.publicKey(), accountCreateResult.privateKey());
+        final Account toDeleteAccount = accountCreateResult.newAccount();
 
         final AccountCreateRequest transferAccountCreateRequest = AccountCreateRequest.of(Hbar.from(1));
         final AccountCreateResult transferAccountCreateResult = protocolLayerClient.executeAccountCreateTransaction(transferAccountCreateRequest);
-        final Account toTransferAccount = new Account(transferAccountCreateResult.accountId(), transferAccountCreateResult.publicKey(), transferAccountCreateResult.privateKey());
+        final Account toTransferAccount = transferAccountCreateResult.newAccount();
 
         //when
         final AccountDeleteRequest request = AccountDeleteRequest.of(toDeleteAccount, toTransferAccount);

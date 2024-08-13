@@ -264,7 +264,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
                 .setKey(publicKey)
                 .setInitialBalance(request.initialBalance());
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
-        return new AccountCreateResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, record.receipt.accountId, publicKey, privateKey);
+        final Account newAccount = Account.of(record.receipt.accountId, publicKey, privateKey);
+        return new AccountCreateResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee, newAccount);
     }
 
     @Override

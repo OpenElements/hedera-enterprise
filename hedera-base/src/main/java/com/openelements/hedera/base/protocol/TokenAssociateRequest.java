@@ -23,7 +23,7 @@ public record TokenAssociateRequest(Hbar maxTransactionFee,
 
     public TokenAssociateRequest {
         Objects.requireNonNull(tokenId, "tokenId must not be null");
-        Objects.requireNonNull(accountId, "accountId must not be null");
+        Objects.requireNonNull(accountId, "newAccountId must not be null");
         Objects.requireNonNull(accountPrivateKey, "accountPrivateKey must not be null");
     }
 

@@ -55,7 +55,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     @Override
     public List<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
-        Objects.requireNonNull(accountId, "accountId must not be null");
+        Objects.requireNonNull(accountId, "newAccountId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/accounts/" + accountId + "/nfts");
         return jsonNodeToNftList(jsonNode);
     }
@@ -63,7 +63,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     @Override
     public List<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
             throws HederaException {
-        Objects.requireNonNull(accountId, "accountId must not be null");
+        Objects.requireNonNull(accountId, "newAccountId must not be null");
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/tokens/" + tokenId + "/nfts", Map.of("account.id", accountId));
         return jsonNodeToNftList(jsonNode);
@@ -90,7 +90,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     @Override
     public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId,
             @NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
-        Objects.requireNonNull(accountId, "accountId must not be null");
+        Objects.requireNonNull(accountId, "newAccountId must not be null");
         return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
                 .filter(nft -> Objects.equals(nft.owner(), accountId));
     }

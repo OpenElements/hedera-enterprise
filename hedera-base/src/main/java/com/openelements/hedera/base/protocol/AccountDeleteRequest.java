@@ -26,6 +26,9 @@ public record AccountDeleteRequest(@NonNull Hbar maxTransactionFee,
         if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
             throw new IllegalArgumentException("transactionValidDuration must be positive");
         }
+        if(transferFoundsToAccount != null && Objects.equals(toDelete.accountId(), transferFoundsToAccount.accountId())) {
+            throw new IllegalArgumentException("transferFoundsToAccount must be different from toDelete");
+        }
     }
 
     @NonNull

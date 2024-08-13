@@ -27,7 +27,7 @@ public class AccountClientImpl implements AccountClient {
     public Account createAccount(@NonNull Hbar initialBalance) throws HederaException {
         final AccountCreateRequest request = AccountCreateRequest.of(initialBalance);
         final AccountCreateResult result = client.executeAccountCreateTransaction(request);
-        return new Account(result.accountId(), result.publicKey(), result.privateKey());
+        return result.newAccount();
     }
 
     @Override

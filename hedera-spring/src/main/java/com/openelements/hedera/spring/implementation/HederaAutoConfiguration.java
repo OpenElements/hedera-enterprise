@@ -73,15 +73,15 @@ public class HederaAutoConfiguration {
     AccountId accountId(final HederaProperties properties) {
         final String accountId = properties.getAccountId();
         if(accountId == null) {
-            throw new IllegalArgumentException("'spring.hedera.accountId' property must be set");
+            throw new IllegalArgumentException("'spring.hedera.newAccountId' property must be set");
         }
         if(accountId.isBlank()) {
-            throw new IllegalArgumentException("'spring.hedera.accountId' property must not be blank");
+            throw new IllegalArgumentException("'spring.hedera.newAccountId' property must not be blank");
         }
         try {
             return AccountId.fromString(accountId);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'spring.hedera.accountId' property", e);
+            throw new IllegalArgumentException("Can not parse 'spring.hedera.newAccountId' property", e);
         }
     }
 

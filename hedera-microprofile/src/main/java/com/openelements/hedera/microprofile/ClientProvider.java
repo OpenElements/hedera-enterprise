@@ -24,7 +24,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 public class ClientProvider {
 
-    @ConfigProperty(name = "hedera.accountId")
+    @ConfigProperty(name = "hedera.newAccountId")
     private String accountIdAsString;
 
     @ConfigProperty(name = "hedera.privateKey")
@@ -37,7 +37,7 @@ public class ClientProvider {
         try {
             return AccountId.fromString(accountIdAsString);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.accountId' property", e);
+            throw new IllegalArgumentException("Can not parse 'hedera.newAccountId' property", e);
         }
     }
 
