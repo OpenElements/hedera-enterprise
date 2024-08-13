@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import org.jspecify.annotations.NonNull;
 import java.time.Instant;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for interacting with a Hedera network.
@@ -56,21 +57,19 @@ public interface AccountClient {
     }
 
     /**
-     * Deletes the account with the given ID.
-     * @param accountId the ID of the account to delete
+     * Deletes the account with the given ID. All fees of that account are transferred to the operator account.
+     * @param account the account to delete
      * @throws HederaException if the account could not be deleted
      */
-    void deleteAccount(@NonNull AccountId accountId) throws HederaException;
+    void deleteAccount(@NonNull Account account) throws HederaException;
 
     /**
-     * Deletes the account with the given ID.
-     * @param accountId  the ID of the account to delete
+     * Deletes the account with the given ID. All fees of that account are transferred to the given toAccount.
+     * @param account the account to delete
+     * @param toAccount the account to transfer the fees to
      * @throws HederaException if the account could not be deleted
      */
-    default void deleteAccount(@NonNull String accountId) throws HederaException {
-        Objects.requireNonNull(accountId, "accountId must not be null");
-        deleteAccount(AccountId.fromString(accountId));
-    }
+    void deleteAccount(@NonNull Account account, @NonNull Account toAccount) throws HederaException;
 
     /**
      * Returns the balance of the given account.

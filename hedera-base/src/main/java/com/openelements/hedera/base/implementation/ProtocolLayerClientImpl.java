@@ -33,6 +33,7 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
@@ -96,8 +97,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
     private final List<TransactionListener> listeners;
 
-    public ProtocolLayerClientImpl(@NonNull final Client client) {
+    private Account operationalAccount;
+
+    public ProtocolLayerClientImpl(@NonNull final Client client, @NonNull final Account operationalAccount) {
         this.client = Objects.requireNonNull(client, "client must not be null");
+        this.operationalAccount = Objects.requireNonNull(operationalAccount, "operationalAccount must not be null");
         listeners = new CopyOnWriteArrayList<>();
     }
 
@@ -270,9 +274,13 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         final AccountDeleteTransaction transaction = new AccountDeleteTransaction()
                 .setMaxTransactionFee(request.maxTransactionFee())
                 .setTransactionValidDuration(request.transactionValidDuration())
-                .setAccountId(request.accountId());
+                .setAccountId(request.toDelete().accountId());
         if(request.transferFoundsToAccount() != null) {
-            transaction.setTransferAccountId(request.transferFoundsToAccount());
+            transaction.setTransferAccountId(request.transferFoundsToAccount().accountId());
+            sign(transaction, request.toDelete().privateKey(), request.transferFoundsToAccount().privateKey());
+        } else {
+            transaction.setTransferAccountId(operationalAccount.accountId());
+            sign(transaction, request.toDelete().privateKey(), operationalAccount.privateKey());
         }
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         return new AccountDeleteResult(record.transactionId, record.receipt.status, record.transactionHash, record.consensusTimestamp, record.transactionFee);

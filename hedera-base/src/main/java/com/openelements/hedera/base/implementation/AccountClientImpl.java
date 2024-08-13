@@ -31,8 +31,14 @@ public class AccountClientImpl implements AccountClient {
     }
 
     @Override
-    public void deleteAccount(@NonNull AccountId account) throws HederaException {
+    public void deleteAccount(@NonNull Account account) throws HederaException {
         final AccountDeleteRequest request = AccountDeleteRequest.of(account);
+        client.executeAccountDeleteTransaction(request);
+    }
+
+    @Override
+    public void deleteAccount(@NonNull Account account, @NonNull Account toAccount) throws HederaException {
+        final AccountDeleteRequest request = AccountDeleteRequest.of(account, toAccount);
         client.executeAccountDeleteTransaction(request);
     }
 

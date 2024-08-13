@@ -3,6 +3,7 @@ package com.openelements.hedera.microprofile;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.AccountClient;
 import com.openelements.hedera.base.ContractVerificationClient;
 import com.openelements.hedera.base.FileClient;
@@ -71,7 +72,8 @@ public class ClientProvider {
     @Produces
     @ApplicationScoped
     ProtocolLayerClient createProtocolLayerClient() {
-        return new ProtocolLayerClientImpl(createClient());
+        final Account operator = Account.of(getAccountId(), getPrivateKey());
+        return new ProtocolLayerClientImpl(createClient(), operator);
     }
 
     @Produces

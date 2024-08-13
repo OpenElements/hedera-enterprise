@@ -1,10 +1,16 @@
 package com.openelements.hedera.spring.test;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.FileId;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
 import com.openelements.hedera.base.Account;
+import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
 import com.openelements.hedera.base.protocol.AccountBalanceResponse;
+import com.openelements.hedera.base.protocol.AccountCreateRequest;
+import com.openelements.hedera.base.protocol.AccountCreateResult;
+import com.openelements.hedera.base.protocol.AccountDeleteRequest;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
 import com.openelements.hedera.base.protocol.FileAppendRequest;
@@ -23,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +43,9 @@ public class ProtocolLayerClientTests {
 
     @Autowired
     private Account adminAccount;
+
+    @Autowired
+    private HederaTestUtils hederaTestUtils;
 
     @Test
     void testGetBalance() throws Exception {
@@ -165,4 +175,40 @@ public class ProtocolLayerClientTests {
         Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileAppendRequestTransaction(FileAppendRequest.of(fakeId, contents)));
         Assertions.assertThrows(IllegalArgumentException.class, () -> protocolLayerClient.executeFileUpdateRequestTransaction(FileUpdateRequest.of(fakeId, contents)));
     }
+
+    @Test
+    void testDeleteAccount() throws Exception {
+        //given
+        final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of();
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
+
+        hederaTestUtils.waitForMirrorNodeRecords();
+        final AccountDeleteRequest request = AccountDeleteRequest.of(new Account(accountCreateResult.accountId(), accountCreateResult.publicKey(), accountCreateResult.privateKey()));
+
+        //then
+        Assertions.assertDoesNotThrow(() -> protocolLayerClient.executeAccountDeleteTransaction(request));
+    }
+
+    @Test
+    void testDeleteAccountWithTransferAccount() throws Exception {
+        //given
+        final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of(Hbar.from(10));
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
+        final Account toDeleteAccount = new Account(accountCreateResult.accountId(), accountCreateResult.publicKey(), accountCreateResult.privateKey());
+
+        final AccountCreateRequest transferAccountCreateRequest = AccountCreateRequest.of(Hbar.from(1));
+        final AccountCreateResult transferAccountCreateResult = protocolLayerClient.executeAccountCreateTransaction(transferAccountCreateRequest);
+        final Account toTransferAccount = new Account(transferAccountCreateResult.accountId(), transferAccountCreateResult.publicKey(), transferAccountCreateResult.privateKey());
+
+        //when
+        final AccountDeleteRequest request = AccountDeleteRequest.of(toDeleteAccount, toTransferAccount);
+        protocolLayerClient.executeAccountDeleteTransaction(request);
+
+        //then
+        hederaTestUtils.waitForMirrorNodeRecords();
+        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(toTransferAccount.accountId());
+        final AccountBalanceResponse accountBalanceResult = protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest);
+        Assertions.assertEquals(Hbar.from(11), accountBalanceResult.hbars());
+    }
+
 }

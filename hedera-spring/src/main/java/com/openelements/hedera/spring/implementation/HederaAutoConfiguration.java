@@ -126,8 +126,8 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    ProtocolLayerClient protocolLevelClient(final Client client) {
-        return new ProtocolLayerClientImpl(client);
+    ProtocolLayerClient protocolLevelClient(final Client client, final Account operationalAccount) {
+        return new ProtocolLayerClientImpl(client, operationalAccount);
     }
 
     @Bean

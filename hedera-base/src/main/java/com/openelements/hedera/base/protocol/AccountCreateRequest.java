@@ -12,7 +12,19 @@ public record AccountCreateRequest(Hbar maxTransactionFee,
                                    @NonNull Hbar initialBalance) implements TransactionRequest {
 
     public AccountCreateRequest {
+        Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
+        Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
         Objects.requireNonNull(initialBalance, "initialBalance is required");
+
+        if (maxTransactionFee.toTinybars() < 0) {
+            throw new IllegalArgumentException("maxTransactionFee must be non-negative");
+        }
+        if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
+            throw new IllegalArgumentException("transactionValidDuration must be positive");
+        }
+        if (initialBalance.toTinybars() < 0) {
+            throw new IllegalArgumentException("initialBalance must be non-negative");
+        }
     }
 
     @NonNull
