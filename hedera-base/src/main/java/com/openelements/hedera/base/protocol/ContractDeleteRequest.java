@@ -11,14 +11,22 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
-public record ContractDeleteRequest(Hbar maxTransactionFee,
-                                    Duration transactionValidDuration,
+public record ContractDeleteRequest(@NonNull Hbar maxTransactionFee,
+                                    @NonNull Duration transactionValidDuration,
                                     @NonNull ContractId contractId,
                                     @Nullable ContractId transferFeeToContractId,
                                     @Nullable AccountId transferFeeToAccountId) implements TransactionRequest {
 
     public ContractDeleteRequest {
+        Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
+        Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
         Objects.requireNonNull(contractId, "contractId is required");
+        if (maxTransactionFee.toTinybars() < 0) {
+            throw new IllegalArgumentException("maxTransactionFee must be non-negative");
+        }
+        if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
+            throw new IllegalArgumentException("transactionValidDuration must be positive");
+        }
     }
 
     @NonNull

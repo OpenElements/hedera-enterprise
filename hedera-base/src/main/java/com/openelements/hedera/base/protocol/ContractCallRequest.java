@@ -9,16 +9,28 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
-public record ContractCallRequest(Hbar maxTransactionFee,
-                                  Duration transactionValidDuration,
+public record
+ContractCallRequest(@NonNull Hbar maxTransactionFee,
+                    @NonNull Duration transactionValidDuration,
                                   @NonNull ContractId contractId,
                                   @NonNull String functionName,
                                   @NonNull List<ContractParam<?>> constructorParams) implements TransactionRequest {
 
     public ContractCallRequest {
+        Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
+        Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
         Objects.requireNonNull(contractId, "contractId is required");
         Objects.requireNonNull(functionName, "functionName is required");
         Objects.requireNonNull(constructorParams, "constructorParams is required");
+        if(maxTransactionFee.toTinybars() < 0) {
+            throw new IllegalArgumentException("maxTransactionFee must be at >= null");
+        }
+        if(!transactionValidDuration.isPositive()) {
+            throw new IllegalArgumentException("transactionValidDuration must be at >= zero");
+        }
+        if(functionName.isBlank() || functionName.contains(" ")) {
+            throw new IllegalArgumentException("functionName must not be blank or contain spaces");
+        }
     }
 
     @NonNull

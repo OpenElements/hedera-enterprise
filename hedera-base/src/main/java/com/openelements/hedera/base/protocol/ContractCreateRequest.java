@@ -9,14 +9,22 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
-public record ContractCreateRequest(Hbar maxTransactionFee,
-                                    Duration transactionValidDuration,
+public record ContractCreateRequest(@NonNull Hbar maxTransactionFee,
+                                    @NonNull Duration transactionValidDuration,
                                     @NonNull FileId fileId,
                                     @NonNull List<ContractParam<?>> constructorParams) implements TransactionRequest {
 
     public ContractCreateRequest {
+        Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
+        Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
         Objects.requireNonNull(fileId, "fileId is required");
         Objects.requireNonNull(constructorParams, "constructorParams is required");
+        if (maxTransactionFee.toTinybars() < 0) {
+            throw new IllegalArgumentException("maxTransactionFee must be non-negative");
+        }
+        if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
+            throw new IllegalArgumentException("transactionValidDuration must be positive");
+        }
     }
 
     @NonNull
