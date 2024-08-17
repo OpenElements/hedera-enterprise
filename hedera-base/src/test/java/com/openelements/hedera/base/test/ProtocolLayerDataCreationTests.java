@@ -23,12 +23,12 @@ import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
 import com.openelements.hedera.base.protocol.ContractDeleteRequest;
 import com.openelements.hedera.base.protocol.ContractDeleteResult;
+import com.openelements.hedera.base.protocol.FileAppendRequest;
 import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -302,5 +302,37 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertDoesNotThrow(() -> new ContractDeleteResult(transactionId, status));
         Assertions.assertThrows(NullPointerException.class, () -> new ContractDeleteResult(null, status));
         Assertions.assertThrows(NullPointerException.class, () -> new ContractDeleteResult(transactionId, null));
+    }
+
+    @Test
+    void testFileAppendRequestCreation() {
+        //given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(10);
+        final String fileIdString = "0.0.12345";
+        final FileId fileId = FileId.fromString(fileIdString);
+        final byte[] contents = new byte[]{};
+        final byte[] largeContents = IntStream.range(0, 2050).mapToObj(i -> "a").reduce("", (a,b) -> a+b).getBytes();
+        final String fileMemo = "fileMemo";
+        final String longFileMemo = IntStream.range(0, 102).mapToObj(i -> "a").reduce("", (a,b) -> a+b);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> FileAppendRequest.of(fileIdString, contents));
+        Assertions.assertDoesNotThrow(() -> FileAppendRequest.of(fileId, contents));
+        Assertions.assertDoesNotThrow(() -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, contents, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, contents, null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileAppendRequest.of((String) null, contents));
+        Assertions.assertThrows(NullPointerException.class, () -> FileAppendRequest.of(fileIdString, null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileAppendRequest.of((FileId) null, contents));
+        Assertions.assertThrows(NullPointerException.class, () -> FileAppendRequest.of(fileId, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileAppendRequest(null, transactionValidDuration, fileId, contents, fileMemo));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileAppendRequest(maxTransactionFee, null, fileId, contents, fileMemo));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, null, contents, fileMemo));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, null, fileMemo));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(Hbar.fromTinybars(-100), transactionValidDuration, fileId, contents, fileMemo));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(maxTransactionFee, Duration.ZERO, fileId, contents, fileMemo));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(maxTransactionFee, Duration.ofSeconds(-1), fileId, contents, fileMemo));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, largeContents, fileMemo));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, largeContents, longFileMemo));
     }
 }

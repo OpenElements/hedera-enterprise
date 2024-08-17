@@ -19,35 +19,45 @@
 
 
   <dependencies>
-  <dependency>
-    <groupId>com.hedera.hashgraph</groupId>
-    <artifactId>sdk</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-api</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>org.jspecify</groupId>
-    <artifactId>jspecify</artifactId>
-    <scope>compile</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter</artifactId>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>io.grpc</groupId>
-    <artifactId>grpc-okhttp</artifactId>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>io.grpc</groupId>
-    <artifactId>grpc-inprocess</artifactId>
-    <scope>test</scope>
-  </dependency>
-</dependencies>
+    <dependency>
+      <groupId>com.hedera.hashgraph</groupId>
+      <artifactId>sdk</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-okhttp</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-inprocess</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>dotenv-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
