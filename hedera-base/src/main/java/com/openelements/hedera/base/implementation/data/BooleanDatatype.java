@@ -1,9 +1,9 @@
 package com.openelements.hedera.base.implementation.data;
 
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import org.jspecify.annotations.NonNull;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import org.jspecify.annotations.NonNull;
 
 public enum BooleanDatatype implements ParamSupplier<Boolean> {
 

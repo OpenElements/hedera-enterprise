@@ -1,18 +1,18 @@
 package com.openelements.hedera.spring.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hedera.base.SmartContractClient;
-import com.openelements.hedera.base.ContractVerificationState;
-import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.hedera.base.ContractVerificationClient;
+import com.openelements.hedera.base.ContractVerificationState;
+import com.openelements.hedera.base.SmartContractClient;
+import com.openelements.hedera.base.implementation.HederaNetwork;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.junit.jupiter.api.condition.DisabledIf;
 
 @SpringBootTest(classes = TestConfig.class)
 class ContractVerificationClientImplementationTest {

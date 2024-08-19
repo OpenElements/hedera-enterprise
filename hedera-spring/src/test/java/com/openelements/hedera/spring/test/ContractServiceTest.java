@@ -5,7 +5,6 @@ import static com.openelements.hedera.base.ContractParam.string;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
-
 import com.openelements.hedera.base.ContractCallResult;
 import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.HederaException;

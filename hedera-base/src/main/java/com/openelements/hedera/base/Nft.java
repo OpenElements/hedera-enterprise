@@ -2,8 +2,8 @@ package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
-import org.jspecify.annotations.NonNull;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a non-fungible token (NFT).

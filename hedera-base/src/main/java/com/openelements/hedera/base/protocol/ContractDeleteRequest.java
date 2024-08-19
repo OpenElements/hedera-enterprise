@@ -2,14 +2,11 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.openelements.hedera.base.ContractParam;
+import java.time.Duration;
+import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
 
 public record ContractDeleteRequest(@NonNull Hbar maxTransactionFee,
                                     @NonNull Duration transactionValidDuration,

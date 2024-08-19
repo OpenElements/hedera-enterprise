@@ -2,11 +2,10 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public record FileUpdateRequest(Hbar maxTransactionFee,
 

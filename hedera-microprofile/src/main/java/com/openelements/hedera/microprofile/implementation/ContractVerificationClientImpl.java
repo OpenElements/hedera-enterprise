@@ -5,7 +5,6 @@ import com.openelements.hedera.base.ContractVerificationClient;
 import com.openelements.hedera.base.ContractVerificationState;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.implementation.HederaNetwork;
-import org.jspecify.annotations.NonNull;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -20,6 +19,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 public class ContractVerificationClientImpl implements ContractVerificationClient {
 

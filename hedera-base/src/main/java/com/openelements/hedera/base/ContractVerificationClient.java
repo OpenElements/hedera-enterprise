@@ -1,8 +1,8 @@
 package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import org.jspecify.annotations.NonNull;
 import java.util.Map;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Client for verifying contracts on the Hedera network.

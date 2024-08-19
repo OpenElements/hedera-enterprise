@@ -2,9 +2,9 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
-import org.jspecify.annotations.NonNull;
 import java.time.Duration;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 public record FileDeleteRequest(Hbar maxTransactionFee,
                                 Duration transactionValidDuration,

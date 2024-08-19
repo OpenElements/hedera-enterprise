@@ -3,9 +3,9 @@ package com.openelements.hedera.base.implementation;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.openelements.hedera.base.ContractCallResult;
-import org.jspecify.annotations.NonNull;
 import java.math.BigInteger;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 public class ContractCallResultImpl implements ContractCallResult {
 

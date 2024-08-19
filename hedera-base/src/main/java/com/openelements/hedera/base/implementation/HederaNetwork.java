@@ -1,7 +1,5 @@
 package com.openelements.hedera.base.implementation;
 
-import java.io.Serializable;
-
 public enum HederaNetwork {
 
     PREVIEWNET("previewnet", 297, "https://previewnet.mirrornode.hedera.com/", "https://previewnet.hashio.io/api"),

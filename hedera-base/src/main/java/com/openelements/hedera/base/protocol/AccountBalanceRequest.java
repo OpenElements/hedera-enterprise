@@ -2,8 +2,8 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
-import org.jspecify.annotations.NonNull;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 public record AccountBalanceRequest(@NonNull AccountId accountId, Hbar queryPayment, Hbar maxQueryPayment) implements QueryRequest {
 

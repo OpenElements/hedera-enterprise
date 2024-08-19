@@ -1,12 +1,10 @@
 package com.openelements.hedera.spring.test;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.AccountClient;
-import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.NftClient;
 import com.openelements.hedera.base.NftRepository;
@@ -14,10 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = TestConfig.class)

@@ -2,7 +2,6 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionId;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;

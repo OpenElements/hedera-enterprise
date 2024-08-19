@@ -15,12 +15,12 @@ import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hedera.base.implementation.SmartContractClientImpl;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import com.openelements.hedera.microprofile.implementation.ContractVerificationClientImpl;
-import org.jspecify.annotations.NonNull;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import java.util.Arrays;
 import java.util.Objects;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jspecify.annotations.NonNull;
 
 public class ClientProvider {
 

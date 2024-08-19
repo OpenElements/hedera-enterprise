@@ -1,9 +1,9 @@
 package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.FileId;
-import org.jspecify.annotations.NonNull;
 import java.time.Instant;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A client for interacting with the file service on the Hedera network.

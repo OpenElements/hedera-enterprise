@@ -1,9 +1,9 @@
 package com.openelements.hedera.base.implementation.data;
 
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import org.jspecify.annotations.NonNull;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import org.jspecify.annotations.NonNull;
 
 public enum LongBasedNumericDatatypes implements ParamSupplier<Long> {
     INT8("int8", (v, params) -> params.addInt8(v.byteValue()), Byte.MIN_VALUE, Byte.MAX_VALUE),

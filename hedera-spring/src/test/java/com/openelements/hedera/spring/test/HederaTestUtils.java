@@ -10,10 +10,6 @@ import com.openelements.hedera.base.protocol.TransactionType;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.PostConstruct;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.ApplicationScope;
 
 public class HederaTestUtils {
 

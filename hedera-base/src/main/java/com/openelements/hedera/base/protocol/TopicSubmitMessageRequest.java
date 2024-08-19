@@ -2,10 +2,10 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TopicId;
-import org.jspecify.annotations.NonNull;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 public record TopicSubmitMessageRequest(Hbar maxTransactionFee,
 

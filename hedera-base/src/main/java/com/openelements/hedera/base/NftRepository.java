@@ -2,9 +2,9 @@ package com.openelements.hedera.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
-import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface for interacting with a Hedera network.

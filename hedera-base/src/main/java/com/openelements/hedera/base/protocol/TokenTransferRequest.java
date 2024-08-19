@@ -2,13 +2,12 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
-import org.jspecify.annotations.NonNull;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 public record TokenTransferRequest(Hbar maxTransactionFee,
 

@@ -7,19 +7,19 @@ import com.openelements.hedera.base.implementation.data.BooleanDatatype;
 import com.openelements.hedera.base.implementation.data.LongBasedNumericDatatypes;
 import com.openelements.hedera.base.implementation.data.ParamSupplier;
 import com.openelements.hedera.base.implementation.data.StringBasedDatatype;
-import org.jspecify.annotations.NonNull;
 import java.math.BigInteger;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 /**
- * Represents a parameter for a smart contract call (see {@link com.openelements.hedera.base.SmartContractClient}).
- * For all supported types, see the static factory methods.
- * Normally a developer should not need to create instances of this class directly.
+ * Represents a parameter for a smart contract call (see {@link com.openelements.hedera.base.SmartContractClient}). For
+ * all supported types, see the static factory methods. Normally a developer should not need to create instances of this
+ * class directly.
  *
- * @param value the value of the parameter
+ * @param value      the value of the parameter
  * @param nativeType the native type of the parameter
- * @param supplier the supplier of the parameter
- * @param <T> the type of the parameter
+ * @param supplier   the supplier of the parameter
+ * @param <T>        the type of the parameter
  */
 public record ContractParam<T>(@NonNull T value, @NonNull String nativeType, @NonNull ParamSupplier<T> supplier) {
 
@@ -27,11 +27,12 @@ public record ContractParam<T>(@NonNull T value, @NonNull String nativeType, @No
         Objects.requireNonNull(value, "value must not be null");
         Objects.requireNonNull(nativeType, "nativeType must not be null");
         Objects.requireNonNull(supplier, "supplier must not be null");
-        if(!supplier.isValidParam(value)) {
-            throw new IllegalArgumentException("value '" + value + "' is not valid for native type '" + nativeType + "'");
+        if (!supplier.isValidParam(value)) {
+            throw new IllegalArgumentException(
+                    "value '" + value + "' is not valid for native type '" + nativeType + "'");
         }
     }
-
+    
     private static <T> ContractParam<T> of(T value, ParamSupplier<T> paramSupplier) {
         Objects.requireNonNull(paramSupplier, "paramSupplier must not be null");
         return new ContractParam<>(value, paramSupplier.getNativeType(), paramSupplier);

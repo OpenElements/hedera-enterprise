@@ -1,13 +1,8 @@
 package com.openelements.hedera.base.test;
 
-import static com.hedera.hashgraph.sdk.HbarUnit.HBAR;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
@@ -17,7 +12,6 @@ import com.openelements.hedera.base.protocol.AccountCreateRequest;
 import com.openelements.hedera.base.protocol.AccountCreateResult;
 import com.openelements.hedera.base.protocol.AccountDeleteRequest;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,7 +27,6 @@ public class ProtocolLayerClientAccountTests {
         hederaTestContext = new HederaTestContext();
         protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(), hederaTestContext.getOperationalAccount());
     }
-
 
     @Test
     void testAccountBalanceRequest() throws Exception {
