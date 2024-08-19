@@ -9,13 +9,9 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 public record TokenAssociateRequest(Hbar maxTransactionFee,
-
                                     Duration transactionValidDuration,
-
                                     @NonNull TokenId tokenId,
-
                                     @NonNull AccountId accountId,
-
                                     @NonNull PrivateKey accountPrivateKey) implements TransactionRequest {
 
     public TokenAssociateRequest {
@@ -24,8 +20,10 @@ public record TokenAssociateRequest(Hbar maxTransactionFee,
         Objects.requireNonNull(accountPrivateKey, "accountPrivateKey must not be null");
     }
 
-    public static TokenAssociateRequest of(@NonNull final TokenId tokenId, @NonNull final AccountId accountId, @NonNull final PrivateKey accountPrivateKey) {
-        return new TokenAssociateRequest(TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE, TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION, tokenId, accountId, accountPrivateKey);
+    public static TokenAssociateRequest of(@NonNull final TokenId tokenId, @NonNull final AccountId accountId,
+            @NonNull final PrivateKey accountPrivateKey) {
+        return new TokenAssociateRequest(TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
+                TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION, tokenId, accountId, accountPrivateKey);
     }
 
 }

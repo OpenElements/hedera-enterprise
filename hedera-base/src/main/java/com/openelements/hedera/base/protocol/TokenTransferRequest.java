@@ -10,14 +10,12 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 public record TokenTransferRequest(Hbar maxTransactionFee,
-
                                    Duration transactionValidDuration,
-
                                    @NonNull TokenId tokenId,
                                    @NonNull List<Long> serials,
-                                   @NonNull  AccountId sender,
-                                   @NonNull  AccountId receiver,
-                                   @NonNull  PrivateKey senderKey) implements TransactionRequest {
+                                   @NonNull AccountId sender,
+                                   @NonNull AccountId receiver,
+                                   @NonNull PrivateKey senderKey) implements TransactionRequest {
 
     public TokenTransferRequest {
         Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
@@ -27,18 +25,25 @@ public record TokenTransferRequest(Hbar maxTransactionFee,
         Objects.requireNonNull(receiver, "receiver must not be null");
         Objects.requireNonNull(senderKey, "senderKey must not be null");
         Objects.requireNonNull(serials, "serials must not be null");
-        if(serials.isEmpty()) throw new IllegalArgumentException("serials must not be empty");
+        if (serials.isEmpty()) {
+            throw new IllegalArgumentException("serials must not be empty");
+        }
         serials.forEach(serial -> {
-            if(serial < 0) throw new IllegalArgumentException("serial must be positive");
+            if (serial < 0) {
+                throw new IllegalArgumentException("serial must be positive");
+            }
         });
     }
 
-    public static TokenTransferRequest of(@NonNull final TokenId tokenId, final long serial, @NonNull final AccountId sender, @NonNull final AccountId receiver, @NonNull final PrivateKey senderKey) {
+    public static TokenTransferRequest of(@NonNull final TokenId tokenId, final long serial,
+            @NonNull final AccountId sender, @NonNull final AccountId receiver, @NonNull final PrivateKey senderKey) {
         return of(tokenId, List.of(serial), sender, receiver, senderKey);
     }
 
-    public static TokenTransferRequest of(@NonNull final TokenId tokenId, @NonNull final List<Long> serials, @NonNull final AccountId sender, @NonNull final AccountId receiver, @NonNull final PrivateKey senderKey) {
-        return new TokenTransferRequest(TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE, TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION, tokenId, serials, sender, receiver, senderKey);
+    public static TokenTransferRequest of(@NonNull final TokenId tokenId, @NonNull final List<Long> serials,
+            @NonNull final AccountId sender, @NonNull final AccountId receiver, @NonNull final PrivateKey senderKey) {
+        return new TokenTransferRequest(TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
+                TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION, tokenId, serials, sender, receiver, senderKey);
     }
 
 

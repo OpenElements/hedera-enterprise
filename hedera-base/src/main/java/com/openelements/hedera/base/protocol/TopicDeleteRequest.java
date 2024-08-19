@@ -13,10 +13,10 @@ public record TopicDeleteRequest(Hbar maxTransactionFee,
                                  @NonNull TopicId topicId) implements TransactionRequest {
 
     public TopicDeleteRequest {
-       Objects.requireNonNull(topicId, "TopicId cannot be null");
+        Objects.requireNonNull(topicId, "TopicId cannot be null");
     }
 
-    public static TopicDeleteRequest of(@NonNull TopicId topicId) {
+    public static TopicDeleteRequest of(@NonNull final TopicId topicId) {
         return new TopicDeleteRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, topicId);
     }
 }

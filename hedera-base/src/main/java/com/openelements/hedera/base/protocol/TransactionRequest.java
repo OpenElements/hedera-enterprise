@@ -2,6 +2,7 @@ package com.openelements.hedera.base.protocol;
 
 import com.hedera.hashgraph.sdk.Hbar;
 import java.time.Duration;
+import org.jspecify.annotations.NonNull;
 
 public interface TransactionRequest {
 
@@ -9,7 +10,7 @@ public interface TransactionRequest {
 
     Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
-    Hbar maxTransactionFee();
+    @NonNull Hbar maxTransactionFee();
 
-    Duration transactionValidDuration();
+    @NonNull Duration transactionValidDuration();
 }
