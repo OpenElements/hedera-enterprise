@@ -24,23 +24,16 @@ import org.junit.jupiter.api.Test;
 
 public class ProtocolLayerClientAccountTests {
 
-    private static Client client;
+    private static HederaTestContext hederaTestContext;
 
     private static ProtocolLayerClient protocolLayerClient;
 
     @BeforeAll
     static void init() {
-        final Dotenv dotenv = Dotenv.load();
-        final String accountIdAsString = dotenv.get("hedera.accountId");
-        final String privateKeyAsString = dotenv.get("hedera.privateKey");
-        final AccountId accountId = AccountId.fromString(accountIdAsString);
-        final PrivateKey privateKey = PrivateKey.fromString(privateKeyAsString);
-        final PublicKey publicKey = privateKey.getPublicKey();
-        final Account operationalAccount = new Account(accountId, publicKey, privateKey);
-        client = Client.forTestnet();
-        client.setOperator(accountId, privateKey);
-        protocolLayerClient = new ProtocolLayerClientImpl(client, operationalAccount);
+        hederaTestContext = new HederaTestContext();
+        protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(), hederaTestContext.getOperationalAccount());
     }
+
 
     @Test
     void testAccountBalanceRequest() throws Exception {
