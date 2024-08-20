@@ -106,6 +106,9 @@ public interface ProtocolLayerClient {
     TokenMintResult executeMintTokenTransaction(@NonNull final TokenMintRequest request) throws HederaException;
 
     @NonNull
+    TokenBurnResult executeBurnTokenTransaction(@NonNull final TokenBurnRequest request) throws HederaException;
+
+    @NonNull
     TokenTransferResult executeTransferTransactionForNft(@NonNull final TokenTransferRequest request)
             throws HederaException;
 

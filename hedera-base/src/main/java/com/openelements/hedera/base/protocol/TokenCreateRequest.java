@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenType;
+import com.openelements.hedera.base.Account;
 import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
@@ -30,6 +31,19 @@ public record TokenCreateRequest(Hbar maxTransactionFee,
         if (symbol.length() > MAX_SYMBOL_LENGTH) {
             throw new IllegalArgumentException("Symbol length must be less than or equal to " + MAX_SYMBOL_LENGTH);
         }
+    }
+
+    public static TokenCreateRequest of(@NonNull final String name, @NonNull final String symbol,
+            @NonNull final Account account) {
+        return of(name, symbol, account.accountId(), account.privateKey(), TokenType.FUNGIBLE_COMMON,
+                account.privateKey());
+    }
+
+    public static TokenCreateRequest of(@NonNull final String name, @NonNull final String symbol,
+            @NonNull TokenType tokenType,
+            @NonNull final Account account) {
+        return of(name, symbol, account.accountId(), account.privateKey(), tokenType,
+                account.privateKey());
     }
 
     public static TokenCreateRequest of(@NonNull final String name, @NonNull final String symbol,
