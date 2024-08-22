@@ -46,7 +46,6 @@
         <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
-        <systemPath>${project.basedir}/hedera-enterprise-bom</systemPath>
       </dependency>
     </dependencies>
   </dependencyManagement>
