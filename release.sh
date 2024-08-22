@@ -28,8 +28,6 @@ export $(grep -v '^#' .env | xargs)
 ./mvnw clean
 
 echo "Releasing version $NEW_VERSION"
-./mvnw install  -f ./hedera-enterprise-bom/pom.xml
-./mvnw versions:set -f ./hedera-enterprise-bom/pom.xml -DnewVersion=$NEW_VERSION
 ./mvnw versions:set -DnewVersion=$NEW_VERSION
 ./mvnw clean verify
 git commit -am "Version $NEW_VERSION"
@@ -38,8 +36,6 @@ git push
 ./mvnw -Ppublication jreleaser:full-release
 
 echo "Setting version to $NEXT_VERSION"
-./mvnw install  -f ./hedera-enterprise-bom/pom.xml
-./mvnw versions:set -f ./hedera-enterprise-bom/pom.xml -DnewVersion=$NEXT_VERSION
 ./mvnw versions:set -DnewVersion=$NEXT_VERSION
 git commit -am "Version $NEXT_VERSION"
 git push
