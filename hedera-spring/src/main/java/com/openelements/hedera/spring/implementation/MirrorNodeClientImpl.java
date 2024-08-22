@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
@@ -12,6 +11,7 @@ import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.mirrornode.TransactionInfo;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,21 +34,23 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     private final RestClient restClient;
 
-    private final String mirrorNodeEndpointScheme = "https";
+    private final String mirrorNodeEndpointProtocol;
 
     private final String mirrorNodeEndpointHost;
 
-    private final String mirrorNodeEndpointPort;
+    private final int mirrorNodeEndpointPort;
 
 
-    public MirrorNodeClientImpl(@NonNull final Client client) {
-        Objects.requireNonNull(client, "client must not be null");
-        final List<String> mirrorNetwork = client.getMirrorNetwork();
-        if (mirrorNetwork.isEmpty()) {
-            throw new IllegalArgumentException("No mirror network is configured");
+    public MirrorNodeClientImpl(@NonNull final String mirrorNodeEndpoint) {
+        Objects.requireNonNull(mirrorNodeEndpoint, "mirrorNodeEndpoint must not be null");
+        try {
+            URL url = new URI(mirrorNodeEndpoint).toURL();
+            mirrorNodeEndpointProtocol = url.getProtocol();
+            mirrorNodeEndpointHost = url.getHost();
+            mirrorNodeEndpointPort = url.getPort();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
         }
-        mirrorNodeEndpointHost = mirrorNetwork.get(0).split("\\:")[0];
-        mirrorNodeEndpointPort = mirrorNetwork.get(0).split("\\:")[1];
         objectMapper = new ObjectMapper();
         restClient = RestClient.create();
     }
@@ -122,7 +124,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HederaException {
         final ResponseEntity<String> responseEntity = restClient.get()
                 .uri(uriBuilder -> {
-                    final UriBuilder withEndpoint = uriBuilder.scheme(mirrorNodeEndpointScheme)
+                    final UriBuilder withEndpoint = uriBuilder.scheme(mirrorNodeEndpointProtocol)
                             .host(mirrorNodeEndpointHost)
                             .port(mirrorNodeEndpointPort);
                     return uriFunction.apply(withEndpoint);

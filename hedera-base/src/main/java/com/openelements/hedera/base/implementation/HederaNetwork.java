@@ -4,11 +4,12 @@ public enum HederaNetwork {
 
     PREVIEWNET("previewnet", 297, "https://previewnet.mirrornode.hedera.com/", "https://previewnet.hashio.io/api"),
     TESTNET("testnet", 296, "https://testnet.mirrornode.hedera.com/", "https://testnet.hashio.io/api"),
-    MAINNET("mainnet", 295, "https://mainnet.mirrornode.hedera.com/","https://mainnet.hashio.io/api"),
+    MAINNET("mainnet", 295, "https://mainnet.mirrornode.hedera.com/", "https://mainnet.hashio.io/api"),
     CUSTOM("custom", -1, null, null);
 
     /**
-     * See https://docs.web3j.io/4.8.7/smart_contracts/interacting_with_smart_contract/#specifying-the-chain-id-on-transactions-eip-155
+     * See
+     * https://docs.web3j.io/4.8.7/smart_contracts/interacting_with_smart_contract/#specifying-the-chain-id-on-transactions-eip-155
      */
     private final long chainId;
 
@@ -42,5 +43,9 @@ public enum HederaNetwork {
 
     public String getName() {
         return name;
+    }
+
+    public String getMirrornodeEndpoint() {
+        return mirrornodeEndpoint;
     }
 }

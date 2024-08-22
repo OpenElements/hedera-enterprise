@@ -6,5 +6,5 @@ spring:
         - ip: 127.0.0.1
           port: 50211
           account: 0.0.3
-      mirrornode: localhost:8080
+      mirrornode: http://localhost:8080
 
