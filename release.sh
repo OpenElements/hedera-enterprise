@@ -25,6 +25,8 @@ NEXT_VERSION="$2"
 
 export $(grep -v '^#' .env | xargs)
 
+./mvnw clean
+
 echo "Releasing version $NEW_VERSION"
 ./mvnw install  -f ./hedera-enterprise-bom/pom.xml
 ./mvnw versions:set -f ./hedera-enterprise-bom/pom.xml -DnewVersion=$NEW_VERSION

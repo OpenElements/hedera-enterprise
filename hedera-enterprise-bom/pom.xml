@@ -6,7 +6,7 @@
 
   <groupId>com.open-elements.hedera</groupId>
   <artifactId>hedera-enterprise-bom</artifactId>
-  <version>0.10.0-SNAPSHOT</version>
+  <version>0.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hedera Enterprise BOM</name>
