@@ -32,7 +32,7 @@ echo "Releasing version $NEW_VERSION"
 ./mvnw clean verify
 git commit -am "Version $NEW_VERSION"
 git push
-./mvnw -Ppublication deploy
+./mvnw -Ppublication deploy -DskipTests
 ./mvnw -Ppublication jreleaser:full-release
 
 echo "Setting version to $NEXT_VERSION"
