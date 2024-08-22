@@ -7,11 +7,11 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record FileCreateRequest(Hbar maxTransactionFee,
-                                Duration transactionValidDuration,
+public record FileCreateRequest(@NonNull Hbar maxTransactionFee,
+                                @NonNull Duration transactionValidDuration,
                                 @NonNull byte[] contents,
                                 @Nullable Instant expirationTime,
-                                String fileMemo) implements TransactionRequest {
+                                @Nullable String fileMemo) implements TransactionRequest {
 
     private static final String DEFAULT_FILE_MEMO = "";
 
@@ -27,10 +27,12 @@ public record FileCreateRequest(Hbar maxTransactionFee,
     }
 
     public static FileCreateRequest of(@NonNull byte[] contents) {
-        return new FileCreateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, contents, null, DEFAULT_FILE_MEMO);
+        return new FileCreateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, contents, null,
+                DEFAULT_FILE_MEMO);
     }
 
     public static FileCreateRequest of(@NonNull byte[] contents, @NonNull Instant expirationTime) {
-        return new FileCreateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, contents, expirationTime, DEFAULT_FILE_MEMO);
+        return new FileCreateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, contents,
+                expirationTime, DEFAULT_FILE_MEMO);
     }
 }

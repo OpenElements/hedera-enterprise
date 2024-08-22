@@ -7,11 +7,11 @@ import java.time.Instant;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record FileUpdateRequest(Hbar maxTransactionFee,
+public record FileUpdateRequest(@NonNull Hbar maxTransactionFee,
 
-                                Duration transactionValidDuration,
+                                @NonNull Duration transactionValidDuration,
 
-                                FileId fileId,
+                                @NonNull FileId fileId,
 
                                 @Nullable byte[] contents,
 
@@ -29,10 +29,12 @@ public record FileUpdateRequest(Hbar maxTransactionFee,
     }
 
     public static FileUpdateRequest of(@NonNull FileId fileId, @NonNull byte[] contents) {
-        return new FileUpdateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, fileId, contents, null, DEFAULT_FILE_MEMO);
+        return new FileUpdateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, fileId, contents,
+                null, DEFAULT_FILE_MEMO);
     }
 
     public static FileUpdateRequest of(@NonNull FileId fileId, @NonNull Instant expirationTime) {
-        return new FileUpdateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, fileId, null, expirationTime, DEFAULT_FILE_MEMO);
+        return new FileUpdateRequest(DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, fileId, null,
+                expirationTime, DEFAULT_FILE_MEMO);
     }
 }

@@ -10,8 +10,8 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record TokenMintRequest(Hbar maxTransactionFee,
-                               Duration transactionValidDuration,
+public record TokenMintRequest(@NonNull Hbar maxTransactionFee,
+                               @NonNull Duration transactionValidDuration,
                                @NonNull TokenId tokenId,
                                @NonNull PrivateKey supplyKey,
                                @Nullable Long amount,

@@ -8,8 +8,8 @@ import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
-public record TokenAssociateRequest(Hbar maxTransactionFee,
-                                    Duration transactionValidDuration,
+public record TokenAssociateRequest(@NonNull Hbar maxTransactionFee,
+                                    @NonNull Duration transactionValidDuration,
                                     @NonNull TokenId tokenId,
                                     @NonNull AccountId accountId,
                                     @NonNull PrivateKey accountPrivateKey) implements TransactionRequest {

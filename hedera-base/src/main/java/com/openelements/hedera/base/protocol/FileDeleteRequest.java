@@ -6,8 +6,8 @@ import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
-public record FileDeleteRequest(Hbar maxTransactionFee,
-                                Duration transactionValidDuration,
+public record FileDeleteRequest(@NonNull Hbar maxTransactionFee,
+                                @NonNull Duration transactionValidDuration,
                                 @NonNull FileId fileId) implements TransactionRequest {
 
     public FileDeleteRequest {

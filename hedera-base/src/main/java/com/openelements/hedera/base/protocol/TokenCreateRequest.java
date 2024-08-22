@@ -10,8 +10,8 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record TokenCreateRequest(Hbar maxTransactionFee,
-                                 Duration transactionValidDuration,
+public record TokenCreateRequest(@NonNull Hbar maxTransactionFee,
+                                 @NonNull Duration transactionValidDuration,
                                  @NonNull String name,
                                  @NonNull String symbol,
                                  @NonNull AccountId treasuryAccountId,

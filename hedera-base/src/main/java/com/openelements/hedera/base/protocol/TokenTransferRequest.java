@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
-public record TokenTransferRequest(Hbar maxTransactionFee,
-                                   Duration transactionValidDuration,
+public record TokenTransferRequest(@NonNull Hbar maxTransactionFee,
+                                   @NonNull Duration transactionValidDuration,
                                    @NonNull TokenId tokenId,
                                    @NonNull List<Long> serials,
                                    @NonNull AccountId sender,
