@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * A client for querying the Hedera Mirror Node REST API.
+ */
 public interface MirrorNodeClient {
 
     @NonNull

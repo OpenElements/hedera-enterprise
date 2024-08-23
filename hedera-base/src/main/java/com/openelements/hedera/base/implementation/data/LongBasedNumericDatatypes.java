@@ -29,7 +29,8 @@ public enum LongBasedNumericDatatypes implements ParamSupplier<Long> {
 
     private final String nativeType;
 
-    LongBasedNumericDatatypes(final String nativeType, final BiConsumer<Long, ContractFunctionParameters> addParam, long minValue, long maxValue) {
+    LongBasedNumericDatatypes(final String nativeType, final BiConsumer<Long, ContractFunctionParameters> addParam,
+            long minValue, long maxValue) {
         this.nativeType = nativeType;
         this.addParam = addParam;
         this.minValue = minValue;
@@ -37,14 +38,14 @@ public enum LongBasedNumericDatatypes implements ParamSupplier<Long> {
     }
 
     @Override
-    public void addParam(@NonNull final Long value, final ContractFunctionParameters params) {
+    public void addParamToFunctionParameters(@NonNull final Long value, final ContractFunctionParameters params) {
         Objects.requireNonNull(value, "value must not be null");
         addParam.accept(value.longValue(), params);
     }
 
     @Override
     public boolean isValidParam(final Long value) {
-        if(value == null) {
+        if (value == null) {
             return false;
         }
         return value >= minValue && value <= maxValue;
@@ -57,7 +58,7 @@ public enum LongBasedNumericDatatypes implements ParamSupplier<Long> {
 
     public void addParam(final long value, @NonNull final ContractFunctionParameters params) {
         Objects.requireNonNull(params, "params must not be null");
-        if(value < minValue || value > maxValue) {
+        if (value < minValue || value > maxValue) {
             throw new IllegalArgumentException("value out of range for type '" + this + "': " + value);
         }
         addParam.accept(value, params);

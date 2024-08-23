@@ -20,7 +20,7 @@ public enum StringBasedDatatype implements ParamSupplier<String> {
         this.addParam = addParam;
     }
 
-    public void addParam(final String value, @NonNull final ContractFunctionParameters params) {
+    public void addParamToFunctionParameters(final String value, @NonNull final ContractFunctionParameters params) {
         Objects.requireNonNull(params, "params must not be null");
         addParam.accept(value, params);
     }
@@ -28,7 +28,7 @@ public enum StringBasedDatatype implements ParamSupplier<String> {
     @Override
     public boolean isValidParam(@NonNull final String value) {
         Objects.requireNonNull(value, "value must not be null");
-        if(this.equals(ADDRESS)) {
+        if (this.equals(ADDRESS)) {
             try {
                 AccountId.fromString(value);
             } catch (final Exception e) {

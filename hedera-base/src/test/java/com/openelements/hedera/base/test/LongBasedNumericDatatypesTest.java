@@ -17,9 +17,10 @@ public class LongBasedNumericDatatypesTest {
 
         //then
         Assertions.assertThrows(NullPointerException.class, () -> type.addParam(1L, null));
-        Assertions.assertThrows(NullPointerException.class, () -> type.addParam(null, parameters));
-        Assertions.assertThrows(NullPointerException.class, () -> type.addParam(Long.valueOf(1L), null));
-        Assertions.assertThrows(NullPointerException.class, () -> type.addParam(null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> type.addParamToFunctionParameters(null, parameters));
+        Assertions.assertThrows(NullPointerException.class,
+                () -> type.addParamToFunctionParameters(Long.valueOf(1L), null));
+        Assertions.assertThrows(NullPointerException.class, () -> type.addParamToFunctionParameters(null, null));
     }
 
     @Test

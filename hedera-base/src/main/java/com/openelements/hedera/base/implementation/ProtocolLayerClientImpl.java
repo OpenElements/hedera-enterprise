@@ -466,7 +466,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     private ContractFunctionParameters createParameters(@NonNull final List<ContractParam<?>> params) {
         Objects.requireNonNull(params, "params must not be null");
         final ContractFunctionParameters constructorParams = new ContractFunctionParameters();
-        final Consumer<ContractParam> consumer = param -> param.supplier().addParam(param.value(), constructorParams);
+        final Consumer<ContractParam> consumer = param -> param.supplier()
+                .addParamToFunctionParameters(param.value(), constructorParams);
         params.forEach(consumer);
         return constructorParams;
     }

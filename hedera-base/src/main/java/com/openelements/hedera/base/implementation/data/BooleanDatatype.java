@@ -15,7 +15,8 @@ public enum BooleanDatatype implements ParamSupplier<Boolean> {
         this.addParam = (v, params) -> params.addBool(v);
     }
 
-    public void addParam(@NonNull final Boolean value, @NonNull final ContractFunctionParameters params) {
+    public void addParamToFunctionParameters(@NonNull final Boolean value,
+            @NonNull final ContractFunctionParameters params) {
         Objects.requireNonNull(value, "value must not be null");
         Objects.requireNonNull(params, "params must not be null");
         addParam.accept(value, params);

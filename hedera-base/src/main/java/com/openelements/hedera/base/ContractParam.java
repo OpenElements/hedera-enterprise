@@ -32,17 +32,30 @@ public record ContractParam<T>(@NonNull T value, @NonNull String nativeType, @No
                     "value '" + value + "' is not valid for native type '" + nativeType + "'");
         }
     }
-    
+
     private static <T> ContractParam<T> of(T value, ParamSupplier<T> paramSupplier) {
         Objects.requireNonNull(paramSupplier, "paramSupplier must not be null");
         return new ContractParam<>(value, paramSupplier.getNativeType(), paramSupplier);
     }
 
+    /**
+     * Creates a new contract parameter with the given value and native type {@code string}.
+     *
+     * @param value the value of the parameter
+     * @return the new contract parameter
+     */
     @NonNull
     public static ContractParam<String> string(String value) {
         return of(value, StringBasedDatatype.STRING);
     }
 
+    /**
+     * Creates a new contract parameter with the given value and native type {@code address}. The input must be address
+     * in solidty format.
+     *
+     * @param value the value of the parameter
+     * @return the new contract parameter
+     */
     @NonNull
     public static ContractParam<String> addressBySolidty(String value) {
         return of(value, StringBasedDatatype.ADDRESS);
@@ -70,6 +83,12 @@ public record ContractParam<T>(@NonNull T value, @NonNull String nativeType, @No
         return of(value, BooleanDatatype.BOOL);
     }
 
+    /**
+     * Creates a new contract parameter with the given value and native type {@code int8}.
+     *
+     * @param value the value of the parameter
+     * @return the new contract parameter
+     */
     @NonNull
     public static ContractParam<Long> int8(byte value) {
         return of((long) value, LongBasedNumericDatatypes.INT8);
