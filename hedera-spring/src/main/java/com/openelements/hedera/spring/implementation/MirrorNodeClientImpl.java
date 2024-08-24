@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
+import com.openelements.hedera.base.mirrornode.Page;
 import com.openelements.hedera.base.mirrornode.TransactionInfo;
 import java.io.IOException;
 import java.net.URI;
@@ -47,7 +48,15 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
             URL url = new URI(mirrorNodeEndpoint).toURL();
             mirrorNodeEndpointProtocol = url.getProtocol();
             mirrorNodeEndpointHost = url.getHost();
-            mirrorNodeEndpointPort = url.getPort();
+            if (mirrorNodeEndpointProtocol == "https" && url.getPort() == -1) {
+                mirrorNodeEndpointPort = 443;
+            } else if (mirrorNodeEndpointProtocol == "http" && url.getPort() == -1) {
+                mirrorNodeEndpointPort = 80;
+            } else if (url.getPort() == -1) {
+                mirrorNodeEndpointPort = 443;
+            } else {
+                mirrorNodeEndpointPort = url.getPort();
+            }
         } catch (Exception e) {
             throw new IllegalArgumentException("Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
         }
@@ -72,10 +81,16 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public List<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException {
-        Objects.requireNonNull(tokenId, "tokenId must not be null");
-        final JsonNode jsonNode = doGetCall("/api/v1/tokens/" + tokenId + "/nfts");
-        return jsonNodeToNftList(jsonNode);
+    public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException {
+        final URI uri = URI.create(
+                getUriPrefix()
+                        + "/api/v1/tokens/" + tokenId + "/nfts");
+        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+        final Function<JsonNode, URI> nextUriExtractionFunction = node -> getNextUri(node);
+
+        return new RestBasedPage<>(objectMapper, restClient,
+                uri,
+                dataExtractionFunction, nextUriExtractionFunction);
     }
 
     @Override
@@ -183,6 +198,54 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
             return new Nft(parsedTokenId, serial, account, metadata);
         } catch (final Exception e) {
             throw new IllegalArgumentException("Error parsing NFT from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private List<Nft> getNfts(final JsonNode jsonNode) {
+        if (!jsonNode.has("nfts")) {
+            return List.of();
+        }
+        final JsonNode nftsNode = jsonNode.get("nfts");
+        if (!nftsNode.isArray()) {
+            throw new IllegalArgumentException("NFTs node is not an array: " + nftsNode);
+        }
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(nftsNode.iterator(), Spliterator.ORDERED),
+                        false)
+                .map(nftNode -> {
+                    try {
+                        return jsonNodeToNft(nftNode);
+                    } catch (final Exception e) {
+                        throw new RuntimeException("Error parsing NFT from JSON '" + nftNode + "'", e);
+                    }
+                }).toList();
+    }
+
+    private String getUriPrefix() {
+        return mirrorNodeEndpointProtocol + "://" + mirrorNodeEndpointHost + ":" + mirrorNodeEndpointPort;
+    }
+
+    private URI getNextUri(final JsonNode jsonNode) {
+        if (!jsonNode.has("links")) {
+            return null;
+        }
+        final JsonNode linksNode = jsonNode.get("links");
+        if (linksNode.isNull()) {
+            return null;
+        }
+        if (!linksNode.has("next")) {
+            return null;
+        }
+        final JsonNode nextNode = linksNode.get("next");
+        if (nextNode.isNull()) {
+            return null;
+        }
+        if (!nextNode.isTextual()) {
+            throw new IllegalArgumentException("Next link is not a string: " + nextNode);
+        }
+        try {
+            return new URI(getUriPrefix() + nextNode.asText());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error parsing next link '" + nextNode.asText() + "'", e);
         }
     }
 

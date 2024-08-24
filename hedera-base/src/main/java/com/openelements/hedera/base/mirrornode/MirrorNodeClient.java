@@ -17,16 +17,18 @@ public interface MirrorNodeClient {
     List<Nft> queryNftsByAccount(@NonNull AccountId accountId) throws HederaException;
 
     @NonNull
-    List<Nft> queryNftsByAccountAndTokenId(@NonNull AccountId accountId, @NonNull TokenId tokenId) throws HederaException;
+    List<Nft> queryNftsByAccountAndTokenId(@NonNull AccountId accountId, @NonNull TokenId tokenId)
+            throws HederaException;
 
     @NonNull
-    List<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException;
+    Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException;
 
     @NonNull
     Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull TokenId tokenId, long serialNumber) throws HederaException;
 
     @NonNull
-    Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull AccountId accountId, @NonNull TokenId tokenId, long serialNumber) throws HederaException;
+    Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull AccountId accountId, @NonNull TokenId tokenId,
+            long serialNumber) throws HederaException;
 
     @NonNull
     Optional<TransactionInfo> queryTransaction(@NonNull String transactionId) throws HederaException;

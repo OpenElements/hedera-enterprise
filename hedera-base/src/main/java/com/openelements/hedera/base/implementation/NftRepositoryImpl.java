@@ -6,6 +6,7 @@ import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.NftRepository;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
+import com.openelements.hedera.base.mirrornode.Page;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,19 +28,21 @@ public class NftRepositoryImpl implements NftRepository {
 
     @NonNull
     @Override
-    public List<Nft> findByType(@NonNull final TokenId tokenId) throws HederaException {
+    public Page<Nft> findByType(@NonNull final TokenId tokenId) throws HederaException {
         return mirrorNodeClient.queryNftsByTokenId(tokenId);
     }
 
     @NonNull
     @Override
-    public Optional<Nft> findByTypeAndSerial(@NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
+    public Optional<Nft> findByTypeAndSerial(@NonNull final TokenId tokenId, final long serialNumber)
+            throws HederaException {
         return mirrorNodeClient.queryNftsByTokenIdAndSerial(tokenId, serialNumber);
     }
 
     @NonNull
     @Override
-    public List<Nft> findByOwnerAndType(@NonNull final AccountId owner, @NonNull final TokenId tokenId) throws HederaException {
+    public List<Nft> findByOwnerAndType(@NonNull final AccountId owner, @NonNull final TokenId tokenId)
+            throws HederaException {
         return mirrorNodeClient.queryNftsByAccountAndTokenId(owner, tokenId);
     }
 

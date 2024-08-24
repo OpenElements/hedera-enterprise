@@ -8,9 +8,12 @@ import com.openelements.hedera.base.AccountClient;
 import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.NftClient;
 import com.openelements.hedera.base.NftRepository;
+import com.openelements.hedera.base.mirrornode.Page;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,30 @@ public class NftRepositoryTests {
     @Autowired
     private Account adminAccount;
 
+    private <T> List<T> getAll(Page<T> page) {
+        if (!page.isFirst()) {
+            final Page<T> first = page.first();
+            return getFromDataSliceTillEnd(first);
+        }
+        final List<T> data = new ArrayList<>();
+        data.addAll(page.getData());
+        if (page.hasNext()) {
+            final Page<T> next = page.next();
+            data.addAll(getFromDataSliceTillEnd(next));
+        }
+        return data;
+    }
+
+    private <T> List<T> getFromDataSliceTillEnd(Page<T> page) {
+        final List<T> data = new ArrayList<>();
+        data.addAll(page.getData());
+        if (page.hasNext()) {
+            final Page<T> next = page.next();
+            data.addAll(getFromDataSliceTillEnd(next));
+        }
+        return data;
+    }
+
     @Test
     void findByTokenId() throws Exception {
         //given
@@ -46,13 +73,40 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByType(tokenId);
+        final Page<Nft> slice = nftRepository.findByType(tokenId);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(2, result.size());
         Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(0)));
         Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(1)));
+    }
+
+    @Test
+    void findByTokenIdForManyTokens() throws Exception {
+        //given
+        final String name = "Tokemon cards";
+        final String symbol = "TOK";
+        final List<String> metadata = IntStream.range(0, 400)
+                .mapToObj(i -> "metadata" + i)
+                .toList();
+        final TokenId tokenId = nftClient.createNftType(name, symbol);
+        final int batchSize = 10;
+        for (int i = 0; i < metadata.size(); i += batchSize) {
+            final int start = i;
+            final int end = Math.min(i + batchSize, metadata.size());
+            nftClient.mintNfts(tokenId, metadata.subList(start, end));
+        }
+        hederaTestUtils.waitForMirrorNodeRecords();
+
+        //when
+        final Page<Nft> slice = nftRepository.findByType(tokenId);
+        final List<Nft> result = getAll(slice);
+
+        //then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(metadata.size(), result.size());
     }
 
     @Test
@@ -64,7 +118,8 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByType(tokenId);
+        final Page<Nft> slice = nftRepository.findByType(tokenId);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
