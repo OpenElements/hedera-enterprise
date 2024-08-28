@@ -84,6 +84,32 @@ public class NftRepositoryTests {
     }
 
     @Test
+    void findByTokenIdForSomePages() throws Exception {
+        //given
+        final String name = "Tokemon cards";
+        final String symbol = "TOK";
+        final List<String> metadata = IntStream.range(0, 40)
+                .mapToObj(i -> "metadata" + i)
+                .toList();
+        final TokenId tokenId = nftClient.createNftType(name, symbol);
+        final int batchSize = 10;
+        for (int i = 0; i < metadata.size(); i += batchSize) {
+            final int start = i;
+            final int end = Math.min(i + batchSize, metadata.size());
+            nftClient.mintNfts(tokenId, metadata.subList(start, end));
+        }
+        hederaTestUtils.waitForMirrorNodeRecords();
+
+        //when
+        final Page<Nft> slice = nftRepository.findByType(tokenId);
+        final List<Nft> result = getAll(slice);
+
+        //then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(metadata.size(), result.size());
+    }
+
+    @Test
     void findByTokenIdForManyTokens() throws Exception {
         //given
         final String name = "Tokemon cards";
