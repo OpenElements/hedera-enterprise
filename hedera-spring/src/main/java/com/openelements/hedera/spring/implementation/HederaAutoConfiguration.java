@@ -153,9 +153,8 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    NftClient nftClient(final ProtocolLayerClient protocolLayerClient, AccountId adminAccount,
-            PrivateKey adminSupplyKey) {
-        return new NftClientImpl(protocolLayerClient, adminAccount, adminSupplyKey);
+    NftClient nftClient(final ProtocolLayerClient protocolLayerClient, Account operationalAccount) {
+        return new NftClientImpl(protocolLayerClient, operationalAccount);
     }
 
     @Bean

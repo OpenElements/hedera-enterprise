@@ -1,6 +1,5 @@
 package com.openelements.hedera.base.mirrornode;
 
-import com.hedera.hashgraph.sdk.TransactionId;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 

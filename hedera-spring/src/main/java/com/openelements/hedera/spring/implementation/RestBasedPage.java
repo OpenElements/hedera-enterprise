@@ -117,7 +117,7 @@ public class RestBasedPage<T> implements Page<T> {
     }
 
     @Override
-    public int getNumber() {
+    public int getPageIndex() {
         return number;
     }
 

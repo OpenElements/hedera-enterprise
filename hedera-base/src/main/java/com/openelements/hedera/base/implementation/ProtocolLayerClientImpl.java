@@ -97,7 +97,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
     private final List<TransactionListener> listeners;
 
-    private Account operationalAccount;
+    private final Account operationalAccount;
 
     public ProtocolLayerClientImpl(@NonNull final Client client, @NonNull final Account operationalAccount) {
         this.client = Objects.requireNonNull(client, "client must not be null");

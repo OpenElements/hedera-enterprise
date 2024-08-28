@@ -66,10 +66,10 @@ public class NftRepositoryTests {
         //given
         final String name = "Tokemon cards";
         final String symbol = "TOK";
-        final String metadata1 = "https://example.com/metadata1";
-        final String metadata2 = "https://example.com/metadata2";
+        final byte[] metadata1 = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
+        final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
-        final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata1, metadata2));
+        final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
@@ -88,15 +88,16 @@ public class NftRepositoryTests {
         //given
         final String name = "Tokemon cards";
         final String symbol = "TOK";
-        final List<String> metadata = IntStream.range(0, 40)
+        final List<byte[]> metadata = IntStream.range(0, 40)
                 .mapToObj(i -> "metadata" + i)
+                .map(s -> s.getBytes(StandardCharsets.UTF_8))
                 .toList();
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final int batchSize = 10;
         for (int i = 0; i < metadata.size(); i += batchSize) {
             final int start = i;
             final int end = Math.min(i + batchSize, metadata.size());
-            nftClient.mintNfts(tokenId, metadata.subList(start, end));
+            nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
         }
         hederaTestUtils.waitForMirrorNodeRecords();
 
@@ -114,15 +115,16 @@ public class NftRepositoryTests {
         //given
         final String name = "Tokemon cards";
         final String symbol = "TOK";
-        final List<String> metadata = IntStream.range(0, 400)
+        final List<byte[]> metadata = IntStream.range(0, 400)
                 .mapToObj(i -> "metadata" + i)
+                .map(s -> s.getBytes(StandardCharsets.UTF_8))
                 .toList();
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final int batchSize = 10;
         for (int i = 0; i < metadata.size(); i += batchSize) {
             final int start = i;
             final int end = Math.min(i + batchSize, metadata.size());
-            nftClient.mintNfts(tokenId, metadata.subList(start, end));
+            nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
         }
         hederaTestUtils.waitForMirrorNodeRecords();
 
@@ -157,10 +159,10 @@ public class NftRepositoryTests {
         //given
         final String name = "Tokemon cards";
         final String symbol = "TOK";
-        final String metadata1 = "https://example.com/metadata1";
-        final String metadata2 = "https://example.com/metadata2";
+        final byte[] metadata1 = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
+        final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
-        final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata1, metadata2));
+        final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
         final AccountId adminAccountId = adminAccount.accountId();
         final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
         final Account account = accountClient.createAccount();
@@ -207,10 +209,10 @@ public class NftRepositoryTests {
         //given
         final String name = "Tokemon cards";
         final String symbol = "TOK";
-        final String metadata1 = "https://example.com/metadata1";
-        final String metadata2 = "https://example.com/metadata2";
+        final byte[] metadata1 = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
+        final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
-        final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata1, metadata2));
+        final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
         final AccountId adminAccountId = adminAccount.accountId();
         final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
         final Account account = accountClient.createAccount();
@@ -256,19 +258,19 @@ public class NftRepositoryTests {
         //given
         final String name = "Tokemon cards";
         final String symbol = "TOK";
-        final String metadata = "https://example.com/metadata1";
+        final byte[] metadata = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
-        final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata));
+        final long serial = nftClient.mintNft(tokenId, metadata);
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final Optional<Nft> result = nftRepository.findByTypeAndSerial(tokenId, serial.get(0));
+        final Optional<Nft> result = nftRepository.findByTypeAndSerial(tokenId, serial);
 
         //then
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result.isPresent());
-        Assertions.assertEquals(metadata, new String(result.get().metadata(), StandardCharsets.UTF_8));
-        Assertions.assertEquals(serial.get(0), result.get().serial());
+        Assertions.assertArrayEquals(metadata, result.get().metadata());
+        Assertions.assertEquals(serial, result.get().serial());
         Assertions.assertEquals(tokenId, result.get().tokenId());
     }
 
@@ -294,26 +296,26 @@ public class NftRepositoryTests {
         //given
         final String name = "Tokemon cards";
         final String symbol = "TOK";
-        final String metadata = "https://example.com/metadata1";
+        final byte[] metadata = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
-        final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata));
+        final long serial = nftClient.mintNft(tokenId, metadata);
         final AccountId adminAccountId = adminAccount.accountId();
         final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
-        nftClient.transferNft(tokenId, serial.get(0), adminAccountId, adminAccountPrivateKey, newOwner);
+        nftClient.transferNft(tokenId, serial, adminAccountId, adminAccountPrivateKey, newOwner);
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final Optional<Nft> result = nftRepository.findByOwnerAndTypeAndSerial(newOwner, tokenId, serial.get(0));
+        final Optional<Nft> result = nftRepository.findByOwnerAndTypeAndSerial(newOwner, tokenId, serial);
 
         //then
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result.isPresent());
-        Assertions.assertEquals(metadata, new String(result.get().metadata(), StandardCharsets.UTF_8));
-        Assertions.assertEquals(serial.get(0), result.get().serial());
+        Assertions.assertArrayEquals(metadata, result.get().metadata());
+        Assertions.assertEquals(serial, result.get().serial());
         Assertions.assertEquals(tokenId, result.get().tokenId());
     }
 
