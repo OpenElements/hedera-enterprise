@@ -65,19 +65,38 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public List<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
+    public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
-        final JsonNode jsonNode = doGetCall("/api/v1/accounts/" + accountId + "/nfts");
-        return jsonNodeToNftList(jsonNode);
+        final URI uri = URI.create(
+                getUriPrefix()
+                        + "/api/v1/accounts/" + accountId + "/nfts");
+        
+        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+        final Function<JsonNode, URI> nextUriExtractionFunction = node -> getNextUri(node);
+
+        return new RestBasedPage<>(objectMapper, restClient,
+                uri,
+                dataExtractionFunction, nextUriExtractionFunction);
     }
 
     @Override
-    public List<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
+    public Page<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
             throws HederaException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         Objects.requireNonNull(tokenId, "tokenId must not be null");
-        final JsonNode jsonNode = doGetCall("/api/v1/tokens/" + tokenId + "/nfts", Map.of("account.id", accountId));
-        return jsonNodeToNftList(jsonNode);
+        
+        final URI uri = URI.create(
+                getUriPrefix()
+                        + doGetCall ("/api/v1/tokens/" + tokenId + "/nfts", Map.of("account.id", accountId)));
+        
+        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+        final Function<JsonNode, URI> nextUriExtractionFunction = node -> getNextUri(node);
+
+        return new RestBasedPage<>(objectMapper, restClient,
+                uri,
+                dataExtractionFunction, nextUriExtractionFunction);
+        
+        
     }
 
     @Override

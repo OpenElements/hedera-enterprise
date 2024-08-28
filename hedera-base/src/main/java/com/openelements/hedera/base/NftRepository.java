@@ -20,7 +20,7 @@ public interface NftRepository {
      * @throws HederaException if the search fails
      */
     @NonNull
-    List<Nft> findByOwner(@NonNull AccountId ownerId) throws HederaException;
+    Page<Nft> findByOwner(@NonNull AccountId ownerId) throws HederaException;
 
     /**
      * Return all NFTs of a given type.
@@ -52,7 +52,7 @@ public interface NftRepository {
      * @throws HederaException if the search fails
      */
     @NonNull
-    List<Nft> findByOwnerAndType(@NonNull AccountId ownerId, @NonNull TokenId tokenId) throws HederaException;
+    Page<Nft> findByOwnerAndType(@NonNull AccountId ownerId, @NonNull TokenId tokenId) throws HederaException;
 
     /**
      * Return the NFT of a given type and serial owned by a specific account.

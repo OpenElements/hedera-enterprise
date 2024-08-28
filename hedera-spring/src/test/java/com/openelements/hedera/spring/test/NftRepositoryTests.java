@@ -146,7 +146,8 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByOwner(newOwner);
+        final Page<Nft> slice = nftRepository.findByOwner(newOwner);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
@@ -168,7 +169,8 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByOwner(newOwner);
+        final Page<Nft> slice = nftRepository.findByOwner(newOwner);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
@@ -196,7 +198,8 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
@@ -218,7 +221,8 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);

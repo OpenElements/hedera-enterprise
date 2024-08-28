@@ -14,10 +14,10 @@ import org.jspecify.annotations.NonNull;
 public interface MirrorNodeClient {
 
     @NonNull
-    List<Nft> queryNftsByAccount(@NonNull AccountId accountId) throws HederaException;
+    Page<Nft> queryNftsByAccount(@NonNull AccountId accountId) throws HederaException;
 
     @NonNull
-    List<Nft> queryNftsByAccountAndTokenId(@NonNull AccountId accountId, @NonNull TokenId tokenId)
+    Page<Nft> queryNftsByAccountAndTokenId(@NonNull AccountId accountId, @NonNull TokenId tokenId)
             throws HederaException;
 
     @NonNull
