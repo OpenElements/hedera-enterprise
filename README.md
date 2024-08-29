@@ -151,28 +151,17 @@ How that environment variables are defined can be found in the
 [this blog post](https://foojay.io/today/how-to-release-a-java-module-with-jreleaser-to-maven-central-with-github-actions/).
 
 On a unix based system the environment variables can be defined in the `.env` file in the root of the project.
-That file is added to the `.gitignore` file and can not be committed to the repository.
-If you have created the `.env` file, you can simply load the environment variables with the following command:
+
+Once that is done you can use the `release.sh` script in the root folder of the repos to create a release:
 
 ```shell
-export $(grep -v '^#' .env | xargs)
-```
-
-To create a release, you can use the following commands:
-
-```shell
-./mvnw versions:set -DnewVersion=0.1.0
-./mvnw clean verify
-git commit -am "Version 0.1.0"
-git push
-./mvnw -Ppublication deploy
-./mvnw -Ppublication jreleaser:full-release
-./mvnw versions:set -DnewVersion=0.2.0-SNAPSHOT
-git commit -am "Version 0.2.0-SNAPSHOT"
-git push
+./release 0.1.0 0.2.0-SNAPSHOT
 ```
 
 This will create a release on GitHub and publish the artifacts to Maven Central.
+As you can see 2 params are passed to the `release.sh` script, The first param defines the version for the release and the second param defines the version after the release.
+In the given example the project has defined version 0.1.0-SNAPSHOT before the script is executed.
+The execution will release the current code under version 0.1.0 and later switch the version to 0.2.0-SNAPSHOT and commit it.
 
 ## License
 
