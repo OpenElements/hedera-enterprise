@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openelements.hedera.base.mirrornode.Page;
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -29,45 +28,50 @@ public class RestBasedPage<T> implements Page<T> {
 
     private final Function<JsonNode, List<T>> dataExtractionFunction;
 
-    private final Function<JsonNode, URI> nextUriExtractionFunction;
-
     private final int number;
 
     private final List<T> data;
 
-    private final URI nextUri;
+    private final String nextPath;
 
-    private final URI firstUri;
+    private final String rootPath;
 
-    private final URI currentUri;
+    private final String currentPath;
 
-    public RestBasedPage(final @NonNull ObjectMapper objectMapper, final @NonNull RestClient restClient,
-            final @NonNull URI uri,
-            final @NonNull Function<JsonNode, List<T>> dataExtractionFunction,
-            final @NonNull Function<JsonNode, URI> nextUriExtractionFunction) {
-        this(objectMapper, restClient, uri, 0, dataExtractionFunction, nextUriExtractionFunction, uri);
+    public RestBasedPage(final @NonNull ObjectMapper objectMapper, final RestClient.Builder restClient,
+            final @NonNull String path,
+            final @NonNull Function<JsonNode, List<T>> dataExtractionFunction) {
+        this(objectMapper, restClient, path, 0, dataExtractionFunction, path);
     }
 
-    public RestBasedPage(final @NonNull ObjectMapper objectMapper, final @NonNull RestClient restClient,
-            final @NonNull URI uri, int number,
+    public RestBasedPage(final @NonNull ObjectMapper objectMapper, final RestClient.Builder restClientBuilder,
+            final @NonNull String path, int number,
             final @NonNull Function<JsonNode, List<T>> dataExtractionFunction,
-            final @NonNull Function<JsonNode, URI> nextUriExtractionFunction,
-            final @NonNull URI firstUri) {
+            final @NonNull String rootPath) {
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
-        this.restClient = Objects.requireNonNull(restClient, "restClient must not be null");
+        Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null");
         this.dataExtractionFunction = Objects.requireNonNull(dataExtractionFunction,
                 "dataExtractionFunction must not be null");
-        this.nextUriExtractionFunction = Objects.requireNonNull(nextUriExtractionFunction,
-                "nextUriExtractionFunction must not be null");
-        this.firstUri = Objects.requireNonNull(firstUri, "firstUri must not be null");
-        this.currentUri = Objects.requireNonNull(uri, "uri must not be null");
+        this.rootPath = Objects.requireNonNull(rootPath, "rootPath must not be null");
+        this.currentPath = Objects.requireNonNull(path, "path must not be null");
         this.number = number;
         if (number < 0) {
             throw new IllegalArgumentException("number must be non-negative");
         }
-        log.debug("Fetching data from URI: {}", uri);
+        log.debug("Fetching data from PATH: {}", path);
+        restClient = restClientBuilder.build();
+        String[] pathParts = path.split("\\?");
+        final String requestPath = pathParts[0];
+        final String requestQuery;
+        if (pathParts.length > 1) {
+            requestQuery = pathParts[1];
+        } else {
+            requestQuery = null;
+        }
+
         final ResponseEntity<String> response = restClient.get()
-                .uri(uri).accept(APPLICATION_JSON)
+                .uri(uriBuilder -> uriBuilder.path(requestPath).query(requestQuery).build())
+                .accept(APPLICATION_JSON)
                 .retrieve()
                 .toEntity(String.class);
         final HttpStatusCode statusCode = response.getStatusCode();
@@ -81,14 +85,39 @@ public class RestBasedPage<T> implements Page<T> {
         try {
             final JsonNode jsonNode = objectMapper.readTree(body);
             data = Collections.unmodifiableList(dataExtractionFunction.apply(jsonNode));
-            nextUri = nextUriExtractionFunction.apply(jsonNode);
+            nextPath = getNextPath(jsonNode);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JSON parsing error", e);
         }
     }
 
+    private String getNextPath(final JsonNode jsonNode) {
+        if (!jsonNode.has("links")) {
+            return null;
+        }
+        final JsonNode linksNode = jsonNode.get("links");
+        if (linksNode.isNull()) {
+            return null;
+        }
+        if (!linksNode.has("next")) {
+            return null;
+        }
+        final JsonNode nextNode = linksNode.get("next");
+        if (nextNode.isNull()) {
+            return null;
+        }
+        if (!nextNode.isTextual()) {
+            throw new IllegalArgumentException("Next link is not a string: " + nextNode);
+        }
+        try {
+            return nextNode.asText();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error parsing next link '" + nextNode.asText() + "'", e);
+        }
+    }
+
     @Override
-    public int getNumber() {
+    public int getPageIndex() {
         return number;
     }
 
@@ -104,26 +133,25 @@ public class RestBasedPage<T> implements Page<T> {
 
     @Override
     public boolean hasNext() {
-        return nextUri != null;
+        return nextPath != null;
     }
 
     @Override
     public Page<T> next() {
-        if (nextUri == null) {
-            throw new IllegalStateException("No next URI");
+        if (nextPath == null) {
+            throw new IllegalStateException("No next Page");
         }
-        return new RestBasedPage<>(objectMapper, restClient, nextUri, number + 1, dataExtractionFunction,
-                nextUriExtractionFunction, firstUri);
+        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), nextPath, number + 1,
+                dataExtractionFunction, rootPath);
     }
 
     @Override
     public Page<T> first() {
-        return new RestBasedPage<>(objectMapper, restClient, firstUri, dataExtractionFunction,
-                nextUriExtractionFunction);
+        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), rootPath, dataExtractionFunction);
     }
 
     @Override
     public boolean isFirst() {
-        return Objects.equals(firstUri, currentUri);
+        return Objects.equals(rootPath, currentPath);
     }
 }

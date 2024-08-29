@@ -1,4 +1,11 @@
 package com.openelements.hedera.base.mirrornode;
 
-public record TransactionInfo(String transactionId) {
+import java.util.Objects;
+import org.jspecify.annotations.NonNull;
+
+public record TransactionInfo(@NonNull String transactionId) {
+
+    public TransactionInfo {
+        Objects.requireNonNull(transactionId, "transactionId must not be null");
+    }
 }

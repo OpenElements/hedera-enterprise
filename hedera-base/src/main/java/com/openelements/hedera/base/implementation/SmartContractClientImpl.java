@@ -12,7 +12,6 @@ import com.openelements.hedera.base.protocol.ContractCallRequest;
 import com.openelements.hedera.base.protocol.ContractCreateRequest;
 import com.openelements.hedera.base.protocol.ContractCreateResult;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -37,7 +36,8 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractId createContract(@NonNull final FileId fileId, @Nullable final ContractParam<?>... constructorParams)
+    public ContractId createContract(@NonNull final FileId fileId,
+            @Nullable final ContractParam<?>... constructorParams)
             throws HederaException {
         try {
             final ContractCreateRequest request;
@@ -55,7 +55,8 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractId createContract(@NonNull final byte[] contents, @Nullable final ContractParam<?>... constructorParams)
+    public ContractId createContract(@NonNull final byte[] contents,
+            @Nullable final ContractParam<?>... constructorParams)
             throws HederaException {
         try {
             final FileId fileId = fileClient.createFile(contents);
@@ -69,11 +70,11 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractId createContract(@NonNull final Path pathToBin, @Nullable final ContractParam<?>... constructorParams)
+    public ContractId createContract(@NonNull final Path pathToBin,
+            @Nullable final ContractParam<?>... constructorParams)
             throws HederaException {
         try {
-            final String content = Files.readString(pathToBin, StandardCharsets.UTF_8);
-            final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+            final byte[] bytes = Files.readAllBytes(pathToBin);
             return createContract(bytes, constructorParams);
         } catch (Exception e) {
             throw new HederaException("Failed to create contract from path " + pathToBin, e);
@@ -82,14 +83,17 @@ public class SmartContractClientImpl implements SmartContractClient {
 
     @NonNull
     @Override
-    public ContractCallResult callContractFunction(@NonNull final ContractId contractId, @NonNull final String functionName,
+    public ContractCallResult callContractFunction(@NonNull final ContractId contractId,
+            @NonNull final String functionName,
             @Nullable ContractParam<?>... params) throws HederaException {
         try {
             final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
-            final ContractFunctionResult result = protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
+            final ContractFunctionResult result = protocolLayerClient.executeContractCallTransaction(request)
+                    .contractFunctionResult();
             return new ContractCallResultImpl(result);
         } catch (Exception e) {
-            throw new HederaException("Failed to call function '" + functionName + "' on contract with id " + contractId, e);
+            throw new HederaException(
+                    "Failed to call function '" + functionName + "' on contract with id " + contractId, e);
         }
     }
 }

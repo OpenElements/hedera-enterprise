@@ -19,6 +19,8 @@ import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hedera.base.implementation.SmartContractClientImpl;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestClient;
 
 @AutoConfiguration
 @EnableConfigurationProperties({HederaProperties.class, HederaNetworkProperties.class})
@@ -150,22 +153,44 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    NftClient nftClient(final ProtocolLayerClient protocolLayerClient, AccountId adminAccount,
-            PrivateKey adminSupplyKey) {
-        return new NftClientImpl(protocolLayerClient, adminAccount, adminSupplyKey);
+    NftClient nftClient(final ProtocolLayerClient protocolLayerClient, Account operationalAccount) {
+        return new NftClientImpl(protocolLayerClient, operationalAccount);
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
     MirrorNodeClient mirrorNodeClient(final HederaProperties properties, HederaNetwork hederaNetwork) {
+        final String mirrorNodeEndpoint;
         if (properties.getNetwork().getMirrorNode() != null) {
-            return new MirrorNodeClientImpl(properties.getNetwork().getMirrorNode());
+            mirrorNodeEndpoint = properties.getNetwork().getMirrorNode();
+        } else if (hederaNetwork.getMirrornodeEndpoint() != null) {
+            mirrorNodeEndpoint = hederaNetwork.getMirrornodeEndpoint();
+        } else {
+            throw new IllegalArgumentException("Mirror node endpoint must be set");
         }
-        if (hederaNetwork.getMirrornodeEndpoint() != null) {
-            return new MirrorNodeClientImpl(hederaNetwork.getMirrornodeEndpoint());
+
+        final String baseUri;
+        try {
+            URL url = new URI(mirrorNodeEndpoint).toURL();
+            final String mirrorNodeEndpointProtocol = url.getProtocol();
+            final String mirrorNodeEndpointHost = url.getHost();
+            final int mirrorNodeEndpointPort;
+            if (mirrorNodeEndpointProtocol == "https" && url.getPort() == -1) {
+                mirrorNodeEndpointPort = 443;
+            } else if (mirrorNodeEndpointProtocol == "http" && url.getPort() == -1) {
+                mirrorNodeEndpointPort = 80;
+            } else if (url.getPort() == -1) {
+                mirrorNodeEndpointPort = 443;
+            } else {
+                mirrorNodeEndpointPort = url.getPort();
+            }
+            baseUri = mirrorNodeEndpointProtocol + "://" + mirrorNodeEndpointHost + ":" + mirrorNodeEndpointPort;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
         }
-        throw new IllegalArgumentException("Mirror node endpoint must be set");
+        RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
+        return new MirrorNodeClientImpl(builder);
     }
 
     @Bean

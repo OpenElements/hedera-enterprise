@@ -14,7 +14,7 @@ public enum HederaNetwork {
     private final long chainId;
 
     /**
-     * URL for the Hash.io relay service. See https://swirldslabs.com/hashio/ for more information.
+     * URL for the Hash.io relay service. See <a href="https://swirldslabs.com/hashio/">...</a> for more information.
      */
     private final String relayUrl;
 

@@ -12,7 +12,6 @@ import com.openelements.hedera.base.mirrornode.Page;
 import com.openelements.hedera.base.mirrornode.TransactionInfo;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,33 +34,16 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     private final RestClient restClient;
 
-    private final String mirrorNodeEndpointProtocol;
-
-    private final String mirrorNodeEndpointHost;
-
-    private final int mirrorNodeEndpointPort;
-
-
-    public MirrorNodeClientImpl(@NonNull final String mirrorNodeEndpoint) {
-        Objects.requireNonNull(mirrorNodeEndpoint, "mirrorNodeEndpoint must not be null");
-        try {
-            URL url = new URI(mirrorNodeEndpoint).toURL();
-            mirrorNodeEndpointProtocol = url.getProtocol();
-            mirrorNodeEndpointHost = url.getHost();
-            if (mirrorNodeEndpointProtocol == "https" && url.getPort() == -1) {
-                mirrorNodeEndpointPort = 443;
-            } else if (mirrorNodeEndpointProtocol == "http" && url.getPort() == -1) {
-                mirrorNodeEndpointPort = 80;
-            } else if (url.getPort() == -1) {
-                mirrorNodeEndpointPort = 443;
-            } else {
-                mirrorNodeEndpointPort = url.getPort();
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
-        }
+    /**
+     * Constructor.
+     *
+     * @param restClientBuilder the builder for the REST client that must have the base URL set
+     */
+    public MirrorNodeClientImpl(final RestClient.Builder restClientBuilder) {
+        Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null");
         objectMapper = new ObjectMapper();
-        restClient = RestClient.create();
+        restClient = restClientBuilder.build();
+
     }
 
     @Override
@@ -101,15 +83,9 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     @Override
     public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException {
-        final URI uri = URI.create(
-                getUriPrefix()
-                        + "/api/v1/tokens/" + tokenId + "/nfts");
+        final String path = "/api/v1/tokens/" + tokenId + "/nfts";
         final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
-        final Function<JsonNode, URI> nextUriExtractionFunction = node -> getNextUri(node);
-
-        return new RestBasedPage<>(objectMapper, restClient,
-                uri,
-                dataExtractionFunction, nextUriExtractionFunction);
+        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
     }
 
     @Override
@@ -157,12 +133,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HederaException {
         final ResponseEntity<String> responseEntity = restClient.get()
-                .uri(uriBuilder -> {
-                    final UriBuilder withEndpoint = uriBuilder.scheme(mirrorNodeEndpointProtocol)
-                            .host(mirrorNodeEndpointHost)
-                            .port(mirrorNodeEndpointPort);
-                    return uriFunction.apply(withEndpoint);
-                })
+                .uri(uriBuilder -> uriFunction.apply(uriBuilder))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
@@ -238,34 +209,4 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                     }
                 }).toList();
     }
-
-    private String getUriPrefix() {
-        return mirrorNodeEndpointProtocol + "://" + mirrorNodeEndpointHost + ":" + mirrorNodeEndpointPort;
-    }
-
-    private URI getNextUri(final JsonNode jsonNode) {
-        if (!jsonNode.has("links")) {
-            return null;
-        }
-        final JsonNode linksNode = jsonNode.get("links");
-        if (linksNode.isNull()) {
-            return null;
-        }
-        if (!linksNode.has("next")) {
-            return null;
-        }
-        final JsonNode nextNode = linksNode.get("next");
-        if (nextNode.isNull()) {
-            return null;
-        }
-        if (!nextNode.isTextual()) {
-            throw new IllegalArgumentException("Next link is not a string: " + nextNode);
-        }
-        try {
-            return new URI(getUriPrefix() + nextNode.asText());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Error parsing next link '" + nextNode.asText() + "'", e);
-        }
-    }
-
 }

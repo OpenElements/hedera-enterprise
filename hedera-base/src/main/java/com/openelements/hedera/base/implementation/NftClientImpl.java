@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
+import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.NftClient;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
@@ -24,33 +25,29 @@ public class NftClientImpl implements NftClient {
 
     private final ProtocolLayerClient client;
 
-    private final AccountId adminAccount;
+    private final Account operationalAccount;
 
-    private final PrivateKey adminSupplyKey;
-
-    public NftClientImpl(@NonNull final ProtocolLayerClient client, @NonNull final AccountId adminAccount,
-            @NonNull final PrivateKey adminSupplyKey) {
+    public NftClientImpl(@NonNull final ProtocolLayerClient client, @NonNull final Account operationalAccount) {
         this.client = Objects.requireNonNull(client, "client must not be null");
-        this.adminAccount = Objects.requireNonNull(adminAccount, "adminAccount must not be null");
-        this.adminSupplyKey = Objects.requireNonNull(adminSupplyKey, "adminSupplyKey must not be null");
+        this.operationalAccount = Objects.requireNonNull(operationalAccount, "operationalAccount must not be null");
     }
 
     @Override
     public TokenId createNftType(@NonNull final String name, @NonNull final String symbol) throws HederaException {
-        return createNftType(name, symbol, adminAccount, adminSupplyKey);
+        return createNftType(name, symbol, operationalAccount);
     }
 
 
     @Override
     public TokenId createNftType(@NonNull final String name, @NonNull final String symbol,
             @NonNull final PrivateKey supplierKey) throws HederaException {
-        return createNftType(name, symbol, adminAccount, adminSupplyKey, supplierKey);
+        return createNftType(name, symbol, operationalAccount, supplierKey);
     }
 
     @Override
     public TokenId createNftType(@NonNull final String name, @NonNull final String symbol,
             @NonNull final AccountId treasuryAccountId, @NonNull final PrivateKey treasuryKey) throws HederaException {
-        return createNftType(name, symbol, treasuryAccountId, treasuryKey, adminSupplyKey);
+        return createNftType(name, symbol, treasuryAccountId, treasuryKey, operationalAccount.privateKey());
     }
 
     @Override
@@ -71,29 +68,24 @@ public class NftClientImpl implements NftClient {
     }
 
     @Override
-    public long mintNft(@NonNull final TokenId tokenId, @NonNull final String metadata) throws HederaException {
-        return mintNft(tokenId, metadata, adminSupplyKey);
+    public long mintNft(@NonNull TokenId tokenId, @NonNull byte[] metadata) throws HederaException {
+        return mintNft(tokenId, operationalAccount.privateKey(), metadata);
     }
 
     @Override
-    public List<Long> mintNfts(@NonNull final TokenId tokenId, @NonNull final List<String> metadata)
+    public long mintNft(@NonNull TokenId tokenId, @NonNull PrivateKey supplyKey, @NonNull byte[] metadata)
             throws HederaException {
-        return mintNfts(tokenId, metadata, adminSupplyKey);
+        return mintNfts(tokenId, supplyKey, metadata).getFirst();
     }
 
     @Override
-    public long mintNft(@NonNull final TokenId tokenId, @NonNull final String metadata,
-            @NonNull final PrivateKey supplyKey) throws HederaException {
-        final List<Long> serials = mintNfts(tokenId, List.of(metadata), supplyKey);
-        if (serials.size() != 1) {
-            throw new HederaException("Expected 1 serial number, but got " + serials.size());
-        }
-        return serials.get(0);
+    public @NonNull List<Long> mintNfts(@NonNull TokenId tokenId, @NonNull byte[]... metadata) throws HederaException {
+        return mintNfts(tokenId, operationalAccount.privateKey(), metadata);
     }
 
     @Override
-    public List<Long> mintNfts(@NonNull final TokenId tokenId, @NonNull final List<String> metadata,
-            @NonNull final PrivateKey supplyKey) throws HederaException {
+    public @NonNull List<Long> mintNfts(@NonNull TokenId tokenId, @NonNull PrivateKey supplyKey,
+            @NonNull byte[]... metadata) throws HederaException {
         final TokenMintRequest request = TokenMintRequest.of(tokenId, supplyKey, metadata);
         final TokenMintResult result = client.executeMintTokenTransaction(request);
         return Collections.unmodifiableList(result.serials());
@@ -101,7 +93,7 @@ public class NftClientImpl implements NftClient {
 
     @Override
     public void burnNfts(@NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers) throws HederaException {
-        burnNfts(tokenId, serialNumbers, adminSupplyKey);
+        burnNfts(tokenId, serialNumbers, operationalAccount.privateKey());
     }
 
     @Override

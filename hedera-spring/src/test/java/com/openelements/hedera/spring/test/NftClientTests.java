@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.AccountClient;
 import com.openelements.hedera.base.NftClient;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class NftClientTests {
         //given
         final String name = "Test NFT";
         final String symbol = "TST";
-        final String metadata = "https://example.com/metadata";
+        final byte[] metadata = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
 
         //when
@@ -52,12 +53,12 @@ public class NftClientTests {
         //given
         final String name = "Test NFT";
         final String symbol = "TST";
-        final String metadata1 = "https://example.com/metadata1";
-        final String metadata2 = "https://example.com/metadata2";
+        final byte[] metadata1 = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
+        final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
 
         //when
-        final List<Long> serial = nftClient.mintNfts(tokenId, List.of(metadata1, metadata2));
+        final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
 
         //then
         Assertions.assertEquals(2, serial.size());
@@ -83,15 +84,17 @@ public class NftClientTests {
         final String name = "Test NFT";
         final String symbol = "TST";
         final Account treasuryAccount = accountClient.createAccount(1);
-        final TokenId tokenId = nftClient.createNftType(name, symbol, treasuryAccount.accountId(), treasuryAccount.privateKey());
+        final TokenId tokenId = nftClient.createNftType(name, symbol, treasuryAccount.accountId(),
+                treasuryAccount.privateKey());
         final Account userAccount = accountClient.createAccount(1);
+        final byte[] metadata = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
         nftClient.associateNft(tokenId, userAccount.accountId(), userAccount.privateKey());
-        final String metadata = "https://example.com/metadata";
-        final long serial = nftClient.mintNft(tokenId, metadata, treasuryAccount.privateKey());
+        final long serial = nftClient.mintNft(tokenId, treasuryAccount.privateKey(), metadata);
 
         //then
         Assertions.assertDoesNotThrow(() -> {
-            nftClient.transferNft(tokenId, serial, treasuryAccount.accountId(), treasuryAccount.privateKey(), userAccount.accountId());
+            nftClient.transferNft(tokenId, serial, treasuryAccount.accountId(), treasuryAccount.privateKey(),
+                    userAccount.accountId());
         });
     }
 
@@ -103,12 +106,12 @@ public class NftClientTests {
         final Account treasuryAccount = accountClient.createAccount();
         final Account supplierAccount = accountClient.createAccount();
         final TokenId tokenId = nftClient.createNftType(name, symbol, treasuryAccount, supplierAccount.privateKey());
+        final byte[] metadata = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
 
         final Account userAccount = accountClient.createAccount();
         nftClient.associateNft(tokenId, userAccount);
 
-        final String metadata = "https://example.com/metadata";
-        final long serial = nftClient.mintNft(tokenId, metadata, supplierAccount.privateKey());
+        final long serial = nftClient.mintNft(tokenId, supplierAccount.privateKey(), metadata);
 
         //then
         Assertions.assertDoesNotThrow(() -> {

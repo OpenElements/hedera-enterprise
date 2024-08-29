@@ -37,7 +37,7 @@ public interface ContractVerificationClient {
      * @param contractName contract name
      * @param contractSource contract source code
      * @param contractMetadata contract metadata
-     * @return
+     * @return verification state
      * @throws IllegalStateException if contract is already verified
      * @throws HederaException if an error happens in communication with the Hedera network
      */
