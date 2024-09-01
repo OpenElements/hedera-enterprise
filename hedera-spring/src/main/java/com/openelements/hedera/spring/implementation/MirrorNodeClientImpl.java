@@ -49,37 +49,27 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     @Override
     public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
-        final URI uri = URI.create(
-                getUriPrefix()
-                        + "/api/v1/accounts/" + accountId + "/nfts");
+        final String path = "/api/v1/accounts/" + accountId + "/nfts";
         
         final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
-        final Function<JsonNode, URI> nextUriExtractionFunction = node -> getNextUri(node);
+       
 
-        return new RestBasedPage<>(objectMapper, restClient,
-                uri,
-                dataExtractionFunction, nextUriExtractionFunction);
+        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path,dataExtractionFunction);
     }
 
     @Override
-    public Page<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
-            throws HederaException {
-        Objects.requireNonNull(accountId, "newAccountId must not be null");
-        Objects.requireNonNull(tokenId, "tokenId must not be null");
-        
-        final URI uri = URI.create(
-                getUriPrefix()
-                        + doGetCall ("/api/v1/tokens/" + tokenId + "/nfts", Map.of("account.id", accountId)));
-        
-        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
-        final Function<JsonNode, URI> nextUriExtractionFunction = node -> getNextUri(node);
+	public Page<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
+			throws HederaException {
+		Objects.requireNonNull(accountId, "newAccountId must not be null");
+		Objects.requireNonNull(tokenId, "tokenId must not be null");
 
-        return new RestBasedPage<>(objectMapper, restClient,
-                uri,
-                dataExtractionFunction, nextUriExtractionFunction);
-        
-        
-    }
+		final String path = "/api/v1/tokens/" + tokenId + "/nfts/" + accountId;
+
+		final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+
+		return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+
+	}
 
     @Override
     public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException {

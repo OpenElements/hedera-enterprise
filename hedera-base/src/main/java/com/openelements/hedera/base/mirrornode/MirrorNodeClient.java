@@ -32,7 +32,7 @@ public interface MirrorNodeClient {
      * @throws HederaException if an error occurs
      */
     @NonNull
-    default List<Nft> queryNftsByAccount(@NonNull String accountId) throws HederaException {
+    default Page<Nft> queryNftsByAccount(@NonNull String accountId) throws HederaException {
         Objects.requireNonNull(accountId, "accountId must not be null");
         return queryNftsByAccount(AccountId.fromString(accountId));
     }
@@ -58,7 +58,7 @@ public interface MirrorNodeClient {
      * @throws HederaException if an error occurs
      */
     @NonNull
-    default List<Nft> queryNftsByAccountAndTokenId(@NonNull String accountId, @NonNull String tokenId)
+    default Page<Nft> queryNftsByAccountAndTokenId(@NonNull String accountId, @NonNull String tokenId)
             throws HederaException {
         Objects.requireNonNull(accountId, "accountId must not be null");
         Objects.requireNonNull(tokenId, "tokenId must not be null");
