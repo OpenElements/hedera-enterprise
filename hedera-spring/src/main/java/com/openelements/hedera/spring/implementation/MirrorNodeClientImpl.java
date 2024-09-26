@@ -60,7 +60,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     @Override
 	public Page<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
 			throws HederaException {
-		Objects.requireNonNull(accountId, "newAccountId must not be null");
+		Objects.requireNonNull(accountId, "accountId must not be null");
 		Objects.requireNonNull(tokenId, "tokenId must not be null");
 
 		final String path = "/api/v1/tokens/" + tokenId + "/nfts/" + accountId;
