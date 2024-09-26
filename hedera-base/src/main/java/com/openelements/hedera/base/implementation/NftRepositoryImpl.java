@@ -22,7 +22,7 @@ public class NftRepositoryImpl implements NftRepository {
 
     @NonNull
     @Override
-    public List<Nft> findByOwner(@NonNull final AccountId owner) throws HederaException {
+    public Page<Nft> findByOwner(@NonNull final AccountId owner) throws HederaException {
         return mirrorNodeClient.queryNftsByAccount(owner);
     }
 
@@ -41,7 +41,7 @@ public class NftRepositoryImpl implements NftRepository {
 
     @NonNull
     @Override
-    public List<Nft> findByOwnerAndType(@NonNull final AccountId owner, @NonNull final TokenId tokenId)
+    public Page<Nft> findByOwnerAndType(@NonNull final AccountId owner, @NonNull final TokenId tokenId)
             throws HederaException {
         return mirrorNodeClient.queryNftsByAccountAndTokenId(owner, tokenId);
     }

@@ -21,7 +21,7 @@ public interface NftRepository {
      * @throws HederaException if the search fails
      */
     @NonNull
-    List<Nft> findByOwner(@NonNull AccountId ownerId) throws HederaException;
+    Page<Nft> findByOwner(@NonNull AccountId ownerId) throws HederaException;
 
     /**
      * Return all NFTs that are owned by the given owner.
@@ -31,7 +31,7 @@ public interface NftRepository {
      * @throws HederaException if the search fails
      */
     @NonNull
-    default List<Nft> findByOwner(@NonNull String ownerId) throws HederaException {
+    default Page<Nft> findByOwner(@NonNull String ownerId) throws HederaException {
         Objects.requireNonNull(ownerId, "ownerId must not be null");
         return findByOwner(AccountId.fromString(ownerId));
     }
@@ -93,7 +93,7 @@ public interface NftRepository {
      * @throws HederaException if the search fails
      */
     @NonNull
-    List<Nft> findByOwnerAndType(@NonNull AccountId ownerId, @NonNull TokenId tokenId) throws HederaException;
+    Page<Nft> findByOwnerAndType(@NonNull AccountId ownerId, @NonNull TokenId tokenId) throws HederaException;
 
     /**
      * Return all NFTs of a given type owned by a specific account.
@@ -104,7 +104,7 @@ public interface NftRepository {
      * @throws HederaException if the search fails
      */
     @NonNull
-    default List<Nft> findByOwnerAndType(@NonNull String ownerId, @NonNull String tokenId) throws HederaException {
+    default Page<Nft> findByOwnerAndType(@NonNull String ownerId, @NonNull String tokenId) throws HederaException {
         Objects.requireNonNull(ownerId, "ownerId must not be null");
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         return findByOwnerAndType(AccountId.fromString(ownerId), TokenId.fromString(tokenId));

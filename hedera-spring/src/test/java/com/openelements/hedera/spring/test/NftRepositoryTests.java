@@ -174,29 +174,66 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByOwner(newOwner);
+		final Page<Nft> slice = nftRepository.findByOwner(newOwner);
+		final List<Nft> result = getAll(slice);
 
-        //then
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(2, result.size());
-        Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(0)));
-        Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(1)));
-    }
+		// then
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(2, result.size());
+		Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(0)));
+		Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(1)));
+	}
+    
+	@Test
+	void findByAccountIdForSomePages() throws Exception {
+		// given
+		final String name = "Tokemon cards";
+		final String symbol = "TOK";
 
-    @Test
-    void findByAccountIdWIthZeroResult() throws Exception {
-        //given
-        final String name = "Tokemon cards";
-        final String symbol = "TOK";
-        final TokenId tokenId = nftClient.createNftType(name, symbol);
-        final Account account = accountClient.createAccount();
-        final AccountId newOwner = account.accountId();
-        final PrivateKey newOwnerPrivateKey = account.privateKey();
-        nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
-        hederaTestUtils.waitForMirrorNodeRecords();
+		final AccountId adminAccountId = adminAccount.accountId();
+		final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
+		final Account account = accountClient.createAccount();
+		final AccountId newOwner = account.accountId();
+		final PrivateKey newOwnerPrivateKey = account.privateKey();
+		final List<byte[]> metadata = IntStream.range(0, 40).mapToObj(i -> "metadata" + i)
+				.map(s -> s.getBytes(StandardCharsets.UTF_8)).toList();
+		final TokenId tokenId = nftClient.createNftType(name, symbol);
+		final int batchSize = 10;
+		for (int i = 0; i < metadata.size(); i += batchSize) {
+			final int start = i;
+			final int end = Math.min(i + batchSize, metadata.size());
+			final List<Long> serial = nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
+			nftClient.transferNft(tokenId, serial.get(i), adminAccountId, adminAccountPrivateKey, newOwner);
 
-        //when
-        final List<Nft> result = nftRepository.findByOwner(newOwner);
+		}
+		nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
+		hederaTestUtils.waitForMirrorNodeRecords();
+
+		// when
+		final Page<Nft> slice = nftRepository.findByOwner(newOwner);
+		final List<Nft> result = getAll(slice);
+
+		// then
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(metadata.size(), result.size());
+
+	}
+
+	@Test
+	void findByAccountIdWIthZeroResult() throws Exception {
+		// given
+		final String name = "Tokemon cards";
+		final String symbol = "TOK";
+		final TokenId tokenId = nftClient.createNftType(name, symbol);
+		final Account account = accountClient.createAccount();
+		final AccountId newOwner = account.accountId();
+		final PrivateKey newOwnerPrivateKey = account.privateKey();
+		nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
+		hederaTestUtils.waitForMirrorNodeRecords();
+
+		// when
+		final Page<Nft> slice = nftRepository.findByOwner(newOwner);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
@@ -224,7 +261,8 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
@@ -232,6 +270,40 @@ public class NftRepositoryTests {
         Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(0)));
         Assertions.assertTrue(result.stream().anyMatch(nft -> nft.serial() == serial.get(1)));
     }
+    
+	@Test
+	void findByTokenIdAndAccountIdForSomePages() throws Exception {
+		// given
+		final String name = "Tokemon cards";
+		final String symbol = "TOK";
+		final List<byte[]> metadata = IntStream.range(0, 40).mapToObj(i -> "metadata" + i)
+				.map(s -> s.getBytes(StandardCharsets.UTF_8)).toList();
+		final TokenId tokenId = nftClient.createNftType(name, symbol);
+
+		final AccountId adminAccountId = adminAccount.accountId();
+		final PrivateKey adminAccountPrivateKey = adminAccount.privateKey();
+		final Account account = accountClient.createAccount();
+		final AccountId newOwner = account.accountId();
+		final PrivateKey newOwnerPrivateKey = account.privateKey();
+		final int batchSize = 10;
+		for (int i = 0; i < metadata.size(); i += batchSize) {
+			final int start = i;
+			final int end = Math.min(i + batchSize, metadata.size());
+			final List<Long> serial = nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
+			nftClient.transferNft(tokenId, serial.get(i), adminAccountId, adminAccountPrivateKey, newOwner);
+
+		}
+		nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
+		hederaTestUtils.waitForMirrorNodeRecords();
+
+		// when
+		final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwner, tokenId);
+		final List<Nft> result = getAll(slice);
+
+		// then
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(metadata.size(), result.size());
+	}
 
     @Test
     void findByTokenIdAndAccountIdWithZeroResult() throws Exception {
@@ -246,7 +318,8 @@ public class NftRepositoryTests {
         hederaTestUtils.waitForMirrorNodeRecords();
 
         //when
-        final List<Nft> result = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwner, tokenId);
+        final List<Nft> result = getAll(slice);
 
         //then
         Assertions.assertNotNull(result);
@@ -335,5 +408,6 @@ public class NftRepositoryTests {
         //then
         Assertions.assertNotNull(result);
         Assertions.assertFalse(result.isPresent());
+
     }
 }
