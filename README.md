@@ -122,6 +122,7 @@ That information can be provided as environemt variables:
 ```shell
 export HEDERA_ACCOUNT_ID=0.0.3447271
 export HEDERA_PRIVATE_KEY=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+export HEDERA_NETWORK=testnet
 ```
 
 As an alternative you can define the information in a `.env` file in each sub-module that contains tests.

@@ -25,20 +25,23 @@ public class ProtocolLayerClientAccountTests {
     @BeforeAll
     static void init() {
         hederaTestContext = new HederaTestContext();
-        protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(), hederaTestContext.getOperationalAccount());
+        protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(),
+                hederaTestContext.getOperationalAccount());
     }
 
     @Test
     void testAccountBalanceRequest() throws Exception {
         //given
-        final Hbar amount = Hbar.from(1000L);
+        final Hbar amount = Hbar.from(1L);
         final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of(amount);
-        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(
+                accountCreateRequest);
         final AccountId accountId = accountCreateResult.newAccount().accountId();
 
         //when
         final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
-        final AccountBalanceResponse accountBalanceResponse = protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest);
+        final AccountBalanceResponse accountBalanceResponse = protocolLayerClient.executeAccountBalanceQuery(
+                accountBalanceRequest);
 
         //then
         Assertions.assertNotNull(accountBalanceResponse);
@@ -50,12 +53,14 @@ public class ProtocolLayerClientAccountTests {
     void testAccountBalanceRequestForZeroBalance() throws Exception {
         //given
         final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of();
-        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(
+                accountCreateRequest);
         final AccountId accountId = accountCreateResult.newAccount().accountId();
 
         //when
         final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
-        final AccountBalanceResponse accountBalanceResponse = protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest);
+        final AccountBalanceResponse accountBalanceResponse = protocolLayerClient.executeAccountBalanceQuery(
+                accountBalanceRequest);
 
         //then
         Assertions.assertNotNull(accountBalanceResponse);
@@ -67,7 +72,8 @@ public class ProtocolLayerClientAccountTests {
     void testAccountBalanceRequestForNotExistingAccount() throws Exception {
         //given
         final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of();
-        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(
+                accountCreateRequest);
         final Account account = accountCreateResult.newAccount();
         AccountDeleteRequest accountDeleteRequest = AccountDeleteRequest.of(account);
         protocolLayerClient.executeAccountDeleteTransaction(accountDeleteRequest);
@@ -76,7 +82,8 @@ public class ProtocolLayerClientAccountTests {
         final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(account.accountId());
 
         //then
-        Assertions.assertThrows(HederaException.class, () ->protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest));
+        Assertions.assertThrows(HederaException.class,
+                () -> protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest));
     }
 
 }
