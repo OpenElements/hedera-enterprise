@@ -332,7 +332,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TopicDeleteResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute create topic transaction", e);
+            throw new HederaException("Failed to execute delete topic transaction", e);
         }
     }
 
@@ -348,7 +348,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TopicSubmitMessageResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute create topic transaction", e);
+            throw new HederaException("Failed to execute submit message transaction", e);
         }
     }
 
@@ -368,7 +368,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TokenCreateResult(receipt.transactionId, receipt.status, receipt.tokenId);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute create topic transaction", e);
+            throw new HederaException("Failed to execute create token transaction", e);
         }
     }
 
@@ -385,7 +385,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TokenAssociateResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute create topic transaction", e);
+            throw new HederaException("Failed to execute associate token transaction", e);
         }
     }
 
@@ -407,7 +407,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TokenBurnResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute create topic transaction", e);
+            throw new HederaException("Failed to execute burn token transaction", e);
         }
     }
 
@@ -429,7 +429,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TokenMintResult(receipt.transactionId, receipt.status, receipt.serials);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute create topic transaction", e);
+            throw new HederaException("Failed to execute mint token transaction", e);
         }
     }
 
@@ -447,7 +447,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TokenTransferResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
-            throw new HederaException("Failed to execute create topic transaction", e);
+            throw new HederaException("Failed to execute transfer nft transaction", e);
         }
     }
 

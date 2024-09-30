@@ -43,36 +43,27 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null");
         objectMapper = new ObjectMapper();
         restClient = restClientBuilder.build();
-
     }
 
     @Override
     public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         final String path = "/api/v1/accounts/" + accountId + "/nfts";
-        
         final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
-       
-
-        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path,dataExtractionFunction);
+        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
     }
 
     @Override
-	public Page<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId)
-			throws HederaException {
-		Objects.requireNonNull(accountId, "accountId must not be null");
-		Objects.requireNonNull(tokenId, "tokenId must not be null");
-
-		final String path = "/api/v1/tokens/" + tokenId + "/nfts/" + accountId;
-
-		final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
-
-		return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
-
-	}
+    public Page<Nft> queryNftsByAccountAndTokenId(@NonNull final AccountId accountId, @NonNull final TokenId tokenId) {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        final String path = "/api/v1/tokens/" + tokenId + "/nfts/?account.id=" + accountId;
+        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+    }
 
     @Override
-    public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HederaException {
+    public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) {
         final String path = "/api/v1/tokens/" + tokenId + "/nfts";
         final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
         return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
