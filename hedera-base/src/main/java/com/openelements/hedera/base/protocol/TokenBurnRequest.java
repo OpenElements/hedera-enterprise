@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -14,6 +15,13 @@ public record TokenBurnRequest(@NonNull Hbar maxTransactionFee,
                                @NonNull PrivateKey supplyKey,
                                @Nullable Long amount,
                                @Nullable Set<Long> serials) implements TransactionRequest {
+
+    public TokenBurnRequest {
+        Objects.requireNonNull(maxTransactionFee, "Max transaction fee cannot be null");
+        Objects.requireNonNull(transactionValidDuration, "Transaction valid duration cannot be null");
+        Objects.requireNonNull(tokenId, "Token ID cannot be null");
+        Objects.requireNonNull(supplyKey, "Supply key cannot be null");
+    }
 
     public static TokenBurnRequest of(TokenId tokenId, long serial, PrivateKey supplyKey) {
         return of(tokenId, Set.of(serial), supplyKey);
