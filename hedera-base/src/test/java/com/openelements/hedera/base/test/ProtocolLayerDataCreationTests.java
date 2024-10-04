@@ -36,6 +36,7 @@ import com.openelements.hedera.base.protocol.FileInfoResponse;
 import com.openelements.hedera.base.protocol.FileDeleteResult;
 import com.openelements.hedera.base.protocol.FileCreateResult;
 import com.openelements.hedera.base.protocol.FileContentsResponse;
+import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.FileAppendResult;
 import com.openelements.hedera.base.protocol.FileContentsRequest;
 import com.openelements.hedera.base.protocol.TokenTransferRequest;
@@ -668,5 +669,31 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> FileContentsRequest.of((String) null));
         Assertions.assertThrows(NullPointerException.class, () -> FileContentsRequest.of((FileId) null));
     }
+
+    @Test
+    void testFileCreateRequestCreation(){
+        //given
+        final Hbar maxTransactionFee= Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration= Duration.ofSeconds(10);
+        final byte[] contents= new byte[]{};
+        final Instant expirationTime= Instant.MAX;
+        final byte[] largeContents = IntStream.range(0, 2050).mapToObj(i -> "a").reduce("", (a,b) -> a+b).getBytes();
+        final String fileMemo= "fileMemo";
+
+        //then
+        Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents));
+        Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents, null));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, expirationTime, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, expirationTime, null));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> FileCreateRequest.of(largeContents));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(contents, null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, expirationTime));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileCreateRequest(null, null, null, null, null));
+    }
+
+
 
 }
