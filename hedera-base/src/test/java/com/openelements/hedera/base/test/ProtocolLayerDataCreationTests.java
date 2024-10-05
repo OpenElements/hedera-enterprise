@@ -688,12 +688,9 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, expirationTime, null));
         Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> FileCreateRequest.of(largeContents));
-        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(contents, null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null));
         Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, expirationTime));
         Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, null));
         Assertions.assertThrows(NullPointerException.class, () -> new FileCreateRequest(null, null, null, null, null));
     }
-
-
-
 }
