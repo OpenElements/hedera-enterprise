@@ -7,7 +7,6 @@ import com.openelements.hedera.base.Nft;
 import com.openelements.hedera.base.NftRepository;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.mirrornode.Page;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
