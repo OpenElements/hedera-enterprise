@@ -13,41 +13,10 @@ import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.ContractParam;
-import com.openelements.hedera.base.protocol.AccountBalanceRequest;
-import com.openelements.hedera.base.protocol.AccountBalanceResponse;
-import com.openelements.hedera.base.protocol.AccountCreateRequest;
-import com.openelements.hedera.base.protocol.AccountCreateResult;
-import com.openelements.hedera.base.protocol.AccountDeleteRequest;
-import com.openelements.hedera.base.protocol.AccountDeleteResult;
-import com.openelements.hedera.base.protocol.ContractCallRequest;
-import com.openelements.hedera.base.protocol.ContractCallResult;
-import com.openelements.hedera.base.protocol.ContractCreateRequest;
-import com.openelements.hedera.base.protocol.ContractCreateResult;
-import com.openelements.hedera.base.protocol.ContractDeleteRequest;
-import com.openelements.hedera.base.protocol.ContractDeleteResult;
-import com.openelements.hedera.base.protocol.FileAppendRequest;
-import com.openelements.hedera.base.protocol.TokenTransferResult;
-import com.openelements.hedera.base.protocol.TokenMintResult;
-import com.openelements.hedera.base.protocol.TokenCreateResult;
-import com.openelements.hedera.base.protocol.TokenBurnResult;
-import com.openelements.hedera.base.protocol.TokenAssociateResult;
-import com.openelements.hedera.base.protocol.FileUpdateResult;
-import com.openelements.hedera.base.protocol.FileInfoResponse;
-import com.openelements.hedera.base.protocol.FileDeleteResult;
-import com.openelements.hedera.base.protocol.FileCreateResult;
-import com.openelements.hedera.base.protocol.FileContentsResponse;
-import com.openelements.hedera.base.protocol.FileCreateRequest;
-import com.openelements.hedera.base.protocol.FileAppendResult;
-import com.openelements.hedera.base.protocol.FileContentsRequest;
-import com.openelements.hedera.base.protocol.TokenTransferRequest;
-import com.openelements.hedera.base.protocol.TokenMintRequest;
-import com.openelements.hedera.base.protocol.TokenCreateRequest;
-import com.openelements.hedera.base.protocol.TokenBurnRequest;
-import com.openelements.hedera.base.protocol.TokenAssociateRequest;
-import com.openelements.hedera.base.protocol.FileUpdateRequest;
-import com.openelements.hedera.base.protocol.FileInfoRequest;
+import com.openelements.hedera.base.protocol.*;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -692,5 +661,24 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, expirationTime));
         Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, null));
         Assertions.assertThrows(NullPointerException.class, () -> new FileCreateRequest(null, null, null, null, null));
+    }
+    @Test
+    void testFileDeleteRequestCreation(){
+        //given
+        final Hbar maxTransactionFee= Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration= Duration.ofSeconds(10);
+        final String fileIdString= "0.0.12345";
+        final FileId fileId= FileId.fromString(fileIdString);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> FileDeleteRequest.of(fileId));
+        Assertions.assertDoesNotThrow(() -> FileDeleteRequest.of(fileIdString));
+        Assertions.assertDoesNotThrow(() -> new FileDeleteRequest(maxTransactionFee, transactionValidDuration, fileId));
+        Assertions.assertThrows(NullPointerException.class, () -> FileDeleteRequest.of((FileId) null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileDeleteRequest.of((String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(maxTransactionFee,transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(maxTransactionFee,null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, null, null));
     }
 }
