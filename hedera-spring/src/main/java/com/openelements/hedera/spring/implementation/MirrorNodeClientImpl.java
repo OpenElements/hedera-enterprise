@@ -92,10 +92,20 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HederaException {
         Objects.requireNonNull(transactionId, "transactionId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/transactions/" + transactionId);
+        TransactionInfo transactionInfo = null;
+
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
-        return Optional.of(new TransactionInfo(transactionId));
+        try {
+            transactionInfo = objectMapper.treeToValue(jsonNode, TransactionInfo.class);
+            return Optional.ofNullable( transactionInfo);
+        } catch (JsonProcessingException jsonProcessingException) {
+            System.err.println("Error while parsing data"+ jsonProcessingException.getMessage());
+            return Optional.empty();
+
+        }
+
     }
 
     private JsonNode doGetCall(String path, Map<String, ?> params) throws HederaException {
