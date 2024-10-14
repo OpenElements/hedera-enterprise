@@ -45,6 +45,8 @@ import com.openelements.hedera.base.protocol.TokenBurnRequest;
 import com.openelements.hedera.base.protocol.TokenAssociateRequest;
 import com.openelements.hedera.base.protocol.FileUpdateRequest;
 import com.openelements.hedera.base.protocol.FileInfoRequest;
+import com.openelements.hedera.base.protocol.FileDeleteRequest;
+import com.openelements.hedera.base.protocol.FileCreateRequest;
 
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
@@ -669,4 +671,46 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> FileContentsRequest.of((FileId) null));
     }
 
+    @Test
+    void testFileCreateRequestCreation(){
+        //given
+        final Hbar maxTransactionFee= Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration= Duration.ofSeconds(10);
+        final byte[] contents= new byte[]{};
+        final Instant expirationTime= Instant.MAX;
+        final byte[] largeContents = IntStream.range(0, 2050).mapToObj(i -> "a").reduce("", (a,b) -> a+b).getBytes();
+        final String fileMemo= "fileMemo";
+
+        //then
+        Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents));
+        Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents, null));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, expirationTime, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, expirationTime, null));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> FileCreateRequest.of(largeContents));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, expirationTime));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileCreateRequest(null, null, null, null, null));
+    }
+    @Test
+    void testFileDeleteRequestCreation(){
+        //given
+        final Hbar maxTransactionFee= Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration= Duration.ofSeconds(10);
+        final String fileIdString= "0.0.12345";
+        final FileId fileId= FileId.fromString(fileIdString);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> FileDeleteRequest.of(fileId));
+        Assertions.assertDoesNotThrow(() -> FileDeleteRequest.of(fileIdString));
+        Assertions.assertDoesNotThrow(() -> new FileDeleteRequest(maxTransactionFee, transactionValidDuration, fileId));
+        Assertions.assertThrows(NullPointerException.class, () -> FileDeleteRequest.of((FileId) null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileDeleteRequest.of((String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(maxTransactionFee,transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(maxTransactionFee,null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, null, null));
+    }
 }
