@@ -19,7 +19,7 @@ import org.springframework.web.client.RestClient;
 
 public class RestBasedPage<T> implements Page<T> {
 
-    private final static Logger log = LoggerFactory.getLogger(RestBasedPage.class);
+    private static final Logger log = LoggerFactory.getLogger(RestBasedPage.class);
 
 
     private final ObjectMapper objectMapper;
