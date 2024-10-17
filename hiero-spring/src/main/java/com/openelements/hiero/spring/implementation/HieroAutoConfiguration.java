@@ -12,7 +12,7 @@ import com.openelements.hiero.base.NftRepository;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
 import com.openelements.hiero.base.implementation.FileClientImpl;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import com.openelements.hiero.base.implementation.NftClientImpl;
 import com.openelements.hiero.base.implementation.NftRepositoryImpl;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
@@ -41,20 +41,20 @@ public class HieroAutoConfiguration {
     private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
 
     @Bean
-    HederaNetwork hederaNetwork(final HieroProperties properties) {
+    HieroNetwork hederaNetwork(final HieroProperties properties) {
         if (properties.getNetwork() == null) {
             throw new IllegalArgumentException("'spring.hiero.network' property must be set");
         }
         final HieroNetworkProperties networkProperties = properties.getNetwork();
-        if (Arrays.stream(HederaNetwork.values())
+        if (Arrays.stream(HieroNetwork.values())
                 .anyMatch(v -> Objects.equals(v.getName(), networkProperties.getName()))) {
             try {
-                return HederaNetwork.valueOf(networkProperties.getName().toUpperCase());
+                return HieroNetwork.valueOf(networkProperties.getName().toUpperCase());
             } catch (Exception e) {
                 throw new IllegalArgumentException("Can not parse 'spring.hiero.network.name' property", e);
             }
         }
-        return HederaNetwork.CUSTOM;
+        return HieroNetwork.CUSTOM;
     }
 
     @Bean
@@ -96,10 +96,10 @@ public class HieroAutoConfiguration {
 
     @Bean
     Client client(final HieroProperties properties, AccountId accountId, PrivateKey privateKey,
-            HederaNetwork hederaNetwork) {
+            HieroNetwork hederaNetwork) {
         try {
             final Client client;
-            if (hederaNetwork != HederaNetwork.CUSTOM) {
+            if (hederaNetwork != HieroNetwork.CUSTOM) {
                 try {
                     log.debug("Hiero network '{}' will be used", hederaNetwork.getName());
                     client = Client.forName(hederaNetwork.getName());
@@ -160,7 +160,7 @@ public class HieroAutoConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
-    MirrorNodeClient mirrorNodeClient(final HieroProperties properties, HederaNetwork hederaNetwork) {
+    MirrorNodeClient mirrorNodeClient(final HieroProperties properties, HieroNetwork hederaNetwork) {
         final String mirrorNodeEndpoint;
         if (properties.getNetwork().getMirrorNode() != null) {
             mirrorNodeEndpoint = properties.getNetwork().getMirrorNode();
@@ -201,7 +201,7 @@ public class HieroAutoConfiguration {
     }
 
     @Bean
-    ContractVerificationClient contractVerificationClient(HederaNetwork hederaNetwork) {
+    ContractVerificationClient contractVerificationClient(HieroNetwork hederaNetwork) {
         return new ContractVerificationClientImplementation(hederaNetwork);
     }
 }

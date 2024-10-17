@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.Nft;
 import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import com.openelements.hiero.base.mirrornode.Page;
@@ -46,7 +46,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
+    public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HieroException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         final String path = "/api/v1/accounts/" + accountId + "/nfts";
         final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
@@ -71,7 +71,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     @Override
     public Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, @NonNull final long serialNumber)
-            throws HederaException {
+            throws HieroException {
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         if (serialNumber <= 0) {
             throw new IllegalArgumentException("serialNumber must be positive");
@@ -82,14 +82,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     @Override
     public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId,
-            @NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
+            @NonNull final TokenId tokenId, final long serialNumber) throws HieroException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
                 .filter(nft -> Objects.equals(nft.owner(), accountId));
     }
 
     @Override
-    public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HederaException {
+    public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HieroException {
         Objects.requireNonNull(transactionId, "transactionId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/transactions/" + transactionId);
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
@@ -98,7 +98,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         return Optional.of(new TransactionInfo(transactionId));
     }
 
-    private JsonNode doGetCall(String path, Map<String, ?> params) throws HederaException {
+    private JsonNode doGetCall(String path, Map<String, ?> params) throws HieroException {
         return doGetCall(builder -> {
             UriBuilder uriBuilder = builder.path(path);
             for (Map.Entry<String, ?> entry : params.entrySet()) {
@@ -108,11 +108,11 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         });
     }
 
-    private JsonNode doGetCall(String path) throws HederaException {
+    private JsonNode doGetCall(String path) throws HieroException {
         return doGetCall(builder -> builder.path(path).build());
     }
 
-    private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HederaException {
+    private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HieroException {
         final ResponseEntity<String> responseEntity = restClient.get()
                 .uri(uriBuilder -> uriFunction.apply(uriBuilder))
                 .accept(MediaType.APPLICATION_JSON)
@@ -130,7 +130,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
             }
             return objectMapper.readTree(body);
         } catch (JsonProcessingException e) {
-            throw new HederaException("Error parsing body as JSON: " + body, e);
+            throw new HieroException("Error parsing body as JSON: " + body, e);
         }
     }
 
@@ -149,14 +149,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }).toList();
     }
 
-    private Optional<Nft> jsonNodeToOptionalNft(final JsonNode jsonNode) throws HederaException {
+    private Optional<Nft> jsonNodeToOptionalNft(final JsonNode jsonNode) throws HieroException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
         try {
             return Optional.of(jsonNodeToNft(jsonNode));
         } catch (final Exception e) {
-            throw new HederaException("Error parsing NFT from JSON '" + jsonNode + "'", e);
+            throw new HieroException("Error parsing NFT from JSON '" + jsonNode + "'", e);
         }
     }
 

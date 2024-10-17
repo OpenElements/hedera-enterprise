@@ -14,7 +14,7 @@
   <artifactId>hiero-spring-sample</artifactId>
 
   <name>Hiero Enterprise Spring Sample</name>
-  <description>Sample for Hedera in Spring</description>
+  <description>Sample for Hiero in Spring</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
 
   <dependencies>

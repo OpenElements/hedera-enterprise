@@ -5,13 +5,13 @@ import org.jspecify.annotations.NonNull;
 /**
  * Represents an exception that occurred while interacting with the Hedera network.
  */
-public class HederaException extends Exception {
+public class HieroException extends Exception {
 
     /**
      * Constructs a new HederaException with the specified detail message.
      * @param message The detail message.
      */
-    public HederaException(@NonNull String message) {
+    public HieroException(@NonNull String message) {
         super(message);
     }
 
@@ -20,7 +20,7 @@ public class HederaException extends Exception {
      * @param message The detail message.
      * @param cause The cause.
      */
-    public HederaException(@NonNull String message, @NonNull Throwable cause) {
+    public HieroException(@NonNull String message, @NonNull Throwable cause) {
         super(message, cause);
     }
 }

@@ -10,7 +10,7 @@
   <packaging>pom</packaging>
 
   <name>Hiero Enterprise BOM</name>
-  <description>Bill of Materials (BOM) for Hedera Enterprise</description>
+  <description>Bill of Materials (BOM) for Hiero Enterprise</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
 
   <properties>

@@ -3,7 +3,7 @@ package com.openelements.hiero.spring.implementation;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hiero.base.ContractVerificationClient;
 import com.openelements.hiero.base.ContractVerificationState;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
@@ -29,10 +29,10 @@ public class ContractVerificationUtility {
      * @param contractName contract name
      * @param contractSource contract source code
      * @param contractMetadata contract metadata
-     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws HieroException if an error happens in communication with the Hedera network
      * @throws IllegalStateException if the contract is not fully verified
      */
-    void doFullVerification(ContractId contractId, String contractName, String contractSource, String contractMetadata) throws HederaException {
+    void doFullVerification(ContractId contractId, String contractName, String contractSource, String contractMetadata) throws HieroException {
         doFullVerification(contractId, contractName, Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata));
     }
 
@@ -41,10 +41,10 @@ public class ContractVerificationUtility {
      * @param contractId contract to verify
      * @param contractName contract name
      * @param files map of file names to file contents
-     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws HieroException if an error happens in communication with the Hedera network
      * @throws IllegalStateException if the contract is not fully verified
      */
-    void doFullVerification(ContractId contractId, String contractName, Map<String, String> files) throws HederaException {
+    void doFullVerification(ContractId contractId, String contractName, Map<String, String> files) throws HieroException {
         final ContractVerificationState state = verificationClient.checkVerification(contractId);
         if(state == ContractVerificationState.FULL) {
             log.debug("Contract {} is already fully verified", contractId);

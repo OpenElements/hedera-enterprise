@@ -3,8 +3,8 @@ package com.openelements.hiero.microprofile.implementation;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hiero.base.ContractVerificationClient;
 import com.openelements.hiero.base.ContractVerificationState;
-import com.openelements.hiero.base.HederaException;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -25,28 +25,28 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
 
     private static final String CONTRACT_VERIFICATION_URL = "https://server-verify.hashscan.io";
 
-    private final HederaNetwork hederaNetwork;
+    private final HieroNetwork hederaNetwork;
 
     private final JsonParserFactory jsonParserFactory;
 
     private final Client webClient;
 
-    public ContractVerificationClientImpl(@NonNull final HederaNetwork hederaNetwork) {
+    public ContractVerificationClientImpl(@NonNull final HieroNetwork hederaNetwork) {
         this.hederaNetwork = Objects.requireNonNull(hederaNetwork, "hieroNetwork must not be null");
         jsonParserFactory = Json.createParserFactory(Map.of());
         webClient = ClientBuilder.newBuilder().build();
     }
 
-    private String getChainId() throws HederaException {
-        if(hederaNetwork == HederaNetwork.CUSTOM) {
-            throw new HederaException("A custom Hiero network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
+    private String getChainId() throws HieroException {
+        if(hederaNetwork == HieroNetwork.CUSTOM) {
+            throw new HieroException("A custom Hiero network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
         }
         return hederaNetwork.getChainId() + "";
     }
 
     @NonNull
     @Override
-    public ContractVerificationState checkVerification(@NonNull ContractId contractId) throws HederaException {
+    public ContractVerificationState checkVerification(@NonNull ContractId contractId) throws HieroException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -57,7 +57,7 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
 
     @Override
     public boolean checkVerification(@NonNull ContractId contractId, @NonNull String fileName,
-            @NonNull String fileContent) throws HederaException {
+            @NonNull String fileContent) throws HieroException {
         final ContractVerificationState state = checkVerification(contractId);
         if(state != ContractVerificationState.FULL) {
             throw new IllegalStateException("Contract is not verified");
@@ -87,14 +87,14 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
             final String content = result.getString("content");
             return Objects.equals(content, fileContent);
         } catch (Exception e) {
-            throw new HederaException("Error verification step", e);
+            throw new HieroException("Error verification step", e);
         }
     }
 
     @NonNull
     @Override
     public ContractVerificationState verify(@NonNull ContractId contractId, @NonNull String contractName,
-            @NonNull Map<String, String> files) throws HederaException {
+            @NonNull Map<String, String> files) throws HieroException {
         throw new UnsupportedOperationException("Not implemented");
     }
 }

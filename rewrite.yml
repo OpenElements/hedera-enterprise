@@ -115,4 +115,13 @@ recipeList:
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HederaNode
       newFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HieroNode
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HederaNetwork
+      newFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HieroNetwork
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.HederaException
+      newFullyQualifiedTypeName: com.openelements.hiero.base.HieroException
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.test.HederaTestContext
+      newFullyQualifiedTypeName: com.openelements.hiero.base.test.HieroTestContext
 

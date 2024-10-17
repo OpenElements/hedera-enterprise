@@ -13,15 +13,15 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HederaTestContext {
+public class HieroTestContext {
 
-    private static final Logger log = LoggerFactory.getLogger(HederaTestContext.class);
+    private static final Logger log = LoggerFactory.getLogger(HieroTestContext.class);
 
     private final Account operationalAccount;
 
     private final Client client;
 
-    public HederaTestContext() {
+    public HieroTestContext() {
         final String hederaAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
         final String hederaPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
         final String hederaNetwork = System.getenv("HEDERA_NETWORK");

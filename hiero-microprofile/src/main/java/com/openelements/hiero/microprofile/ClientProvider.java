@@ -10,7 +10,7 @@ import com.openelements.hiero.base.FileClient;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
 import com.openelements.hiero.base.implementation.FileClientImpl;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.implementation.SmartContractClientImpl;
 import com.openelements.hiero.base.protocol.ProtocolLayerClient;
@@ -49,10 +49,10 @@ public class ClientProvider {
         }
     }
 
-    private HederaNetwork getHederaNetwork() {
-        if(Arrays.stream(HederaNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), network))) {
+    private HieroNetwork getHederaNetwork() {
+        if(Arrays.stream(HieroNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), network))) {
             try {
-                return HederaNetwork.valueOf(network.toUpperCase());
+                return HieroNetwork.valueOf(network.toUpperCase());
             } catch (Exception e) {
                 throw new IllegalArgumentException("Can not parse 'hieor.network' property", e);
             }
@@ -64,7 +64,7 @@ public class ClientProvider {
     private Client createClient() {
         final AccountId accountId = getAccountId();
         final PrivateKey privateKey = getPrivateKey();
-        final HederaNetwork hederaNetwork = getHederaNetwork();
+        final HieroNetwork hederaNetwork = getHederaNetwork();
         return Client.forName(hederaNetwork.getName())
             .setOperator(accountId, privateKey);
     }

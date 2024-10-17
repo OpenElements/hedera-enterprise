@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 
 public class ProtocolLayerClientTokenTests {
 
-    private static HederaTestContext hederaTestContext;
+    private static HieroTestContext hederaTestContext;
 
     private static ProtocolLayerClient protocolLayerClient;
 
     @BeforeAll
     static void init() {
-        hederaTestContext = new HederaTestContext();
+        hederaTestContext = new HieroTestContext();
         protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(),
                 hederaTestContext.getOperationalAccount());
     }

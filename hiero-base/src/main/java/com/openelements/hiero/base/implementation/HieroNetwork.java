@@ -1,6 +1,6 @@
 package com.openelements.hiero.base.implementation;
 
-public enum HederaNetwork {
+public enum HieroNetwork {
 
     PREVIEWNET("previewnet", 297, "https://previewnet.mirrornode.hedera.com/", "https://previewnet.hashio.io/api"),
     TESTNET("testnet", 296, "https://testnet.mirrornode.hedera.com/", "https://testnet.hashio.io/api"),
@@ -26,7 +26,7 @@ public enum HederaNetwork {
 
     private final String mirrornodeEndpoint;
 
-    HederaNetwork(final String name, final long chainId, final String mirrornodeEndpoint, final String relayUrl) {
+    HieroNetwork(final String name, final long chainId, final String mirrornodeEndpoint, final String relayUrl) {
         this.name = name;
         this.chainId = chainId;
         this.mirrornodeEndpoint = mirrornodeEndpoint;

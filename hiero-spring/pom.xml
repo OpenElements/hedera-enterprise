@@ -14,7 +14,7 @@
   <artifactId>hiero-spring</artifactId>
 
   <name>Hiero Enterprise Spring</name>
-  <description>Library to work with Hedera in Spring</description>
+  <description>Library to work with Hiero in Spring</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
 
   <dependencies>

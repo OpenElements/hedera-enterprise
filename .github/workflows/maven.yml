@@ -39,8 +39,8 @@ jobs:
       - name: Build with Maven
         env:
           spring_profiles_active: solo
-          HEDERA_ACCOUNT_ID: ${{ steps.solo.outputs.accountId }}
-          HEDERA_PRIVATE_KEY: ${{ steps.solo.outputs.privateKey }}
-          HEDERA_NETWORK: solo
+          HIERO_ACCOUNT_ID: ${{ steps.solo.outputs.accountId }}
+          HIERO_PRIVATE_KEY: ${{ steps.solo.outputs.privateKey }}
+          HIERO_NETWORK: solo
         run: ./mvnw verify
 

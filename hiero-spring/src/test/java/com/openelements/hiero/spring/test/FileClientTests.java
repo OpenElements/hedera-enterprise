@@ -2,7 +2,7 @@ package com.openelements.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hiero.base.FileClient;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -156,7 +156,7 @@ public class FileClientTests {
 
 
         //then
-        Assertions.assertThrows(HederaException.class, () -> fileClient.readFile(fileId));
+        Assertions.assertThrows(HieroException.class, () -> fileClient.readFile(fileId));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class FileClientTests {
         fileClient.deleteFile(fileId);
 
         //when
-        Assertions.assertThrows(HederaException.class, () -> fileClient.deleteFile(fileId));
+        Assertions.assertThrows(HieroException.class, () -> fileClient.deleteFile(fileId));
     }
 
     @Test

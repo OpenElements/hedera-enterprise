@@ -15,10 +15,10 @@ public interface ContractVerificationClient {
      * Check the verification state of a contract.
      * @param contractId contract to check
      * @return verification state
-     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws HieroException if an error happens in communication with the Hedera network
      */
     @NonNull
-    ContractVerificationState checkVerification(@NonNull ContractId contractId) throws HederaException;
+    ContractVerificationState checkVerification(@NonNull ContractId contractId) throws HieroException;
 
     /**
      * Check the verification state of a file that is part of a contract.
@@ -27,9 +27,9 @@ public interface ContractVerificationClient {
      * @param fileContent file content
      * @return true if the contract contains is verified and contains a file with the given name and content
      * @throws IllegalStateException if contract is not verified
-     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws HieroException if an error happens in communication with the Hedera network
      */
-    boolean checkVerification(@NonNull ContractId contractId, @NonNull String fileName, @NonNull String fileContent) throws HederaException;
+    boolean checkVerification(@NonNull ContractId contractId, @NonNull String fileName, @NonNull String fileContent) throws HieroException;
 
     /**
      * Try to verify a contract.
@@ -39,10 +39,10 @@ public interface ContractVerificationClient {
      * @param contractMetadata contract metadata
      * @return verification state
      * @throws IllegalStateException if contract is already verified
-     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws HieroException if an error happens in communication with the Hedera network
      */
     @NonNull
-    default ContractVerificationState verify(@NonNull final ContractId contractId, @NonNull final String contractName, @NonNull final String contractSource, final String contractMetadata) throws HederaException {
+    default ContractVerificationState verify(@NonNull final ContractId contractId, @NonNull final String contractName, @NonNull final String contractSource, final String contractMetadata) throws HieroException {
         return verify(contractId, contractName, Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata));
     }
 
@@ -53,8 +53,8 @@ public interface ContractVerificationClient {
      * @param files contract files
      * @return verification state
      * @throws IllegalStateException if contract is already verified
-     * @throws HederaException if an error happens in communication with the Hedera network
+     * @throws HieroException if an error happens in communication with the Hedera network
      */
     @NonNull
-    ContractVerificationState verify(@NonNull ContractId contractId, @NonNull String contractName, @NonNull Map<String, String> files)  throws HederaException;
+    ContractVerificationState verify(@NonNull ContractId contractId, @NonNull String contractName, @NonNull Map<String, String> files)  throws HieroException;
 }

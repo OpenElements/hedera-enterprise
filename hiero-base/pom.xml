@@ -14,7 +14,7 @@
   <artifactId>hiero-base</artifactId>
 
   <name>Hiero Enterprise Base</name>
-  <description>Base Library to work with Hedera in Spring and JakartaEE</description>
+  <description>Base Library to work with Hiero in Spring and JakartaEE</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
 
 

@@ -14,7 +14,7 @@
   <artifactId>hiero-microprofile</artifactId>
 
   <name>Hiero Enterprise Microprofile</name>
-  <description>Library to work with Hedera in JakartaEE / Microprofile</description>
+  <description>Library to work with Hiero in JakartaEE / Microprofile</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
 
 

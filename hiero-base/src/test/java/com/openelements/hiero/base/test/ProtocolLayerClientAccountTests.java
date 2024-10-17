@@ -4,7 +4,7 @@ package com.openelements.hiero.base.test;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.openelements.hiero.base.Account;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;
 import com.openelements.hiero.base.protocol.AccountBalanceResponse;
@@ -18,13 +18,13 @@ import org.junit.jupiter.api.Test;
 
 public class ProtocolLayerClientAccountTests {
 
-    private static HederaTestContext hederaTestContext;
+    private static HieroTestContext hederaTestContext;
 
     private static ProtocolLayerClient protocolLayerClient;
 
     @BeforeAll
     static void init() {
-        hederaTestContext = new HederaTestContext();
+        hederaTestContext = new HieroTestContext();
         protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(),
                 hederaTestContext.getOperationalAccount());
     }
@@ -82,7 +82,7 @@ public class ProtocolLayerClientAccountTests {
         final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(account.accountId());
 
         //then
-        Assertions.assertThrows(HederaException.class,
+        Assertions.assertThrows(HieroException.class,
                 () -> protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest));
     }
 
