@@ -89,7 +89,7 @@ import org.slf4j.LoggerFactory;
 
 public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
-    private final static Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
 
     public static final int DEFAULT_GAS = 1_000_000;
 

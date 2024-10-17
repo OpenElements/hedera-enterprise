@@ -38,7 +38,7 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties({HederaProperties.class, HederaNetworkProperties.class})
 public class HederaAutoConfiguration {
 
-    private final static Logger log = LoggerFactory.getLogger(HederaAutoConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(HederaAutoConfiguration.class);
 
     @Bean
     HederaNetwork hederaNetwork(final HederaProperties properties) {

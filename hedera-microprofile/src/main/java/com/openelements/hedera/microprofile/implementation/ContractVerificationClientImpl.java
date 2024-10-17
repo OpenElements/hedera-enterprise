@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
 
 public class ContractVerificationClientImpl implements ContractVerificationClient {
 
-    private final static String CONTRACT_VERIFICATION_URL = "https://server-verify.hashscan.io";
+    private static final String CONTRACT_VERIFICATION_URL = "https://server-verify.hashscan.io";
 
     private final HederaNetwork hederaNetwork;
 
