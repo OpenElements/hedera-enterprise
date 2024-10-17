@@ -1,0 +1,127 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.openelements.hiero.MovePackages
+displayName: Rename Packages from hedera to hiero
+recipeList:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: com.openelements.hedera
+      newPackageName: com.openelements.hiero
+      recursive: true
+
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-base
+      newArtifactId: hiero-base
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring
+      newArtifactId: hiero-spring
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring-sample
+      newArtifactId: hiero-spring-sample
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-microprofile
+      newArtifactId: hiero-microprofile
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-base
+      newArtifactId: hiero-base
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring
+      newArtifactId: hiero-spring
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring-sample
+      newArtifactId: hiero-spring-sample
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-microprofile
+      newArtifactId: hiero-microprofile
+
+# Needs to be migrated by hand, because OpenRewrite does not parse module-info.java
+#  - org.openrewrite.text.FindAndReplace:
+#      filePattern: '**/module-info.java'
+#      find: com.openelements.hedera
+#      replace: com.openelements.hiero
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.md'
+      find: hedera
+      replace: hiero
+      caseSensitive: true
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.md'
+      find: Hedera
+      replace: Hiero
+      caseSensitive: true
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.openelements.hiero.MigrateProperies
+displayName: Rename Properties from hedera to hiero
+recipeList:
+  - org.openrewrite.properties.ChangePropertyKey:
+        oldPropertyKey: spring.hedera.accountId
+        newPropertyKey: spring.hiero.accountId
+        regex: true
+  - org.openrewrite.properties.ChangePropertyKey:
+        oldPropertyKey: spring.hedera.privateKey
+        newPropertyKey: spring.hiero.privateKey
+        regex: true
+  - org.openrewrite.properties.ChangePropertyKey:
+        oldPropertyKey: spring.hedera.network.name
+        newPropertyKey: spring.hiero.network.name
+        regex: true
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.openelements.hiero.MigrateClasses
+displayName: Rename Classes from hedera to hiero
+recipeList:
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.spring.sample.HederaEndpoint
+      newFullyQualifiedTypeName: com.openelements.hiero.spring.sample.HieroEndpoint
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.spring.EnableHedera
+      newFullyQualifiedTypeName: com.openelements.hiero.spring.EnableHiero
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.spring.implementation.HederaAutoConfiguration
+      newFullyQualifiedTypeName: com.openelements.hiero.spring.implementation.HieroAutoConfiguration
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.spring.implementation.HederaNetworkProperties
+      newFullyQualifiedTypeName: com.openelements.hiero.spring.implementation.HieroNetworkProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.spring.implementation.HederaProperties
+      newFullyQualifiedTypeName: com.openelements.hiero.spring.implementation.HieroProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.HederaContext
+      newFullyQualifiedTypeName: com.openelements.hiero.base.HieroContext
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HederaNode
+      newFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HieroNode
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HederaNetwork
+      newFullyQualifiedTypeName: com.openelements.hiero.base.implementation.HieroNetwork
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.HederaException
+      newFullyQualifiedTypeName: com.openelements.hiero.base.HieroException
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.openelements.hiero.base.test.HederaTestContext
+      newFullyQualifiedTypeName: com.openelements.hiero.base.test.HieroTestContext
+
