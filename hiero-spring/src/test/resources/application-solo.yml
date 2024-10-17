@@ -1,5 +1,5 @@
 spring:
-  hedera:
+  hiero:
     network:
       name: solo
       nodes:

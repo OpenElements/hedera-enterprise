@@ -1,11 +1,11 @@
 package com.openelements.hiero.spring.sample;
 
-import com.openelements.hiero.spring.EnableHedera;
+import com.openelements.hiero.spring.EnableHiero;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableHedera
+@EnableHiero
 public class Application {
 
     public static void main(String[] args) {

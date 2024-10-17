@@ -24,20 +24,20 @@ import org.jspecify.annotations.NonNull;
 
 public class ClientProvider {
 
-    @ConfigProperty(name = "hedera.newAccountId")
+    @ConfigProperty(name = "hiero.newAccountId")
     private String accountIdAsString;
 
-    @ConfigProperty(name = "hedera.privateKey")
+    @ConfigProperty(name = "hiero.privateKey")
     private String privateKeyAsString;
 
-    @ConfigProperty(name = "hedera.network")
+    @ConfigProperty(name = "hieor.network")
     private String network;
 
     private AccountId getAccountId() {
         try {
             return AccountId.fromString(accountIdAsString);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.newAccountId' property", e);
+            throw new IllegalArgumentException("Can not parse 'hiero.newAccountId' property", e);
         }
     }
 
@@ -45,7 +45,7 @@ public class ClientProvider {
         try {
             return PrivateKey.fromString(privateKeyAsString);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.privateKey' property", e);
+            throw new IllegalArgumentException("Can not parse 'hiero.privateKey' property", e);
         }
     }
 
@@ -54,10 +54,10 @@ public class ClientProvider {
             try {
                 return HederaNetwork.valueOf(network.toUpperCase());
             } catch (Exception e) {
-                throw new IllegalArgumentException("Can not parse 'hedera.network' property", e);
+                throw new IllegalArgumentException("Can not parse 'hieor.network' property", e);
             }
         } else {
-            throw new IllegalArgumentException("'hedera.network' property must be set to a valid value");
+            throw new IllegalArgumentException("'hiero.network' property must be set to a valid value");
         }
     }
 

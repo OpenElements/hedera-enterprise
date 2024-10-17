@@ -35,57 +35,57 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
 
 @AutoConfiguration
-@EnableConfigurationProperties({HederaProperties.class, HederaNetworkProperties.class})
-public class HederaAutoConfiguration {
+@EnableConfigurationProperties({HieroProperties.class, HieroNetworkProperties.class})
+public class HieroAutoConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(HederaAutoConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
 
     @Bean
-    HederaNetwork hederaNetwork(final HederaProperties properties) {
+    HederaNetwork hederaNetwork(final HieroProperties properties) {
         if (properties.getNetwork() == null) {
-            throw new IllegalArgumentException("'spring.hedera.network' property must be set");
+            throw new IllegalArgumentException("'spring.hiero.network' property must be set");
         }
-        final HederaNetworkProperties networkProperties = properties.getNetwork();
+        final HieroNetworkProperties networkProperties = properties.getNetwork();
         if (Arrays.stream(HederaNetwork.values())
                 .anyMatch(v -> Objects.equals(v.getName(), networkProperties.getName()))) {
             try {
                 return HederaNetwork.valueOf(networkProperties.getName().toUpperCase());
             } catch (Exception e) {
-                throw new IllegalArgumentException("Can not parse 'spring.hedera.network.name' property", e);
+                throw new IllegalArgumentException("Can not parse 'spring.hiero.network.name' property", e);
             }
         }
         return HederaNetwork.CUSTOM;
     }
 
     @Bean
-    PrivateKey privateKey(final HederaProperties properties) {
+    PrivateKey privateKey(final HieroProperties properties) {
         final String privateKey = properties.getPrivateKey();
         if (privateKey == null) {
-            throw new IllegalArgumentException("'spring.hedera.privateKey' property must be set");
+            throw new IllegalArgumentException("'spring.hiero.privateKey' property must be set");
         }
         if (privateKey.isBlank()) {
-            throw new IllegalArgumentException("'spring.hedera.privateKey' property must not be blank");
+            throw new IllegalArgumentException("'spring.hiero.privateKey' property must not be blank");
         }
         try {
             return PrivateKey.fromString(privateKey);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'spring.hedera.privateKey' property", e);
+            throw new IllegalArgumentException("Can not parse 'spring.hiero.privateKey' property", e);
         }
     }
 
     @Bean
-    AccountId accountId(final HederaProperties properties) {
+    AccountId accountId(final HieroProperties properties) {
         final String accountId = properties.getAccountId();
         if (accountId == null) {
-            throw new IllegalArgumentException("'spring.hedera.newAccountId' property must be set");
+            throw new IllegalArgumentException("'spring.hiero.newAccountId' property must be set");
         }
         if (accountId.isBlank()) {
-            throw new IllegalArgumentException("'spring.hedera.newAccountId' property must not be blank");
+            throw new IllegalArgumentException("'spring.hiero.newAccountId' property must not be blank");
         }
         try {
             return AccountId.fromString(accountId);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'spring.hedera.newAccountId' property", e);
+            throw new IllegalArgumentException("Can not parse 'spring.hiero.newAccountId' property", e);
         }
     }
 
@@ -95,13 +95,13 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    Client client(final HederaProperties properties, AccountId accountId, PrivateKey privateKey,
+    Client client(final HieroProperties properties, AccountId accountId, PrivateKey privateKey,
             HederaNetwork hederaNetwork) {
         try {
             final Client client;
             if (hederaNetwork != HederaNetwork.CUSTOM) {
                 try {
-                    log.debug("Hedera network '{}' will be used", hederaNetwork.getName());
+                    log.debug("Hiero network '{}' will be used", hederaNetwork.getName());
                     client = Client.forName(hederaNetwork.getName());
                 } catch (Exception e) {
                     throw new IllegalArgumentException("Can not create client for network " + hederaNetwork.getName(),
@@ -109,9 +109,9 @@ public class HederaAutoConfiguration {
                 }
             } else {
                 if (properties.getNetwork() == null) {
-                    throw new IllegalArgumentException("'spring.hedera.network' property must be set");
+                    throw new IllegalArgumentException("'spring.hiero.network' property must be set");
                 }
-                final HederaNetworkProperties networkProperties = properties.getNetwork();
+                final HieroNetworkProperties networkProperties = properties.getNetwork();
                 final Map<String, AccountId> nodes = new HashMap<>();
                 networkProperties.getNodes().forEach(node -> nodes.put(node.getIp() + ":" + node.getPort(),
                         AccountId.fromString(node.getAccount())));
@@ -128,7 +128,7 @@ public class HederaAutoConfiguration {
             log.debug("Client created for account: {}", accountId);
             return client;
         } catch (Exception e) {
-            throw new IllegalStateException("Can not create Hedera specific configuration", e);
+            throw new IllegalStateException("Can not create Hiero specific configuration", e);
         }
     }
 
@@ -158,9 +158,9 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+    @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
-    MirrorNodeClient mirrorNodeClient(final HederaProperties properties, HederaNetwork hederaNetwork) {
+    MirrorNodeClient mirrorNodeClient(final HieroProperties properties, HederaNetwork hederaNetwork) {
         final String mirrorNodeEndpoint;
         if (properties.getNetwork().getMirrorNode() != null) {
             mirrorNodeEndpoint = properties.getNetwork().getMirrorNode();
@@ -194,7 +194,7 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+    @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
     NftRepository nftRepository(final MirrorNodeClient mirrorNodeClient) {
         return new NftRepositoryImpl(mirrorNodeClient);

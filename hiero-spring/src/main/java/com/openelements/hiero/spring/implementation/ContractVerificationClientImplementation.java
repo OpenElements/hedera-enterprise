@@ -36,7 +36,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     private final RestClient restClient;
 
     public ContractVerificationClientImplementation(@NonNull final HederaNetwork hederaNetwork) {
-        this.hederaNetwork = Objects.requireNonNull(hederaNetwork, "hederaNetwork must not be null");
+        this.hederaNetwork = Objects.requireNonNull(hederaNetwork, "hieroNetwork must not be null");
         objectMapper = new ObjectMapper();
         restClient = RestClient.create();
     }
@@ -45,7 +45,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     private String getChainId() throws HederaException {
         if (hederaNetwork == HederaNetwork.CUSTOM) {
             throw new HederaException(
-                    "A custom Hedera network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
+                    "A custom Hiero network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
         }
         return hederaNetwork.getChainId() + "";
     }
