@@ -1,0 +1,73 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.openelements.hiero.MovePackages
+displayName: Rename Packages from hedera to hiero
+recipeList:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: com.openelements.hedera
+      newPackageName: com.openelements.hiero
+      recursive: true
+
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-base
+      newArtifactId: hiero-base
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring
+      newArtifactId: hiero-spring
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring-sample
+      newArtifactId: hiero-spring-sample
+  - org.openrewrite.maven.ChangeManagedDependencyGroupIdAndArtifactId:
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-microprofile
+      newArtifactId: hiero-microprofile
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-base
+      newArtifactId: hiero-base
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring
+      newArtifactId: hiero-spring
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-spring-sample
+      newArtifactId: hiero-spring-sample
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      changeManagedDependency: true
+      oldGroupId: com.open-elements.hedera
+      newGroupId: com.open-elements.hiero
+      oldArtifactId: hedera-microprofile
+      newArtifactId: hiero-microprofile
+
+  -
+
+#  - org.openrewrite.text.FindAndReplace:
+#      filePattern: '**/module-info.java'
+#      find: com.openelements.hedera
+#      replace: com.openelements.hiero
+
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.md'
+      find: hedera
+      replace: hiero
+      caseSensitive: true
+  - org.openrewrite.text.FindAndReplace:
+      filePattern: '**/*.md'
+      find: Hedera
+      replace: Hiero
+      caseSensitive: true

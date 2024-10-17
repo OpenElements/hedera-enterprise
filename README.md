@@ -1,6 +1,6 @@
-# Hedera Enterprise
-This project provides Java modules to integrate [Hedera network](https://hedera.com) smoothless in a Spring Boot or Microprofile (like Quarkus) application.
-This module is based on the [Hedera Java SDK](https://github.com/hashgraph/hedera-sdk-java).
+# Hiero Enterprise
+This project provides Java modules to integrate [Hiero network](https://hiero.com) smoothless in a Spring Boot or Microprofile (like Quarkus) application.
+This module is based on the [Hiero Java SDK](https://github.com/hashgraph/hiero-sdk-java).
 
 ## Spring Boot support
 
@@ -8,8 +8,8 @@ To use this module, you need to add the following dependency to your project:
 
 ```xml 
 <dependency>
-    <groupId>com.open-elements.hedera</groupId>
-    <artifactId>hedera-spring</artifactId>
+    <groupId>com.open-elements.hiero</groupId>
+    <artifactId>hiero-spring</artifactId>
     <version>VERSION</version> 
 </dependency>
 ```
@@ -19,27 +19,27 @@ To use this module, you need to add the following dependency to your project:
 To configure the module, you need to add the following properties to your application.properties file:
 
 ```properties
-spring.hedera.accountId=0.0.53854625
-spring.hedera.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
-spring.hedera.network=testnet
+spring.hiero.accountId=0.0.53854625
+spring.hiero.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+spring.hiero.network=testnet
 ```
 
 The account information (accountId, privateKey, publicKey) can all be found at the
-[Hedera portal](https://portal.hedera.com/) for a testnet or previewnet account.
-Today only the "DER Encoded Private Key" of the "ECDSA" key type is supported for the `spring.hedera.privateKey` property.
+[Hiero portal](https://portal.hiero.com/) for a testnet or previewnet account.
+Today only the "DER Encoded Private Key" of the "ECDSA" key type is supported for the `spring.hiero.privateKey` property.
 
-The 2 properties `spring.hedera.accountId` and `spring.hedera.privateKey` define the so called "operation account".
-The operational account is used as the account that sends all transactions against the Hedera network.
+The 2 properties `spring.hiero.accountId` and `spring.hiero.privateKey` define the so called "operation account".
+The operational account is used as the account that sends all transactions against the Hiero network.
 
 ### Usage
 
-To use the module, you need to add the `@EnableHedera` annotation to your Spring Boot application class.
+To use the module, you need to add the `@EnableHiero` annotation to your Spring Boot application class.
 
 ```java
-import com.open.elements.spring.hedera.EnableHedera;
+import com.open.elements.spring.hiero.EnableHiero;
 
 @SpringBootApplication
-@EnableHedera
+@EnableHiero
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -47,12 +47,12 @@ public class Application {
 }
 ```
  
-Once that is done you can for example autowire the `FileClient` class and call the methods to interact with the Hedera network.
+Once that is done you can for example autowire the `FileClient` class and call the methods to interact with the Hiero network.
 
 ```java
 
 @Service
-public class HederaAccountService {
+public class HieroAccountService {
 
     @Autowired
     private FileClient fileClient;
@@ -68,16 +68,16 @@ public class HederaAccountService {
 All APIs of the client are synchronous and return the result of the operation. For asynchronous operations, you can
 easily wrap calls by use the [`@Async` annotation of spring](https://spring.io/guides/gs/async-method).
 
-### Hedera Spring Sample
+### Hiero Spring Sample
 
-A sample application that uses the Hedera Spring module can be found in the `hedera-spring-sample` module.
+A sample application that uses the Hiero Spring module can be found in the `hiero-spring-sample` module.
 The sample application is a simple Spring Boot application that reads has a REST endpoint at `localhost:8080/` and 
 shows the hbar balance of the account `0.0.100`.
-To use the application, you need to have created a Hedera testnet account at the [Hedera portal](https://portal.hedera.com/).
-The account information can be added to the `application.properties` file in the `hedera-spring-sample` module:
+To use the application, you need to have created a Hiero testnet account at the [Hiero portal](https://portal.hiero.com/).
+The account information can be added to the `application.properties` file in the `hiero-spring-sample` module:
 ```properties
-spring.hedera.accountId=0.0.3447271
-spring.hedera.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+spring.hiero.accountId=0.0.3447271
+spring.hiero.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
 ```
 
 Alternatively, you can provide the account information as environment variables:
@@ -92,20 +92,20 @@ The support for Microprofile is still in development and can not be used yet.
 
 ## Managed services
 
-The module provides a set of managed services that can be used to interact with the Hedera network.
+The module provides a set of managed services that can be used to interact with the Hiero network.
 The following services are available in spring and microprofile:
 
-- `com.openelements.hedera.base.AccountClient`: to interact with Hedera accounts
-- `com.openelements.hedera.base.FileClient`: to interact with Hedera files
-- `com.openelements.hedera.base.SmartContractClient`: to interact with Hedera smart contracts
-- `com.openelements.hedera.base.ContractVerificationClient`: to verify smart contracts
-- `com.openelements.hedera.base.NftClient`: to interact with Hedera NFTs
-- `com.openelements.hedera.base.NftRepository`: to query NFTs
+- `com.openelements.hiero.base.AccountClient`: to interact with Hiero accounts
+- `com.openelements.hiero.base.FileClient`: to interact with Hiero files
+- `com.openelements.hiero.base.SmartContractClient`: to interact with Hiero smart contracts
+- `com.openelements.hiero.base.ContractVerificationClient`: to verify smart contracts
+- `com.openelements.hiero.base.NftClient`: to interact with Hiero NFTs
+- `com.openelements.hiero.base.NftRepository`: to query NFTs
 
 Next to that the following low-level services are available:
 
-- `com.openelements.hedera.base.protocol.ProtocolLayerClient`: to interact with the Hedera protocol layer
-- `com.openelements.hedera.base.mirrornode.MirrorNodeClient`: to query the Hedera mirror node 
+- `com.openelements.hiero.base.protocol.ProtocolLayerClient`: to interact with the Hiero protocol layer
+- `com.openelements.hiero.base.mirrornode.MirrorNodeClient`: to query the Hiero mirror node 
 
 ## Built the project
 
@@ -115,7 +115,7 @@ The project is based on [Maven](https://maven.apache.org/). To build the project
 ./mvnw verify
 ```
 
-The tests in the project are working against the Hedera testnet.
+The tests in the project are working against the Hiero testnet.
 To run the tests, you need to provide the account id and the "DER Encoded Private Key" of the "ECDSA" testnet account.
 That information can be provided as environemt variables:
  
@@ -129,8 +129,8 @@ As an alternative you can define the information in a `.env` file in each sub-mo
 The file should look like this:
 
 ```
-spring.hedera.accountId=0.0.3447271
-spring.hedera.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+spring.hiero.accountId=0.0.3447271
+spring.hiero.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
 ```
 
 ### Create a release

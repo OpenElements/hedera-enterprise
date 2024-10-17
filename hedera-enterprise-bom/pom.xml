@@ -4,12 +4,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.open-elements.hedera</groupId>
-  <artifactId>hedera-enterprise-bom</artifactId>
+  <groupId>com.open-elements.hiero</groupId>
+  <artifactId>hiero-enterprise-bom</artifactId>
   <version>0.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Hedera Enterprise BOM</name>
+  <name>Hiero Enterprise BOM</name>
   <description>Bill of Materials (BOM) for Hedera Enterprise</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
 
@@ -35,12 +35,12 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hedera-base</artifactId>
+        <artifactId>hiero-base</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hedera-spring</artifactId>
+        <artifactId>hiero-spring</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
