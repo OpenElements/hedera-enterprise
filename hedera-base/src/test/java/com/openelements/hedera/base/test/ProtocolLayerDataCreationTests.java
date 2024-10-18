@@ -730,8 +730,7 @@ public class ProtocolLayerDataCreationTests {
     }
     
     @Test
-    void testTopicDeleteResult() {
-    	
+    void testTopicDeleteResultCreation() {
     	//given
     	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
     	final Status validStatus =Status.SUCCESS;
