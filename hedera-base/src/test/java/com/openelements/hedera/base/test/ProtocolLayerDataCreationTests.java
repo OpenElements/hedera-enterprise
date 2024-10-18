@@ -47,6 +47,7 @@ import com.openelements.hedera.base.protocol.FileUpdateRequest;
 import com.openelements.hedera.base.protocol.FileInfoRequest;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
+import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
 
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
@@ -712,5 +713,18 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(maxTransactionFee,null, null));
         Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, transactionValidDuration, null));
         Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, null, null));
+    }
+
+    @Test
+    void testTopicSubmitMessageResultCreation() {
+
+        //given
+        final TransactionId validTransactionId = TransactionId.fromString("0.0.12345@1");
+        final Status validStatus = Status.SUCCESS;
+
+        //then
+        Assertions.assertDoesNotThrow(() -> new TopicSubmitMessageResult(validTransactionId, validStatus));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(null, validStatus));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(validTransactionId, null));
     }
 }
