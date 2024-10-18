@@ -27,6 +27,7 @@ import com.openelements.hedera.base.protocol.ContractDeleteRequest;
 import com.openelements.hedera.base.protocol.ContractDeleteResult;
 import com.openelements.hedera.base.protocol.FileAppendRequest;
 import com.openelements.hedera.base.protocol.TokenTransferResult;
+import com.openelements.hedera.base.protocol.TopicDeleteResult;
 import com.openelements.hedera.base.protocol.TokenMintResult;
 import com.openelements.hedera.base.protocol.TokenCreateResult;
 import com.openelements.hedera.base.protocol.TokenBurnResult;
@@ -726,5 +727,18 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertDoesNotThrow(() -> new TopicSubmitMessageResult(validTransactionId, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(null, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(validTransactionId, null));
+    }
+    
+    @Test
+    void testTopicDeleteResult() {
+    	
+    	//given
+    	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
+    	final Status validStatus =Status.SUCCESS;
+    	
+    	//then
+    	Assertions.assertDoesNotThrow(() -> new TopicDeleteResult(validTransactionId,validStatus));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteResult(null, validStatus));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteResult(validTransactionId, null));
     }
 }
