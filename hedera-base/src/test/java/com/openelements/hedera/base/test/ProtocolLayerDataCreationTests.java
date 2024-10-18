@@ -719,7 +719,7 @@ public class ProtocolLayerDataCreationTests {
     void testTopicSubmitMessageResultCreation() {
 
         //given
-        final TransactionId validTransactionId = TransactionId.fromString("0.0.12345@1");
+        final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
         final Status validStatus = Status.SUCCESS;
 
         //then
