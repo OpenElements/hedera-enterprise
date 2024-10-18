@@ -1,53 +1,10 @@
 package com.openelements.hedera.base.test;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
+import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenType;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.ContractParam;
-import com.openelements.hedera.base.protocol.AccountBalanceRequest;
-import com.openelements.hedera.base.protocol.AccountBalanceResponse;
-import com.openelements.hedera.base.protocol.AccountCreateRequest;
-import com.openelements.hedera.base.protocol.AccountCreateResult;
-import com.openelements.hedera.base.protocol.AccountDeleteRequest;
-import com.openelements.hedera.base.protocol.AccountDeleteResult;
-import com.openelements.hedera.base.protocol.ContractCallRequest;
-import com.openelements.hedera.base.protocol.ContractCallResult;
-import com.openelements.hedera.base.protocol.ContractCreateRequest;
-import com.openelements.hedera.base.protocol.ContractCreateResult;
-import com.openelements.hedera.base.protocol.ContractDeleteRequest;
-import com.openelements.hedera.base.protocol.ContractDeleteResult;
-import com.openelements.hedera.base.protocol.FileAppendRequest;
-import com.openelements.hedera.base.protocol.TokenTransferResult;
-import com.openelements.hedera.base.protocol.TokenMintResult;
-import com.openelements.hedera.base.protocol.TokenCreateResult;
-import com.openelements.hedera.base.protocol.TokenBurnResult;
-import com.openelements.hedera.base.protocol.TokenAssociateResult;
-import com.openelements.hedera.base.protocol.FileUpdateResult;
-import com.openelements.hedera.base.protocol.FileInfoResponse;
-import com.openelements.hedera.base.protocol.FileDeleteResult;
-import com.openelements.hedera.base.protocol.FileCreateResult;
-import com.openelements.hedera.base.protocol.FileContentsResponse;
-import com.openelements.hedera.base.protocol.FileAppendResult;
-import com.openelements.hedera.base.protocol.FileContentsRequest;
-import com.openelements.hedera.base.protocol.TokenTransferRequest;
-import com.openelements.hedera.base.protocol.TokenMintRequest;
-import com.openelements.hedera.base.protocol.TokenCreateRequest;
-import com.openelements.hedera.base.protocol.TokenBurnRequest;
-import com.openelements.hedera.base.protocol.TokenAssociateRequest;
-import com.openelements.hedera.base.protocol.FileUpdateRequest;
-import com.openelements.hedera.base.protocol.FileInfoRequest;
-import com.openelements.hedera.base.protocol.FileDeleteRequest;
-import com.openelements.hedera.base.protocol.FileCreateRequest;
-import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
+import com.openelements.hedera.base.protocol.*;
 
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
@@ -717,7 +674,6 @@ public class ProtocolLayerDataCreationTests {
 
     @Test
     void testTopicSubmitMessageResultCreation() {
-
         //given
         final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
         final Status validStatus = Status.SUCCESS;
@@ -727,4 +683,22 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(null, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(validTransactionId, null));
     }
+
+    @Test
+    void testTopicSubmitMessageRequestCreation() {
+        // Given
+        final TopicId validTopicId = TopicId.fromString("0.0.12345");
+        final String validMessage = "This is a valid message";
+        final byte[] validMessageBytes = validMessage.getBytes(StandardCharsets.UTF_8);
+        final byte[] largeMessage = new byte[1025];
+
+        // Then
+        Assertions.assertDoesNotThrow(() -> TopicSubmitMessageRequest.of(validTopicId, validMessage));
+        Assertions.assertDoesNotThrow(() -> TopicSubmitMessageRequest.of(validTopicId, validMessageBytes));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(null, validMessage));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(validTopicId, (String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(validTopicId, (byte[]) null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> TopicSubmitMessageRequest.of(validTopicId, largeMessage));
+    }
+
 }
