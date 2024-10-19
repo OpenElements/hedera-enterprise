@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
@@ -48,6 +49,7 @@ import com.openelements.hedera.base.protocol.FileInfoRequest;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
+import com.openelements.hedera.base.protocol.TopicDeleteRequest;
 
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
@@ -726,5 +728,22 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertDoesNotThrow(() -> new TopicSubmitMessageResult(validTransactionId, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(null, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(validTransactionId, null));
+    }
+
+    @Test
+    void testTopicDeleteRequestCreation() {
+        //given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(10);
+        final String topicIdString = "0.0.12345";
+        final TopicId topicId = TopicId.fromString(topicIdString);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> TopicDeleteRequest.of(topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, topicId));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicDeleteRequest.of(null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, transactionValidDuration, topicId));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, null, topicId));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, null));
     }
 }
