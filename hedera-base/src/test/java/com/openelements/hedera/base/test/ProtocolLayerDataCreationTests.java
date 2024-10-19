@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.TopicId;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
@@ -27,6 +28,7 @@ import com.openelements.hedera.base.protocol.ContractDeleteRequest;
 import com.openelements.hedera.base.protocol.ContractDeleteResult;
 import com.openelements.hedera.base.protocol.FileAppendRequest;
 import com.openelements.hedera.base.protocol.TokenTransferResult;
+import com.openelements.hedera.base.protocol.TopicCreateResult;
 import com.openelements.hedera.base.protocol.TokenMintResult;
 import com.openelements.hedera.base.protocol.TokenCreateResult;
 import com.openelements.hedera.base.protocol.TokenBurnResult;
@@ -726,5 +728,19 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertDoesNotThrow(() -> new TopicSubmitMessageResult(validTransactionId, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(null, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(validTransactionId, null));
+    }
+
+    @Test
+    void testTopicCreateResultCreation() {
+    	//given
+    	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
+    	final Status validStatus =Status.SUCCESS;
+    	final TopicId validTopicId = TopicId.fromString("0.0.12345");
+    	
+    	//then
+    	Assertions.assertDoesNotThrow(() -> new TopicCreateResult(validTransactionId,validStatus,validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(null, validStatus, validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(validTransactionId, null, validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(validTransactionId, validStatus, null));
     }
 }
