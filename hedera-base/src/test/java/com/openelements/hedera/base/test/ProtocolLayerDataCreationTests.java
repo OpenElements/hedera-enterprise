@@ -749,6 +749,5 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, transactionValidDuration, null));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, null, null));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, null, null));
-
     }
 }
