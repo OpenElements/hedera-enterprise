@@ -741,9 +741,14 @@ public class ProtocolLayerDataCreationTests {
         //then
         Assertions.assertDoesNotThrow(() -> TopicDeleteRequest.of(topicId));
         Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(null, transactionValidDuration, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(maxTransactionFee, null, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(null, null, topicId));
         Assertions.assertThrows(NullPointerException.class, () -> TopicDeleteRequest.of(null));
-        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, transactionValidDuration, topicId));
-        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, null, topicId));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, null, null));
+
     }
 }
