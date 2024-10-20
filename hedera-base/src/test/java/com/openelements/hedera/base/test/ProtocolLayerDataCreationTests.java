@@ -48,6 +48,7 @@ import com.openelements.hedera.base.protocol.FileInfoRequest;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
+import com.openelements.hedera.base.protocol.TopicCreateRequest;
 
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
@@ -174,6 +175,17 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, null, transactionHash, consensusTimestamp, transactionFee));
         Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, status, null, consensusTimestamp, transactionFee));
     }
+
+	@Test
+	void testTopicCreateRequestCreation() {
+		//given
+		final Hbar validMaxTransactionFee = Hbar.fromTinybars(1000);
+		final Duration validTransactionDuration = Duration.ofSeconds(120);
+
+		Assertions.assertDoesNotThrow(() -> new TopicCreateRequest(validMaxTransactionFee, validTransactionDuration));
+		Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateRequest(null, validTransactionDuration));
+		Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateRequest(validMaxTransactionFee, null));
+	}
 
     @Test
     void testContractCallRequestCreation() {

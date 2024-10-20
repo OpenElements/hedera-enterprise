@@ -310,6 +310,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)
             throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
+        Objects.requireNonNull(request.maxTransactionFee(), "maxTransactionFee must not be null");
+		Objects.requireNonNull(request.transactionValidDuration(), "transactionValidDuration must not be null");
         try {
             final TopicCreateTransaction transaction = new TopicCreateTransaction()
                     .setMaxTransactionFee(request.maxTransactionFee())
