@@ -28,6 +28,7 @@ import com.openelements.hedera.base.protocol.ContractDeleteRequest;
 import com.openelements.hedera.base.protocol.ContractDeleteResult;
 import com.openelements.hedera.base.protocol.FileAppendRequest;
 import com.openelements.hedera.base.protocol.TokenTransferResult;
+import com.openelements.hedera.base.protocol.TopicCreateResult;
 import com.openelements.hedera.base.protocol.TokenMintResult;
 import com.openelements.hedera.base.protocol.TokenCreateResult;
 import com.openelements.hedera.base.protocol.TokenBurnResult;
@@ -50,6 +51,7 @@ import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageRequest;
+import com.openelements.hedera.base.protocol.TopicCreateRequest;
 
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
@@ -176,6 +178,17 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, null, transactionHash, consensusTimestamp, transactionFee));
         Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, status, null, consensusTimestamp, transactionFee));
     }
+
+	@Test
+	void testTopicCreateRequestCreation() {
+		//given
+		final Hbar validMaxTransactionFee = Hbar.fromTinybars(1000);
+		final Duration validTransactionDuration = Duration.ofSeconds(120);
+
+		Assertions.assertDoesNotThrow(() -> new TopicCreateRequest(validMaxTransactionFee, validTransactionDuration));
+		Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateRequest(null, validTransactionDuration));
+		Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateRequest(validMaxTransactionFee, null));
+	}
 
     @Test
     void testContractCallRequestCreation() {
@@ -751,4 +764,17 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageRequest(validMaxTransactionFee, validTransactionValidDuration, validTopicId, null));
     }
 
+  @Test
+    void testTopicCreateResultCreation() {
+    	//given
+    	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
+    	final Status validStatus =Status.SUCCESS;
+    	final TopicId validTopicId = TopicId.fromString("0.0.12345");
+    	
+    	//then
+    	Assertions.assertDoesNotThrow(() -> new TopicCreateResult(validTransactionId,validStatus,validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(null, validStatus, validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(validTransactionId, null, validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(validTransactionId, validStatus, null));
+    }
 }

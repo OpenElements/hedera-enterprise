@@ -9,7 +9,12 @@ public record TopicCreateRequest(@NonNull Hbar maxTransactionFee,
                                  @NonNull Duration transactionValidDuration) implements TransactionRequest {
 
     public TopicCreateRequest {
-
+			if (maxTransactionFee == null) {
+				throw new NullPointerException("maxTransactionFee cannot be null");
+			}
+			if (transactionValidDuration == null) {
+				throw new NullPointerException("transactionValidDuration cannot be null");
+			}
     }
 
     public static TopicCreateRequest of() {
