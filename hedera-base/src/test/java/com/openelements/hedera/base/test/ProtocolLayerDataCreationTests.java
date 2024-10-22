@@ -9,10 +9,10 @@ import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.ContractParam;
 import com.openelements.hedera.base.protocol.AccountBalanceRequest;
@@ -52,6 +52,7 @@ import com.openelements.hedera.base.protocol.FileInfoRequest;
 import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
+import com.openelements.hedera.base.protocol.TopicSubmitMessageRequest;
 import com.openelements.hedera.base.protocol.TopicDeleteRequest;
 import com.openelements.hedera.base.protocol.TopicCreateRequest;
 
@@ -734,7 +735,6 @@ public class ProtocolLayerDataCreationTests {
 
     @Test
     void testTopicSubmitMessageResultCreation() {
-
         //given
         final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
         final Status validStatus = Status.SUCCESS;
@@ -758,6 +758,28 @@ public class ProtocolLayerDataCreationTests {
     }
   
     @Test
+    void testTopicSubmitMessageRequestCreation() {
+        // Given
+        final TopicId validTopicId = TopicId.fromString("0.0.12345");
+        final String validMessage = "This is a valid message";
+        final byte[] validMessageBytes = validMessage.getBytes(StandardCharsets.UTF_8);
+        final byte[] largeMessage = new byte[1025];
+        final Hbar validMaxTransactionFee = Hbar.fromTinybars(100_000);
+        final Duration validTransactionValidDuration = Duration.ofMinutes(2);
+
+        // Then
+        Assertions.assertDoesNotThrow(() -> TopicSubmitMessageRequest.of(validTopicId, validMessage));
+        Assertions.assertDoesNotThrow(() -> TopicSubmitMessageRequest.of(validTopicId, validMessageBytes));
+        Assertions.assertDoesNotThrow(() -> new TopicSubmitMessageRequest(validMaxTransactionFee, validTransactionValidDuration, validTopicId, validMessage.getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(null, validMessage));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(validTopicId, (String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(validTopicId, (byte[]) null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> TopicSubmitMessageRequest.of(validTopicId, largeMessage));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageRequest(validMaxTransactionFee, validTransactionValidDuration, null, validMessage.getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageRequest(validMaxTransactionFee, validTransactionValidDuration, validTopicId, null));
+    }
+
+  @Test
     void testTopicDeleteRequestCreation() {
         //given
         final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
