@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -28,6 +29,7 @@ import com.openelements.hedera.base.protocol.ContractDeleteRequest;
 import com.openelements.hedera.base.protocol.ContractDeleteResult;
 import com.openelements.hedera.base.protocol.FileAppendRequest;
 import com.openelements.hedera.base.protocol.TokenTransferResult;
+import com.openelements.hedera.base.protocol.TopicDeleteResult;
 import com.openelements.hedera.base.protocol.TopicCreateResult;
 import com.openelements.hedera.base.protocol.TokenMintResult;
 import com.openelements.hedera.base.protocol.TokenCreateResult;
@@ -51,6 +53,7 @@ import com.openelements.hedera.base.protocol.FileDeleteRequest;
 import com.openelements.hedera.base.protocol.FileCreateRequest;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
 import com.openelements.hedera.base.protocol.TopicSubmitMessageRequest;
+import com.openelements.hedera.base.protocol.TopicDeleteRequest;
 import com.openelements.hedera.base.protocol.TopicCreateRequest;
 
 import java.lang.reflect.Constructor;
@@ -741,7 +744,19 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(null, validStatus));
         Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(validTransactionId, null));
     }
-
+    
+    @Test
+    void testTopicDeleteResultCreation() {
+    	//given
+    	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
+    	final Status validStatus =Status.SUCCESS;
+    	
+    	//then
+    	Assertions.assertDoesNotThrow(() -> new TopicDeleteResult(validTransactionId,validStatus));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteResult(null, validStatus));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteResult(validTransactionId, null));
+    }
+  
     @Test
     void testTopicSubmitMessageRequestCreation() {
         // Given
@@ -765,7 +780,28 @@ public class ProtocolLayerDataCreationTests {
     }
 
   @Test
-    void testTopicCreateResultCreation() {
+    void testTopicDeleteRequestCreation() {
+        //given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(10);
+        final String topicIdString = "0.0.12345";
+        final TopicId topicId = TopicId.fromString(topicIdString);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> TopicDeleteRequest.of(topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(null, transactionValidDuration, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(maxTransactionFee, null, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(null, null, topicId));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicDeleteRequest.of(null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, null, null));
+    }
+  
+  @Test
+  void testTopicCreateResultCreation() {
     	//given
     	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
     	final Status validStatus =Status.SUCCESS;
