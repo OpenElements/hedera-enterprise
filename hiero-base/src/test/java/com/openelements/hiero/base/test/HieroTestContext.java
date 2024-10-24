@@ -22,9 +22,9 @@ public class HieroTestContext {
     private final Client client;
 
     public HieroTestContext() {
-        final String hederaAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
-        final String hederaPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
-        final String hederaNetwork = System.getenv("HEDERA_NETWORK");
+        final String hederaAccountIdByEnv = System.getenv("HIERO_ACCOUNT_ID");
+        final String hederaPrivateKeyByEnv = System.getenv("HIERO_PRIVATE_KEY");
+        final String hederaNetwork = System.getenv("HIERO_NETWORK");
 
         if(hederaAccountIdByEnv != null && hederaPrivateKeyByEnv != null) {
             final AccountId accountId = AccountId.fromString(hederaAccountIdByEnv);

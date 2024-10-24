@@ -1,6 +1,6 @@
 # Hiero Enterprise
-This project provides Java modules to integrate [Hiero network](https://hiero.com) smoothless in a Spring Boot or Microprofile (like Quarkus) application.
-This module is based on the [Hiero Java SDK](https://github.com/hashgraph/hiero-sdk-java).
+This project provides Java modules to integrate [Hiero network](https://hiero.org) smoothless in a Spring Boot or Microprofile (like Quarkus) application.
+This module is based on the [Hiero Java SDK](https://github.com/hashgraph/hedera-sdk-java).
 
 ## Spring Boot support
 
@@ -25,11 +25,11 @@ spring.hiero.network=testnet
 ```
 
 The account information (accountId, privateKey, publicKey) can all be found at the
-[Hiero portal](https://portal.hiero.com/) for a testnet or previewnet account.
+[Hedera portal](https://portal.hedera.com/) for a testnet or previewnet account.
 Today only the "DER Encoded Private Key" of the "ECDSA" key type is supported for the `spring.hiero.privateKey` property.
 
 The 2 properties `spring.hiero.accountId` and `spring.hiero.privateKey` define the so called "operation account".
-The operational account is used as the account that sends all transactions against the Hiero network.
+The operational account is used as the account that sends all transactions against a Hiero network.
 
 ### Usage
 
@@ -47,7 +47,7 @@ public class Application {
 }
 ```
  
-Once that is done you can for example autowire the `FileClient` class and call the methods to interact with the Hiero network.
+Once that is done you can for example autowire the `FileClient` class and call the methods to interact with a Hiero based network.
 
 ```java
 
@@ -73,7 +73,7 @@ easily wrap calls by use the [`@Async` annotation of spring](https://spring.io/g
 A sample application that uses the Hiero Spring module can be found in the `hiero-spring-sample` module.
 The sample application is a simple Spring Boot application that reads has a REST endpoint at `localhost:8080/` and 
 shows the hbar balance of the account `0.0.100`.
-To use the application, you need to have created a Hiero testnet account at the [Hiero portal](https://portal.hiero.com/).
+To use the application, you need to have created a Hedera testnet account at the [Hedera portal](https://portal.hedera.com/).
 The account information can be added to the `application.properties` file in the `hiero-spring-sample` module:
 ```properties
 spring.hiero.accountId=0.0.3447271
@@ -92,7 +92,7 @@ The support for Microprofile is still in development and can not be used yet.
 
 ## Managed services
 
-The module provides a set of managed services that can be used to interact with the Hiero network.
+The module provides a set of managed services that can be used to interact with a Hiero based network.
 The following services are available in spring and microprofile:
 
 - `com.openelements.hiero.base.AccountClient`: to interact with Hiero accounts
@@ -115,7 +115,7 @@ The project is based on [Maven](https://maven.apache.org/). To build the project
 ./mvnw verify
 ```
 
-The tests in the project are working against the Hiero testnet.
+The tests in the project are working against the Hedera testnet.
 To run the tests, you need to provide the account id and the "DER Encoded Private Key" of the "ECDSA" testnet account.
 That information can be provided as environemt variables:
  
