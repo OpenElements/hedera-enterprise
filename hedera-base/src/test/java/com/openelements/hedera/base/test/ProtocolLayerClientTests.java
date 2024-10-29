@@ -1,5 +1,6 @@
 package com.openelements.hedera.base.test;
 
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ public class ProtocolLayerClientTests {
     void testNullParams() {
         //given
         final Account account = new Account(AccountId.fromString("0.0.12345"), PrivateKey.generateED25519().getPublicKey(), PrivateKey.generateED25519());
-        final ProtocolLayerClientImpl client = new ProtocolLayerClientImpl(Client.forTestnet(), account);
+        final ProtocolLayerClient client = new ProtocolLayerClientImpl(Client.forTestnet(), account);
 
         //then
         Assertions.assertThrows(NullPointerException.class, () -> client.executeAccountBalanceQuery(null));
