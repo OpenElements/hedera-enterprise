@@ -1,12 +1,14 @@
 package com.openelements.hedera.base.mirrornode;
 
+import java.util.Objects;
+import java.util.Optional;
+
+import org.jspecify.annotations.NonNull;
+
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
-import java.util.Objects;
-import java.util.Optional;
-import org.jspecify.annotations.NonNull;
 
 /**
  * A client for querying the Hedera Mirror Node REST API.
@@ -143,6 +145,17 @@ public interface MirrorNodeClient {
         return queryNftsByAccountAndTokenIdAndSerial(AccountId.fromString(accountId), TokenId.fromString(tokenId),
                 serialNumber);
     }
+
+    /**
+     * Queries all transactions for a specific account.
+     *
+     * @param accountId the account ID to query transactions for
+     * @return a page of transaction information
+     * @throws HederaException if an error occurs during the query
+     */
+    @NonNull
+    Page<TransactionInfo> queryTransactionsByAccount(@NonNull AccountId accountId) throws HederaException;
+
 
     /**
      * Queries the transaction information for a specific transaction ID.
