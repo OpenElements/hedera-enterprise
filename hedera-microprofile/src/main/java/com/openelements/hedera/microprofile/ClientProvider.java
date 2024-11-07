@@ -17,6 +17,7 @@ import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import com.openelements.hedera.microprofile.implementation.ContractVerificationClientImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.Objects;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -24,12 +25,15 @@ import org.jspecify.annotations.NonNull;
 
 public class ClientProvider {
 
-    @ConfigProperty(name = "hedera.newAccountId")
+    @Inject
+    @ConfigProperty(name = "hedera.accountId")
     private String accountIdAsString;
 
+    @Inject
     @ConfigProperty(name = "hedera.privateKey")
     private String privateKeyAsString;
 
+    @Inject
     @ConfigProperty(name = "hedera.network")
     private String network;
 
@@ -50,7 +54,7 @@ public class ClientProvider {
     }
 
     private HederaNetwork getHederaNetwork() {
-        if(Arrays.stream(HederaNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), network))) {
+        if (Arrays.stream(HederaNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), network))) {
             try {
                 return HederaNetwork.valueOf(network.toUpperCase());
             } catch (Exception e) {
@@ -66,7 +70,7 @@ public class ClientProvider {
         final PrivateKey privateKey = getPrivateKey();
         final HederaNetwork hederaNetwork = getHederaNetwork();
         return Client.forName(hederaNetwork.getName())
-            .setOperator(accountId, privateKey);
+                .setOperator(accountId, privateKey);
     }
 
     @Produces
@@ -84,7 +88,8 @@ public class ClientProvider {
 
     @Produces
     @ApplicationScoped
-    SmartContractClient createSmartContractClient(@NonNull final ProtocolLayerClient protocolLayerClient, @NonNull final FileClient fileClient) {
+    SmartContractClient createSmartContractClient(@NonNull final ProtocolLayerClient protocolLayerClient,
+            @NonNull final FileClient fileClient) {
         return new SmartContractClientImpl(protocolLayerClient, fileClient);
     }
 
@@ -96,7 +101,8 @@ public class ClientProvider {
 
     @Produces
     @ApplicationScoped
-    ContractVerificationClient createContractVerificationClient(@NonNull final ProtocolLayerClient protocolLayerClient, @NonNull final FileClient fileClient) {
+    ContractVerificationClient createContractVerificationClient(@NonNull final ProtocolLayerClient protocolLayerClient,
+            @NonNull final FileClient fileClient) {
         return new ContractVerificationClientImpl(getHederaNetwork());
     }
 }
