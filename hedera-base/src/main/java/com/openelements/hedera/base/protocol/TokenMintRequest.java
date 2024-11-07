@@ -17,7 +17,7 @@ public record TokenMintRequest(@NonNull Hbar maxTransactionFee,
                                @Nullable Long amount,
                                @NonNull List<byte[]> metadata) implements TransactionRequest {
 
-    final static int MAX_METADATA_SIZE = 100;
+    static final int MAX_METADATA_SIZE = 100;
 
     public TokenMintRequest {
         Objects.requireNonNull(tokenId, "tokenId must not be null");

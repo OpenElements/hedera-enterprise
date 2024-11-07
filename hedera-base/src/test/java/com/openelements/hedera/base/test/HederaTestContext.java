@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class HederaTestContext {
 
-    private final static Logger log = LoggerFactory.getLogger(HederaTestContext.class);
+    private static final Logger log = LoggerFactory.getLogger(HederaTestContext.class);
 
     private final Account operationalAccount;
 

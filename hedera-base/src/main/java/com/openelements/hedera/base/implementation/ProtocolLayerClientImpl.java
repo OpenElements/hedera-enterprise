@@ -89,7 +89,7 @@ import org.slf4j.LoggerFactory;
 
 public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
-    private final static Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
 
     public static final int DEFAULT_GAS = 1_000_000;
 
@@ -310,6 +310,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)
             throws HederaException {
         Objects.requireNonNull(request, "request must not be null");
+        Objects.requireNonNull(request.maxTransactionFee(), "maxTransactionFee must not be null");
+		Objects.requireNonNull(request.transactionValidDuration(), "transactionValidDuration must not be null");
         try {
             final TopicCreateTransaction transaction = new TopicCreateTransaction()
                     .setMaxTransactionFee(request.maxTransactionFee())

@@ -6,8 +6,11 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
+import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.TokenType;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import com.openelements.hedera.base.Account;
 import com.openelements.hedera.base.ContractParam;
@@ -24,10 +27,40 @@ import com.openelements.hedera.base.protocol.ContractCreateResult;
 import com.openelements.hedera.base.protocol.ContractDeleteRequest;
 import com.openelements.hedera.base.protocol.ContractDeleteResult;
 import com.openelements.hedera.base.protocol.FileAppendRequest;
+import com.openelements.hedera.base.protocol.TokenTransferResult;
+import com.openelements.hedera.base.protocol.TopicDeleteResult;
+import com.openelements.hedera.base.protocol.TopicCreateResult;
+import com.openelements.hedera.base.protocol.TokenMintResult;
+import com.openelements.hedera.base.protocol.TokenCreateResult;
+import com.openelements.hedera.base.protocol.TokenBurnResult;
+import com.openelements.hedera.base.protocol.TokenAssociateResult;
+import com.openelements.hedera.base.protocol.FileUpdateResult;
+import com.openelements.hedera.base.protocol.FileInfoResponse;
+import com.openelements.hedera.base.protocol.FileDeleteResult;
+import com.openelements.hedera.base.protocol.FileCreateResult;
+import com.openelements.hedera.base.protocol.FileContentsResponse;
+import com.openelements.hedera.base.protocol.FileAppendResult;
+import com.openelements.hedera.base.protocol.FileContentsRequest;
+import com.openelements.hedera.base.protocol.TokenTransferRequest;
+import com.openelements.hedera.base.protocol.TokenMintRequest;
+import com.openelements.hedera.base.protocol.TokenCreateRequest;
+import com.openelements.hedera.base.protocol.TokenBurnRequest;
+import com.openelements.hedera.base.protocol.TokenAssociateRequest;
+import com.openelements.hedera.base.protocol.FileUpdateRequest;
+import com.openelements.hedera.base.protocol.FileInfoRequest;
+import com.openelements.hedera.base.protocol.FileDeleteRequest;
+import com.openelements.hedera.base.protocol.FileCreateRequest;
+import com.openelements.hedera.base.protocol.TopicSubmitMessageResult;
+import com.openelements.hedera.base.protocol.TopicSubmitMessageRequest;
+import com.openelements.hedera.base.protocol.TopicDeleteRequest;
+import com.openelements.hedera.base.protocol.TopicCreateRequest;
+
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -147,6 +180,17 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, null, transactionHash, consensusTimestamp, transactionFee));
         Assertions.assertThrows(NullPointerException.class, () -> new AccountDeleteResult(transactionId, status, null, consensusTimestamp, transactionFee));
     }
+
+	@Test
+	void testTopicCreateRequestCreation() {
+		//given
+		final Hbar validMaxTransactionFee = Hbar.fromTinybars(1000);
+		final Duration validTransactionDuration = Duration.ofSeconds(120);
+
+		Assertions.assertDoesNotThrow(() -> new TopicCreateRequest(validMaxTransactionFee, validTransactionDuration));
+		Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateRequest(null, validTransactionDuration));
+		Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateRequest(validMaxTransactionFee, null));
+	}
 
     @Test
     void testContractCallRequestCreation() {
@@ -334,5 +378,438 @@ public class ProtocolLayerDataCreationTests {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(maxTransactionFee, Duration.ofSeconds(-1), fileId, contents, fileMemo));
         Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, largeContents, fileMemo));
         Assertions.assertThrows(IllegalArgumentException.class, () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, largeContents, longFileMemo));
+    }
+
+    @Test
+    public void testTokenTransferResultCreation() {
+        //given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+
+        //then
+        Assertions.assertDoesNotThrow(() -> new TokenTransferResult(transactionId, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferResult(null, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferResult(transactionId, null));
+    }
+
+    @Test
+    public void testTokenMintResultCreation() {
+        // Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+        final List<Long> serials = List.of(1L, 2L, 3L);
+
+        // Then
+        Assertions.assertDoesNotThrow(() -> new TokenMintResult(transactionId, status, serials));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(null, status, serials));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(transactionId, null, serials));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(transactionId, status, null));
+    }
+
+    @Test
+    public void testTokenCreateResultCreation() {
+        //Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+        final TokenId tokenId = TokenId.fromString("0.0.12345");
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new TokenCreateResult(transactionId, status, tokenId));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateResult(null, status, tokenId));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateResult(transactionId, null, tokenId));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateResult(transactionId, status, null));
+    }
+
+    @Test
+    public void testTokenBurnResultCreation() {
+        //Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new TokenBurnResult(transactionId, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnResult(null, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnResult(transactionId, null));
+    }
+
+    @Test
+    public void testTokenAssociateResultCreation() {
+        //Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new TokenAssociateResult(transactionId, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenAssociateResult(null, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenAssociateResult(transactionId, null));
+    }
+
+    @Test
+    void testFileUpdateResultCreation() {
+        //Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileUpdateResult(transactionId, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileUpdateResult(null, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileUpdateResult(transactionId, null));
+    }
+
+    @Test
+    void testFileInfoResponseCreation() {
+        //Given
+        final FileId fileId = FileId.fromString("0.0.12345");
+        final int size = 100;
+        final boolean deleted = false;
+        final Instant expirationTime = Instant.now().plus(Duration.ofDays(30));
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileInfoResponse(fileId, size, deleted, expirationTime));
+    }
+
+    @Test
+    void testFileDeleteResultCreation() {
+        //Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileDeleteResult(transactionId, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteResult(null, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteResult(transactionId, null));
+    }
+
+    @Test
+    void testFileCreateResultCreation() {
+        //Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+        final FileId fileId = FileId.fromString("0.0.12345");
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileCreateResult(transactionId, status, fileId));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileCreateResult(null, status, fileId));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileCreateResult(transactionId, null, fileId));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileCreateResult(transactionId, status, null));
+    }
+
+    @Test
+    void testFileContentsResponseCreation() {
+        //Given
+        final FileId fileId = FileId.fromString("0.0.12345");
+        final byte[] contents = new byte[]{1, 2, 3};
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileContentsResponse(fileId, contents));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileContentsResponse(null, contents));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileContentsResponse(fileId, null));
+    }
+
+    @Test
+    void testFileAppendResultCreation() {
+        //Given
+        final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+        final Status status = Status.SUCCESS;
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileAppendResult(transactionId, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileAppendResult(null, status));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileAppendResult(transactionId, null));
+    }
+
+    @Test
+    void testTokenTransferRequestCreation() {
+        //given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(120);
+        final TokenId tokenId = TokenId.fromString("0.0.1234");
+        final List<Long> serials = List.of(1L, 2L);
+        final AccountId sender = AccountId.fromString("0.0.5678");
+        final AccountId receiver = AccountId.fromString("0.0.9876");
+        final PrivateKey senderKey = PrivateKey.generateECDSA();
+        final List<Long> emptySerials = List.of();
+        final List<Long> negativeSerials = List.of(-1L);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, sender, receiver, senderKey));
+        Assertions.assertDoesNotThrow(() -> TokenTransferRequest.of(tokenId, 1L, sender, receiver, senderKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferRequest(null, transactionValidDuration, tokenId, serials, sender, receiver, senderKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferRequest(maxTransactionFee, null, tokenId, serials, sender, receiver, senderKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, null, serials, sender, receiver, senderKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, null, sender, receiver, senderKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, null, receiver, senderKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, sender, null, senderKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, sender, receiver, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, emptySerials, sender, receiver, senderKey));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, negativeSerials, sender, receiver, senderKey));
+    }
+
+    @Test
+    void testTokenMintRequestCreation() {
+        //given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(120);
+        final TokenId tokenId = TokenId.fromString("0.0.12345");
+        final PrivateKey supplyKey = PrivateKey.generateECDSA();
+        final Long amount = 10L;
+        final List<byte[]> validMetadata = List.of("valid".getBytes(StandardCharsets.UTF_8));
+        final byte[] largeMetadata = new byte[101];
+
+        //then
+        Assertions.assertDoesNotThrow(() -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, validMetadata));
+        Assertions.assertDoesNotThrow(() -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, null, validMetadata));
+        Assertions.assertDoesNotThrow(() -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, List.of()));
+        Assertions.assertDoesNotThrow(() -> TokenMintRequest.of(tokenId, supplyKey, "valid metadata"));
+        Assertions.assertDoesNotThrow(() -> TokenMintRequest.of(tokenId, supplyKey, amount));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, null, supplyKey, amount, validMetadata));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, null, amount, validMetadata));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, 0L, validMetadata));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, null, List.of()));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new TokenMintRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, null, List.of(largeMetadata)));
+    }
+
+    @Test
+    void testTokenCreateRequestCreation() {
+        //Given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(120);
+        final String name = "Token Name";
+        final String symbol = "TKN";
+        final AccountId treasuryAccountId = AccountId.fromString("0.0.12345");
+        final PrivateKey treasuryKey = PrivateKey.generateECDSA();
+        final PrivateKey supplyKey = PrivateKey.generateECDSA();
+        final TokenType tokenType = TokenType.FUNGIBLE_COMMON;
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new TokenCreateRequest(maxTransactionFee, transactionValidDuration, name, symbol, treasuryAccountId, treasuryKey, tokenType, supplyKey));
+        Assertions.assertDoesNotThrow(() -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateRequest(null, transactionValidDuration, name, symbol, treasuryAccountId, treasuryKey, tokenType, supplyKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateRequest(maxTransactionFee, null, name, symbol, treasuryAccountId, treasuryKey, tokenType, supplyKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateRequest(maxTransactionFee, transactionValidDuration, null, symbol, treasuryAccountId, treasuryKey, tokenType, supplyKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateRequest(maxTransactionFee, transactionValidDuration, name, null, treasuryAccountId, treasuryKey, tokenType, supplyKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateRequest(maxTransactionFee, transactionValidDuration, name, symbol, null, treasuryKey, tokenType, supplyKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenCreateRequest(maxTransactionFee, transactionValidDuration, name, symbol, treasuryAccountId, treasuryKey, null, supplyKey));
+    }
+
+    @Test
+    void testTokenBurnRequestCreation() {
+        //Given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(120);
+        final TokenId tokenId = TokenId.fromString("0.0.12345");
+        final PrivateKey supplyKey = PrivateKey.generateECDSA();
+        final Long amount = 100L;
+        final Set<Long> serials = Set.of(1L, 2L, 3L);
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new TokenBurnRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, serials));
+        Assertions.assertDoesNotThrow(() -> TokenBurnRequest.of(tokenId, 1L, supplyKey));
+        Assertions.assertDoesNotThrow(() -> TokenBurnRequest.of(tokenId, serials, supplyKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnRequest(null, transactionValidDuration, tokenId, supplyKey, amount, serials));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnRequest(maxTransactionFee, null, tokenId, supplyKey, amount, serials));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnRequest(maxTransactionFee, transactionValidDuration, null, supplyKey, amount, serials));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnRequest(maxTransactionFee, transactionValidDuration, tokenId, null, amount, serials));
+        Assertions.assertDoesNotThrow(() -> new TokenBurnRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, null, serials));
+        Assertions.assertDoesNotThrow(() -> new TokenBurnRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, null));
+    }
+
+    @Test
+    void testTokenAssociateRequestCreation() {
+        //Given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(120);
+        final TokenId tokenId = TokenId.fromString("0.0.12345");
+        final AccountId accountId = AccountId.fromString("0.0.54321");
+        final PrivateKey accountPrivateKey = PrivateKey.generateECDSA();
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new TokenAssociateRequest(maxTransactionFee, transactionValidDuration, tokenId, accountId, accountPrivateKey));
+        Assertions.assertDoesNotThrow(() -> TokenAssociateRequest.of(tokenId, accountId, accountPrivateKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenAssociateRequest(maxTransactionFee, transactionValidDuration, null, accountId, accountPrivateKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenAssociateRequest(maxTransactionFee, transactionValidDuration, tokenId, null, accountPrivateKey));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenAssociateRequest(maxTransactionFee, transactionValidDuration, tokenId, accountId, null));
+    }
+
+    @Test
+    void testFileUpdateRequestCreation() {
+        //Given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(120);
+        final FileId fileId = FileId.fromString("0.0.12345");
+        final byte[] contents = new byte[100];
+        final Instant expirationTime = Instant.now().plus(Duration.ofDays(1));
+        final String fileMemo = "Test file memo";
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileUpdateRequest(maxTransactionFee, transactionValidDuration, fileId, contents, expirationTime, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileUpdateRequest(maxTransactionFee, transactionValidDuration, fileId, null, expirationTime, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileUpdateRequest(maxTransactionFee, transactionValidDuration, fileId, contents, null, fileMemo));
+        Assertions.assertDoesNotThrow(() -> FileUpdateRequest.of(fileId, contents));
+        Assertions.assertDoesNotThrow(() -> FileUpdateRequest.of(fileId, expirationTime));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new FileUpdateRequest(maxTransactionFee, transactionValidDuration, fileId, new byte[FileUpdateRequest.FILE_CREATE_MAX_BYTES + 1], expirationTime, fileMemo));
+    }
+
+    @Test
+    void testFileInfoRequestCreation() {
+        //Given
+        final FileId validFileId = FileId.fromString("0.0.12345");
+        final Hbar queryPayment = Hbar.fromTinybars(1000);
+        final Hbar maxQueryPayment = Hbar.fromTinybars(2000);
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileInfoRequest(validFileId, null, null));
+        Assertions.assertDoesNotThrow(() -> new FileInfoRequest(validFileId, queryPayment, null));
+        Assertions.assertDoesNotThrow(() -> new FileInfoRequest(validFileId, null, maxQueryPayment));
+        Assertions.assertDoesNotThrow(() -> new FileInfoRequest(validFileId, queryPayment, maxQueryPayment));
+        Assertions.assertDoesNotThrow(() -> FileInfoRequest.of(validFileId));
+        Assertions.assertDoesNotThrow(() -> FileInfoRequest.of("0.0.12345"));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileInfoRequest(null, queryPayment, maxQueryPayment));
+        Assertions.assertThrows(NullPointerException.class, () -> FileInfoRequest.of((String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileInfoRequest.of((FileId) null));
+    }
+
+    @Test
+    void testFileContentsRequestCreation() {
+        //Given
+        final FileId validFileId = FileId.fromString("0.0.12345");
+        final Hbar queryPayment = Hbar.fromTinybars(1000);
+        final Hbar maxQueryPayment = Hbar.fromTinybars(2000);
+
+        //Then
+        Assertions.assertDoesNotThrow(() -> new FileContentsRequest(validFileId, null, null));
+        Assertions.assertDoesNotThrow(() -> new FileContentsRequest(validFileId, queryPayment, null));
+        Assertions.assertDoesNotThrow(() -> new FileContentsRequest(validFileId, null, maxQueryPayment));
+        Assertions.assertDoesNotThrow(() -> new FileContentsRequest(validFileId, queryPayment, maxQueryPayment));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileContentsRequest(null, queryPayment, maxQueryPayment));
+        Assertions.assertDoesNotThrow(() -> FileContentsRequest.of(validFileId));
+        Assertions.assertDoesNotThrow(() -> FileContentsRequest.of("0.0.12345"));
+        Assertions.assertThrows(NullPointerException.class, () -> FileContentsRequest.of((String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileContentsRequest.of((FileId) null));
+    }
+
+    @Test
+    void testFileCreateRequestCreation(){
+        //given
+        final Hbar maxTransactionFee= Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration= Duration.ofSeconds(10);
+        final byte[] contents= new byte[]{};
+        final Instant expirationTime= Instant.MAX;
+        final byte[] largeContents = IntStream.range(0, 2050).mapToObj(i -> "a").reduce("", (a,b) -> a+b).getBytes();
+        final String fileMemo= "fileMemo";
+
+        //then
+        Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents));
+        Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents, null));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, expirationTime, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, fileMemo));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, expirationTime, null));
+        Assertions.assertDoesNotThrow(() -> new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> FileCreateRequest.of(largeContents));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, expirationTime));
+        Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileCreateRequest(null, null, null, null, null));
+    }
+    @Test
+    void testFileDeleteRequestCreation(){
+        //given
+        final Hbar maxTransactionFee= Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration= Duration.ofSeconds(10);
+        final String fileIdString= "0.0.12345";
+        final FileId fileId= FileId.fromString(fileIdString);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> FileDeleteRequest.of(fileId));
+        Assertions.assertDoesNotThrow(() -> FileDeleteRequest.of(fileIdString));
+        Assertions.assertDoesNotThrow(() -> new FileDeleteRequest(maxTransactionFee, transactionValidDuration, fileId));
+        Assertions.assertThrows(NullPointerException.class, () -> FileDeleteRequest.of((FileId) null));
+        Assertions.assertThrows(NullPointerException.class, () -> FileDeleteRequest.of((String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(maxTransactionFee,transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(maxTransactionFee,null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new FileDeleteRequest(null, null, null));
+    }
+
+    @Test
+    void testTopicSubmitMessageResultCreation() {
+        //given
+        final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
+        final Status validStatus = Status.SUCCESS;
+
+        //then
+        Assertions.assertDoesNotThrow(() -> new TopicSubmitMessageResult(validTransactionId, validStatus));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(null, validStatus));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageResult(validTransactionId, null));
+    }
+    
+    @Test
+    void testTopicDeleteResultCreation() {
+    	//given
+    	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
+    	final Status validStatus =Status.SUCCESS;
+    	
+    	//then
+    	Assertions.assertDoesNotThrow(() -> new TopicDeleteResult(validTransactionId,validStatus));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteResult(null, validStatus));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteResult(validTransactionId, null));
+    }
+  
+    @Test
+    void testTopicSubmitMessageRequestCreation() {
+        // Given
+        final TopicId validTopicId = TopicId.fromString("0.0.12345");
+        final String validMessage = "This is a valid message";
+        final byte[] validMessageBytes = validMessage.getBytes(StandardCharsets.UTF_8);
+        final byte[] largeMessage = new byte[1025];
+        final Hbar validMaxTransactionFee = Hbar.fromTinybars(100_000);
+        final Duration validTransactionValidDuration = Duration.ofMinutes(2);
+
+        // Then
+        Assertions.assertDoesNotThrow(() -> TopicSubmitMessageRequest.of(validTopicId, validMessage));
+        Assertions.assertDoesNotThrow(() -> TopicSubmitMessageRequest.of(validTopicId, validMessageBytes));
+        Assertions.assertDoesNotThrow(() -> new TopicSubmitMessageRequest(validMaxTransactionFee, validTransactionValidDuration, validTopicId, validMessage.getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(null, validMessage));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(validTopicId, (String) null));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicSubmitMessageRequest.of(validTopicId, (byte[]) null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> TopicSubmitMessageRequest.of(validTopicId, largeMessage));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageRequest(validMaxTransactionFee, validTransactionValidDuration, null, validMessage.getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicSubmitMessageRequest(validMaxTransactionFee, validTransactionValidDuration, validTopicId, null));
+    }
+
+  @Test
+    void testTopicDeleteRequestCreation() {
+        //given
+        final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+        final Duration transactionValidDuration = Duration.ofSeconds(10);
+        final String topicIdString = "0.0.12345";
+        final TopicId topicId = TopicId.fromString(topicIdString);
+
+        //then
+        Assertions.assertDoesNotThrow(() -> TopicDeleteRequest.of(topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(null, transactionValidDuration, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(maxTransactionFee, null, topicId));
+        Assertions.assertDoesNotThrow(() -> new TopicDeleteRequest(null, null, topicId));
+        Assertions.assertThrows(NullPointerException.class, () -> TopicDeleteRequest.of(null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, transactionValidDuration, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(maxTransactionFee, null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new TopicDeleteRequest(null, null, null));
+    }
+  
+  @Test
+  void testTopicCreateResultCreation() {
+    	//given
+    	final TransactionId validTransactionId = TransactionId.fromString("0.0.123451@1697590800.123456789");
+    	final Status validStatus =Status.SUCCESS;
+    	final TopicId validTopicId = TopicId.fromString("0.0.12345");
+    	
+    	//then
+    	Assertions.assertDoesNotThrow(() -> new TopicCreateResult(validTransactionId,validStatus,validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(null, validStatus, validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(validTransactionId, null, validTopicId));
+    	Assertions.assertThrows(NullPointerException.class, () -> new TopicCreateResult(validTransactionId, validStatus, null));
     }
 }

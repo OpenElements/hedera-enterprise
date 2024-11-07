@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileClientImpl implements FileClient {
 
-    private final static Logger log = LoggerFactory.getLogger(FileClientImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(FileClientImpl.class);
 
     private final ProtocolLayerClient protocolLayerClient;
 

@@ -12,7 +12,7 @@ public record ContractCallResult(@NonNull TransactionId transactionId, @NonNull 
                                  @NonNull byte[] transactionHash, @NonNull Instant consensusTimestamp,
                                  @NonNull Hbar transactionFee,
                                  @NonNull ContractFunctionResult contractFunctionResult) implements TransactionRecord {
-    
+
     public ContractCallResult {
         Objects.requireNonNull(transactionId, "transactionId must not be null");
         Objects.requireNonNull(status, "status must not be null");

@@ -23,7 +23,7 @@ import org.springframework.web.client.RestClient;
 
 public class ContractVerificationClientImplementation implements ContractVerificationClient {
 
-    private final static String CONTRACT_VERIFICATION_URL = "https://server-verify.hashscan.io";
+    private static final String CONTRACT_VERIFICATION_URL = "https://server-verify.hashscan.io";
 
     private record VerifyRequest(String address, String chain, String creatorTxHash, String chosenContract,
                                  Map<String, String> files) {
