@@ -1,15 +1,5 @@
 package com.openelements.hedera.spring.implementation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.openelements.hedera.base.HederaException;
-import com.openelements.hedera.base.Nft;
-import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
-import com.openelements.hedera.base.mirrornode.Page;
-import com.openelements.hedera.base.mirrornode.TransactionInfo;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -20,6 +10,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
+
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,6 +18,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.TokenId;
+import com.openelements.hedera.base.HederaException;
+import com.openelements.hedera.base.Nft;
+import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
+import com.openelements.hedera.base.mirrornode.Page;
+import com.openelements.hedera.base.mirrornode.TransactionInfo;
 
 public class MirrorNodeClientImpl implements MirrorNodeClient {
 
@@ -86,6 +88,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
                 .filter(nft -> Objects.equals(nft.owner(), accountId));
+    }
+
+    @Override
+    public Page<TransactionInfo> queryTransactionsByAccount(@NonNull final AccountId accountId) throws HederaException {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        final String path = "/api/v1/transactions?account.id=" + accountId.toString();
+        final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction = this::extractTransactionInfoFromJsonNode;
+        return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
     }
 
     @Override
@@ -190,4 +200,23 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                     }
                 }).toList();
     }
+
+    private List<TransactionInfo> extractTransactionInfoFromJsonNode(JsonNode jsonNode) {
+        if (!jsonNode.has("transactions")) {
+            return List.of();
+        }
+        final JsonNode transactionsNode = jsonNode.get("transactions");
+        if (!transactionsNode.isArray()) {
+            throw new IllegalArgumentException("Transactions node is not an array: " + transactionsNode);
+        }
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(transactionsNode.iterator(), Spliterator.ORDERED), false)
+                .map(transactionNode -> {
+                    try {
+                        final String transactionId = transactionNode.get("transaction_id").asText();
+                        return new TransactionInfo(transactionId);
+                    } catch (final Exception e) {
+                        throw new RuntimeException("Error parsing transaction from JSON '" + transactionNode + "'", e);
+                    }
+                }).toList();
+    } 
 }
