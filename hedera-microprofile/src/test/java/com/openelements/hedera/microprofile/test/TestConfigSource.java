@@ -15,9 +15,27 @@ public class TestConfigSource implements ConfigSource {
         properties = new HashMap<>();
         properties.put("mp.initializer.allow", "true");
         properties.put("mp.initializer.no-warn", "true");
-        properties.put("hedera.accountId", dotenv.get("hedera.accountId"));
-        properties.put("hedera.privateKey", dotenv.get("hedera.privateKey"));
-        properties.put("hedera.network", dotenv.get("hedera.network"));
+
+        final String hederaAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
+        if (hederaAccountIdByEnv != null) {
+            properties.put("hedera.accountId", hederaAccountIdByEnv);
+        } else {
+            properties.put("hedera.accountId", dotenv.get("hedera.accountId"));
+        }
+
+        final String hederaPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
+        if (hederaPrivateKeyByEnv != null) {
+            properties.put("hedera.privateKey", hederaPrivateKeyByEnv);
+        } else {
+            properties.put("hedera.privateKey", dotenv.get("hedera.privateKey"));
+        }
+
+        final String hederaNetwork = System.getenv("HEDERA_NETWORK");
+        if (hederaNetwork != null) {
+            properties.put("hedera.network", hederaNetwork);
+        } else {
+            properties.put("hedera.network", dotenv.get("hedera.network"));
+        }
     }
 
     @Override
