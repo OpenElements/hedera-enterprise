@@ -153,4 +153,27 @@ public interface MirrorNodeClient {
      */
     @NonNull
     Optional<TransactionInfo> queryTransaction(@NonNull String transactionId) throws HederaException;
+
+    /**
+     * Queries the account information for a specific account ID.
+     *
+     * @param accountId the account ID
+     * @return the account information for the account ID
+     * @throws HederaException if an error occurs
+     */
+    @NonNull
+    Optional<AccountInfo> queryAccount(@NonNull AccountId accountId) throws HederaException;
+
+    /**
+     * Queries the account information for a specific account ID.
+     *
+     * @param accountId the account ID
+     * @return the account information for the account ID
+     * @throws HederaException if an error occurs
+     */
+    @NonNull
+    default Optional<AccountInfo> queryAccount(@NonNull String accountId) throws HederaException {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        return queryAccount(AccountId.fromString(accountId));
+    }
 }

@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hedera.base.HederaException;
 import com.openelements.hedera.base.Nft;
+import com.openelements.hedera.base.mirrornode.AccountInfo;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.mirrornode.Page;
 import com.openelements.hedera.base.mirrornode.TransactionInfo;
@@ -98,6 +99,13 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         return Optional.of(new TransactionInfo(transactionId));
     }
 
+    @Override
+    public @NonNull Optional<AccountInfo> queryAccount(@NonNull AccountId accountId) throws HederaException {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        final JsonNode jsonNode = doGetCall("/api/v1/accounts/" + accountId);
+        return jsonNodeToOptionalAccountINfo(jsonNode);
+    }
+
     private JsonNode doGetCall(String path, Map<String, ?> params) throws HederaException {
         return doGetCall(builder -> {
             UriBuilder uriBuilder = builder.path(path);
@@ -167,6 +175,30 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
             final long serial = jsonNode.get("serial_number").asLong();
             final byte[] metadata = jsonNode.get("metadata").binaryValue();
             return new Nft(parsedTokenId, serial, account, metadata);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException("Error parsing NFT from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private @NonNull Optional<AccountInfo> jsonNodeToOptionalAccountINfo(JsonNode jsonNode) throws HederaException {
+        if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(jsonNodeToAccountInfo(jsonNode));
+        } catch (final Exception e) {
+            throw new HederaException("Error parsing AccountInfo from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private AccountInfo jsonNodeToAccountInfo(JsonNode jsonNode) {
+        try {
+            final AccountId accountId = AccountId.fromString(jsonNode.get("account").asText());
+            final String evmAddress = jsonNode.get("evm_address").asText();
+            final long ethereumNonce = jsonNode.get("ethereum_nonce").asLong();
+            final long pendingReward = jsonNode.get("pending_reward").asLong();
+            final long balance = jsonNode.get("balance").get("balance").asLong();
+            return new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward);
         } catch (final Exception e) {
             throw new IllegalArgumentException("Error parsing NFT from JSON '" + jsonNode + "'", e);
         }
