@@ -1,5 +1,6 @@
 package com.openelements.hedera.base.mirrornode;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -189,4 +190,40 @@ public interface MirrorNodeClient {
         Objects.requireNonNull(accountId, "accountId must not be null");
         return queryAccount(AccountId.fromString(accountId));
     }
+
+    /**
+     * Queries the ExchangeRates for the network.
+     *
+     * @return the Optional of ExchangeRates for the Network
+     * @throws HederaException if an error occurs
+     */
+    @NonNull
+    Optional<ExchangeRates> queryExchangeRates() throws HederaException;
+
+    /**
+     * Queries the NetworkFee for the network.
+     *
+     * @return the List of NetworkFee for the Network
+     * @throws HederaException if an error occurs
+     */
+    @NonNull
+    List<NetworkFee> queryNetworkFees() throws HederaException;
+
+    /**
+     * Queries the NetworkStake for the network.
+     *
+     * @return the Optional of NetworkStake for the Network
+     * @throws HederaException if an error occurs
+     */
+    @NonNull
+    Optional<NetworkStake> queryNetworkStake() throws HederaException;
+
+    /**
+     * Queries the NetworkSupplies for the network.
+     *
+     * @return the Optional of NetworkSupplies for the Network
+     * @throws HederaException if an error occurs
+     */
+    @NonNull
+    Optional<NetworkSupplies> queryNetworkSupplies() throws HederaException;
 }

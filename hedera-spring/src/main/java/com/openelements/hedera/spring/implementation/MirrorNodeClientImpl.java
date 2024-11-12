@@ -2,6 +2,7 @@ package com.openelements.hedera.spring.implementation;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,6 +31,11 @@ import com.openelements.hedera.base.mirrornode.AccountInfo;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.mirrornode.Page;
 import com.openelements.hedera.base.mirrornode.TransactionInfo;
+import com.openelements.hedera.base.mirrornode.ExchangeRate;
+import com.openelements.hedera.base.mirrornode.ExchangeRates;
+import com.openelements.hedera.base.mirrornode.NetworkFee;
+import com.openelements.hedera.base.mirrornode.NetworkStake;
+import com.openelements.hedera.base.mirrornode.NetworkSupplies;
 
 public class MirrorNodeClientImpl implements MirrorNodeClient {
 
@@ -114,6 +120,30 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         Objects.requireNonNull(accountId, "accountId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/accounts/" + accountId);
         return jsonNodeToOptionalAccountINfo(jsonNode);
+    }
+
+    @Override
+    public @NonNull Optional<ExchangeRates> queryExchangeRates() throws HederaException {
+        final JsonNode jsonNode = doGetCall("/api/v1/network/exchangerate");
+        return jsonNodeToOptionalExchangeRates(jsonNode);
+    }
+
+    @Override
+    public @NonNull List<NetworkFee> queryNetworkFees() throws HederaException {
+        final JsonNode jsonNode = doGetCall("/api/v1/network/fees");
+        return jsonNodeToListNetworkFee(jsonNode);
+    }
+
+    @Override
+    public @NonNull Optional<NetworkStake> queryNetworkStake() throws HederaException {
+        final JsonNode jsonNode = doGetCall("/api/v1/network/stake");
+        return jsonNodeToOptionalNetworkStake(jsonNode);
+    }
+
+    @Override
+    public @NonNull Optional<NetworkSupplies> queryNetworkSupplies() throws HederaException {
+        final JsonNode jsonNode = doGetCall("/api/v1/network/supply");
+        return jsonNodeToOptionalNetworkSupplies(jsonNode);
     }
 
     private JsonNode doGetCall(String path, Map<String, ?> params) throws HederaException {
@@ -211,6 +241,140 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
             return new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward);
         } catch (final Exception e) {
             throw new IllegalArgumentException("Error parsing NFT from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private @NonNull Optional<ExchangeRates> jsonNodeToOptionalExchangeRates(JsonNode jsonNode) throws HederaException {
+        if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(jsonNodeToExchangeRates(jsonNode));
+        } catch (final Exception e) {
+            throw new HederaException("Error parsing ExchangeRates from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private ExchangeRates jsonNodeToExchangeRates(JsonNode jsonNode) {
+        try {
+            final int currentCentEquivalent = jsonNode.get("current_rate").get("cent_equivalent").asInt();
+            final int currentHbarEquivalent = jsonNode.get("current_rate").get("hbar_equivalent").asInt();
+            final Instant currentExpirationTime = Instant.ofEpochSecond(
+                    jsonNode.get("current_rate").get("expiration_time").asLong()
+            );
+
+            final int nextCentEquivalent = jsonNode.get("next_rate").get("cent_equivalent").asInt();
+            final int nextHbarEquivalent = jsonNode.get("next_rate").get("hbar_equivalent").asInt();
+            final Instant nextExpirationTime = Instant.ofEpochSecond(
+                    jsonNode.get("next_rate").get("expiration_time").asLong()
+            );
+
+            return new ExchangeRates(
+                    new ExchangeRate(currentCentEquivalent, currentHbarEquivalent, currentExpirationTime),
+                    new ExchangeRate(nextCentEquivalent, nextHbarEquivalent, nextExpirationTime)
+            );
+        } catch (final Exception e) {
+            throw new IllegalArgumentException("Error parsing ExchangeRates from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private List<NetworkFee> jsonNodeToListNetworkFee(JsonNode jsonNode) throws HederaException {
+        if(jsonNode == null || !jsonNode.fieldNames().hasNext() || !jsonNode.has("fees")) {
+            return List.of();
+        }
+
+        final JsonNode feesNode = jsonNode.get("fees");
+        if (!feesNode.isArray()) {
+            throw new IllegalArgumentException("Fees node is not an array: " + feesNode);
+        }
+
+        try {
+            return StreamSupport
+                    .stream(Spliterators.spliteratorUnknownSize(feesNode.iterator(), Spliterator.ORDERED), false)
+                    .map(this::jsonNodeToNetworkFee)
+                    .toList();
+        } catch (final Exception e) {
+            throw new HederaException("Error parsing NetworkFees from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private NetworkFee jsonNodeToNetworkFee(JsonNode jsonNode) {
+        try {
+            final long gas = jsonNode.get("gas").asLong();
+            final String transactionType = jsonNode.get("transaction_type").asText();
+
+            return new NetworkFee(gas, transactionType);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException("Error parsing NetworkFee from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private @NonNull Optional<NetworkStake> jsonNodeToOptionalNetworkStake(JsonNode jsonNode) throws HederaException {
+        if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(jsonNodeToNetworkStake(jsonNode));
+        } catch (final Exception e) {
+            throw new HederaException("Error parsing NetworkStake from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private NetworkStake jsonNodeToNetworkStake(JsonNode jsonNode) {
+        try {
+            final long maxStakeReward = jsonNode.get("max_stake_rewarded").asLong();
+            final long maxStakeRewardPerHbar = jsonNode.get("max_staking_reward_rate_per_hbar").asLong();
+            final long maxTotalReward = jsonNode.get("max_total_reward").asLong();
+            final double nodeRewardFeeFraction = jsonNode.get("node_reward_fee_fraction").asDouble();
+            final long reservedStakingRewards = jsonNode.get("reserved_staking_rewards").asLong();
+            final long rewardBalanceThreshold = jsonNode.get("reward_balance_threshold").asLong();
+            final long stakeTotal = jsonNode.get("stake_total").asLong();
+            final long stakingPeriodDuration = jsonNode.get("staking_period_duration").asLong();
+            final long stakingPeriodsStored = jsonNode.get("staking_periods_stored").asLong();
+            final double stakingRewardFeeFraction = jsonNode.get("staking_reward_fee_fraction").asDouble();
+            final long stakingRewardRate = jsonNode.get("staking_reward_rate").asLong();
+            final long stakingStartThreshold = jsonNode.get("staking_start_threshold").asLong();
+            final long unreservedStakingRewardBalance = jsonNode.get("unreserved_staking_reward_balance").asLong();
+
+            return new NetworkStake(
+                    maxStakeReward,
+                    maxStakeRewardPerHbar,
+                    maxTotalReward,
+                    nodeRewardFeeFraction,
+                    reservedStakingRewards,
+                    rewardBalanceThreshold,
+                    stakeTotal,
+                    stakingPeriodDuration,
+                    stakingPeriodsStored,
+                    stakingRewardFeeFraction,
+                    stakingRewardRate,
+                    stakingStartThreshold,
+                    unreservedStakingRewardBalance
+            );
+        } catch (final Exception e) {
+            throw new IllegalArgumentException("Error parsing NetworkStake from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private @NonNull Optional<NetworkSupplies> jsonNodeToOptionalNetworkSupplies(JsonNode jsonNode) throws HederaException {
+        if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(jsonNodeToNetworkSupplies(jsonNode));
+        } catch (final Exception e) {
+            throw new HederaException("Error parsing NetworkSupplies from JSON '" + jsonNode + "'", e);
+        }
+    }
+
+    private NetworkSupplies jsonNodeToNetworkSupplies(JsonNode jsonNode) {
+        try {
+            final String releasedSupply = jsonNode.get("released_supply").asText();
+            final String totalSupply = jsonNode.get("total_supply").asText();
+
+            return new NetworkSupplies(releasedSupply, totalSupply);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException("Error parsing NetworkSupplies from JSON '" + jsonNode + "'", e);
         }
     }
 
