@@ -11,7 +11,6 @@ public class TestConfigSource implements ConfigSource {
     private final Map<String, String> properties;
 
     public TestConfigSource() {
-        final Dotenv dotenv = Dotenv.load();
         properties = new HashMap<>();
         properties.put("mp.initializer.allow", "true");
         properties.put("mp.initializer.no-warn", "true");
@@ -20,21 +19,21 @@ public class TestConfigSource implements ConfigSource {
         if (hederaAccountIdByEnv != null) {
             properties.put("hedera.accountId", hederaAccountIdByEnv);
         } else {
-            properties.put("hedera.accountId", dotenv.get("hedera.accountId"));
+            properties.put("hedera.accountId", Dotenv.load().get("hedera.accountId"));
         }
 
         final String hederaPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
         if (hederaPrivateKeyByEnv != null) {
             properties.put("hedera.privateKey", hederaPrivateKeyByEnv);
         } else {
-            properties.put("hedera.privateKey", dotenv.get("hedera.privateKey"));
+            properties.put("hedera.privateKey", Dotenv.load().get("hedera.privateKey"));
         }
 
         final String hederaNetwork = System.getenv("HEDERA_NETWORK");
         if (hederaNetwork != null) {
             properties.put("hedera.network", hederaNetwork);
         } else {
-            properties.put("hedera.network", dotenv.get("hedera.network"));
+            properties.put("hedera.network", "testnet");
         }
     }
 
