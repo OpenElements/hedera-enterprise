@@ -10,6 +10,7 @@ import com.openelements.hedera.base.FileClient;
 import com.openelements.hedera.base.NftClient;
 import com.openelements.hedera.base.NftRepository;
 import com.openelements.hedera.base.AccountRepository;
+import com.openelements.hedera.base.NetworkRepository;
 import com.openelements.hedera.base.SmartContractClient;
 import com.openelements.hedera.base.implementation.AccountClientImpl;
 import com.openelements.hedera.base.implementation.FileClientImpl;
@@ -19,6 +20,7 @@ import com.openelements.hedera.base.implementation.NftRepositoryImpl;
 import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hedera.base.implementation.SmartContractClientImpl;
 import com.openelements.hedera.base.implementation.AccountRepositoryImpl;
+import com.openelements.hedera.base.implementation.NetworkRepositoryImpl;
 import com.openelements.hedera.base.mirrornode.MirrorNodeClient;
 import com.openelements.hedera.base.protocol.ProtocolLayerClient;
 import java.net.URI;
@@ -207,6 +209,13 @@ public class HederaAutoConfiguration {
             havingValue = "true", matchIfMissing = true)
     AccountRepository accountRepository(final MirrorNodeClient mirrorNodeClient) {
         return new AccountRepositoryImpl(mirrorNodeClient);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+            havingValue = "true", matchIfMissing = true)
+    NetworkRepository networkRepository(final MirrorNodeClient mirrorNodeClient) {
+        return new NetworkRepositoryImpl(mirrorNodeClient);
     }
 
     @Bean
