@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e  # Exit the script if any command fails
 
 if [ -z "$1" ]; then
   echo "Please provide version that should be released and the next snapshot version. Example: ./release.sh 0.1.0 0.2.0-SNAPSHOT"
