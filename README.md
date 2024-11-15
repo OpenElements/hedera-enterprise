@@ -1,5 +1,5 @@
 # Hedera Enterprise
-This project provides Java modules to integrate [Hedera network](https://hedera.com) smoothless in a Spring Boot or Microprofile (like Quarkus) application.
+This project provides Java modules to integrate [Hedera network](https://hedera.com) smoothless in a Spring Boot or Eclipse Microprofile (like Quarkus) application.
 This module is based on the [Hedera Java SDK](https://github.com/hashgraph/hedera-sdk-java).
 
 ## Spring Boot support
@@ -95,17 +95,17 @@ The support for Microprofile is still in development and can not be used yet.
 The module provides a set of managed services that can be used to interact with the Hedera network.
 The following services are available in spring and microprofile:
 
-- `com.openelements.hedera.base.AccountClient`: to interact with Hedera accounts
-- `com.openelements.hedera.base.FileClient`: to interact with Hedera files
-- `com.openelements.hedera.base.SmartContractClient`: to interact with Hedera smart contracts
-- `com.openelements.hedera.base.ContractVerificationClient`: to verify smart contracts
-- `com.openelements.hedera.base.NftClient`: to interact with Hedera NFTs
-- `com.openelements.hedera.base.NftRepository`: to query NFTs
+- `com.openelements.hiero.base.AccountClient`: to interact with Hedera accounts
+- `com.openelements.hiero.base.FileClient`: to interact with Hedera files
+- `com.openelements.hiero.base.SmartContractClient`: to interact with Hedera smart contracts
+- `com.openelements.hiero.base.ContractVerificationClient`: to verify smart contracts
+- `com.openelements.hiero.base.NftClient`: to interact with Hedera NFTs
+- `com.openelements.hiero.base.NftRepository`: to query NFTs
 
 Next to that the following low-level services are available:
 
-- `com.openelements.hedera.base.protocol.ProtocolLayerClient`: to interact with the Hedera protocol layer
-- `com.openelements.hedera.base.mirrornode.MirrorNodeClient`: to query the Hedera mirror node 
+- `com.openelements.hiero.base.protocol.ProtocolLayerClient`: to interact with the Hedera protocol layer
+- `com.openelements.hiero.base.mirrornode.MirrorNodeClient`: to query the Hedera mirror node 
 
 ## Built the project
 
