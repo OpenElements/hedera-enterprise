@@ -1,5 +1,9 @@
 package com.openelements.hedera.base.implementation;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 public enum HederaNetwork {
 
     PREVIEWNET("previewnet", 297, "https://previewnet.mirrornode.hedera.com/", "https://previewnet.hashio.io/api"),
@@ -47,5 +51,12 @@ public enum HederaNetwork {
 
     public String getMirrornodeEndpoint() {
         return mirrornodeEndpoint;
+    }
+
+    public static Optional<HederaNetwork> findByName(final String name) {
+        Objects.requireNonNull(name, "name must not be null");
+        return Stream.of(HederaNetwork.values())
+                .filter(v -> Objects.equals(v.name.toLowerCase(), name.toLowerCase()))
+                .findAny();
     }
 }

@@ -18,8 +18,6 @@ import com.openelements.hedera.microprofile.implementation.ContractVerificationC
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import java.util.Arrays;
-import java.util.Objects;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jspecify.annotations.NonNull;
 
@@ -38,31 +36,36 @@ public class ClientProvider {
     private String network;
 
     private AccountId getAccountId() {
+        if (network == null) {
+            throw new IllegalStateException("accountId value is null");
+        }
         try {
             return AccountId.fromString(accountIdAsString);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.newAccountId' property", e);
+            throw new IllegalArgumentException(
+                    "Can not parse 'hedera.newAccountId' property: '" + accountIdAsString + "'", e);
         }
     }
 
     private PrivateKey getPrivateKey() {
+        if (network == null) {
+            throw new IllegalStateException("privateKey value is null");
+        }
         try {
             return PrivateKey.fromString(privateKeyAsString);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.privateKey' property", e);
+            throw new IllegalArgumentException(
+                    "Can not parse 'hedera.privateKey' property: '" + privateKeyAsString + "'", e);
         }
     }
 
     private HederaNetwork getHederaNetwork() {
-        if (Arrays.stream(HederaNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), network))) {
-            try {
-                return HederaNetwork.valueOf(network.toUpperCase());
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Can not parse 'hedera.network' property", e);
-            }
-        } else {
-            throw new IllegalArgumentException("'hedera.network' property must be set to a valid value");
+        if (network == null) {
+            throw new IllegalStateException("network value is null");
         }
+        return HederaNetwork.findByName(network)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "'hedera.network' property must be set to a valid value. Is '" + network + "'"));
     }
 
     private Client createClient() {
