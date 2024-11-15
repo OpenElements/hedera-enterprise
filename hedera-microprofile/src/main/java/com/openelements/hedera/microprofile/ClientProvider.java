@@ -64,8 +64,7 @@ public class ClientProvider {
             throw new IllegalStateException("network value is null");
         }
         return HederaNetwork.findByName(network)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "'hedera.network' property must be set to a valid value. Is '" + network + "'"));
+                .orElse(HederaNetwork.CUSTOM);
     }
 
     private Client createClient() {
