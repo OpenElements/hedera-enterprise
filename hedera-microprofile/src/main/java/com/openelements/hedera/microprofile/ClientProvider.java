@@ -18,52 +18,65 @@ import com.openelements.hedera.microprofile.implementation.ContractVerificationC
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.jspecify.annotations.NonNull;
 
 public class ClientProvider {
 
     @Inject
-    @ConfigProperty(name = "hedera.accountId")
-    private String accountIdAsString;
+    @ConfigProperties
+    private HieroOperatorConfiguration configuration;
 
     @Inject
-    @ConfigProperty(name = "hedera.privateKey")
-    private String privateKeyAsString;
+    @ConfigProperties
+    private HieroNetworkConfiguration networkConfiguration;
 
-    @Inject
-    @ConfigProperty(name = "hedera.network")
-    private String network;
 
     private AccountId getAccountId() {
-        if (network == null) {
+        if (configuration == null) {
+            throw new IllegalStateException("configuration is null");
+        }
+        final String accountId = configuration.getAccountId();
+        if (accountId == null) {
             throw new IllegalStateException("accountId value is null");
         }
         try {
-            return AccountId.fromString(accountIdAsString);
+            return AccountId.fromString(accountId);
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                    "Can not parse 'hedera.newAccountId' property: '" + accountIdAsString + "'", e);
+                    "Can not parse 'hedera.newAccountId' property: '" + accountId + "'", e);
         }
     }
 
     private PrivateKey getPrivateKey() {
-        if (network == null) {
+        if (configuration == null) {
+            throw new IllegalStateException("configuration is null");
+        }
+        final String privateKey = configuration.getPrivateKey();
+        if (privateKey == null) {
             throw new IllegalStateException("privateKey value is null");
         }
         try {
-            return PrivateKey.fromString(privateKeyAsString);
+            return PrivateKey.fromString(privateKey);
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                    "Can not parse 'hedera.privateKey' property: '" + privateKeyAsString + "'", e);
+                    "Can not parse 'hedera.privateKey' property: '" + privateKey + "'", e);
         }
     }
 
     private HederaNetwork getHederaNetwork() {
-        if (network == null) {
+        if (networkConfiguration == null) {
             throw new IllegalStateException("network value is null");
         }
-        return HederaNetwork.findByName(network)
+        final String networkName = networkConfiguration.getName();
+        if (networkName == null) {
+            throw new IllegalStateException("networkName is null");
+        }
+        return HederaNetwork.findByName(networkName)
                 .orElse(HederaNetwork.CUSTOM);
     }
 
@@ -71,8 +84,22 @@ public class ClientProvider {
         final AccountId accountId = getAccountId();
         final PrivateKey privateKey = getPrivateKey();
         final HederaNetwork hederaNetwork = getHederaNetwork();
-        return Client.forName(hederaNetwork.getName())
-                .setOperator(accountId, privateKey);
+        if (Objects.equals(HederaNetwork.CUSTOM, hederaNetwork)) {
+            final Map<String, AccountId> nodes = new HashMap<>();
+            networkConfiguration.getNodes()
+                    .forEach(node -> nodes.put(node.ip() + ":" + node.port(), AccountId.fromString(node.account())));
+            Client client = Client.forNetwork(nodes);
+            try {
+                client.setMirrorNetwork(List.of(networkConfiguration.getMirrornode()));
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Error setting mirror network", e);
+            }
+            client.setOperator(accountId, privateKey);
+            return client;
+        } else {
+            return Client.forName(hederaNetwork.getName())
+                    .setOperator(accountId, privateKey);
+        }
     }
 
     @Produces
