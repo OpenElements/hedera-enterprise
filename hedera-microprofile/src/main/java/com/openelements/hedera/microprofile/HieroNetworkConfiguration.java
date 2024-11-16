@@ -2,9 +2,9 @@ package com.openelements.hedera.microprofile;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -15,28 +15,28 @@ public class HieroNetworkConfiguration {
     public record Node(String ip, String port, String account) {
     }
 
-    private String name;
+    private Optional<String> name;
 
     @Inject
-    @ConfigProperty(name = "nodes", defaultValue = " ") //TODO: We need a better default value
-    private String[] nodes;
+    @ConfigProperty(name = "nodes")
+    private Optional<Set<String>> nodes;
 
-    @ConfigProperty(name = "mirrornode", defaultValue = " ") //TODO: We need a better default value
-    private String mirrornode;
+    @ConfigProperty(name = "mirrornode")
+    private Optional<String> mirrornode;
 
-    public String getName() {
+    public Optional<String> getName() {
         return name;
     }
 
-    public String getMirrornode() {
+    public Optional<String> getMirrornode() {
         return mirrornode;
     }
 
     public Set<Node> getNodes() {
-        if (nodes == null) {
+        if (!nodes.isPresent()) {
             return Set.of();
         }
-        return Stream.of(nodes)
+        return nodes.get().stream()
                 .map(n -> {
                     // 172.234.134.4:8080:0.0.3
                     final String[] split = n.split(":");

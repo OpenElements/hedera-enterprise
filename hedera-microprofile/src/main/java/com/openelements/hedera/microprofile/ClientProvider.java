@@ -72,11 +72,8 @@ public class ClientProvider {
         if (networkConfiguration == null) {
             throw new IllegalStateException("network value is null");
         }
-        final String networkName = networkConfiguration.getName();
-        if (networkName == null) {
-            throw new IllegalStateException("networkName is null");
-        }
-        return HederaNetwork.findByName(networkName)
+        return networkConfiguration.getName()
+                .map(n -> HederaNetwork.findByName(n).orElse(HederaNetwork.CUSTOM))
                 .orElse(HederaNetwork.CUSTOM);
     }
 
@@ -89,11 +86,15 @@ public class ClientProvider {
             networkConfiguration.getNodes()
                     .forEach(node -> nodes.put(node.ip() + ":" + node.port(), AccountId.fromString(node.account())));
             Client client = Client.forNetwork(nodes);
-            try {
-                client.setMirrorNetwork(List.of(networkConfiguration.getMirrornode()));
-            } catch (InterruptedException e) {
-                throw new RuntimeException("Error setting mirror network", e);
-            }
+            networkConfiguration.getMirrornode()
+                    .map(mirrorNode -> List.of(mirrorNode))
+                    .ifPresent(mirrorNodes -> {
+                        try {
+                            client.setMirrorNetwork(mirrorNodes);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException("Error setting mirror network", e);
+                        }
+                    });
             client.setOperator(accountId, privateKey);
             return client;
         } else {
