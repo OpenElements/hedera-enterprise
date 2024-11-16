@@ -18,59 +18,88 @@ import com.openelements.hedera.microprofile.implementation.ContractVerificationC
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import java.util.stream.Collectors;
+import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.jspecify.annotations.NonNull;
 
 public class ClientProvider {
 
     @Inject
-    @ConfigProperty(name = "hedera.accountId")
-    private String accountIdAsString;
+    @ConfigProperties
+    private HieroOperatorConfiguration configuration;
 
     @Inject
-    @ConfigProperty(name = "hedera.privateKey")
-    private String privateKeyAsString;
+    @ConfigProperties
+    private HieroNetworkConfiguration networkConfiguration;
 
-    @Inject
-    @ConfigProperty(name = "hedera.network")
-    private String network;
 
     private AccountId getAccountId() {
+        if (configuration == null) {
+            throw new IllegalStateException("configuration is null");
+        }
+        final String accountId = configuration.getAccountId();
+        if (accountId == null) {
+            throw new IllegalStateException("accountId value is null");
+        }
         try {
-            return AccountId.fromString(accountIdAsString);
+            return AccountId.fromString(accountId);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.newAccountId' property", e);
+            throw new IllegalArgumentException(
+                    "Can not parse 'hedera.newAccountId' property: '" + accountId + "'", e);
         }
     }
 
     private PrivateKey getPrivateKey() {
+        if (configuration == null) {
+            throw new IllegalStateException("configuration is null");
+        }
+        final String privateKey = configuration.getPrivateKey();
+        if (privateKey == null) {
+            throw new IllegalStateException("privateKey value is null");
+        }
         try {
-            return PrivateKey.fromString(privateKeyAsString);
+            return PrivateKey.fromString(privateKey);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.privateKey' property", e);
+            throw new IllegalArgumentException(
+                    "Can not parse 'hedera.privateKey' property: '" + privateKey + "'", e);
         }
     }
 
     private HederaNetwork getHederaNetwork() {
-        if (Arrays.stream(HederaNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), network))) {
-            try {
-                return HederaNetwork.valueOf(network.toUpperCase());
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Can not parse 'hedera.network' property", e);
-            }
-        } else {
-            throw new IllegalArgumentException("'hedera.network' property must be set to a valid value");
+        if (networkConfiguration == null) {
+            throw new IllegalStateException("network value is null");
         }
+        return networkConfiguration.getName()
+                .map(n -> HederaNetwork.findByName(n).orElse(HederaNetwork.CUSTOM))
+                .orElse(HederaNetwork.CUSTOM);
     }
 
     private Client createClient() {
         final AccountId accountId = getAccountId();
         final PrivateKey privateKey = getPrivateKey();
         final HederaNetwork hederaNetwork = getHederaNetwork();
-        return Client.forName(hederaNetwork.getName())
-                .setOperator(accountId, privateKey);
+        if (Objects.equals(HederaNetwork.CUSTOM, hederaNetwork)) {
+            final Map<String, AccountId> nodes = networkConfiguration.getNodes()
+                    .stream().collect(Collectors.toMap(n -> n.getAddress(), n -> n.getAccountId()));
+            Client client = Client.forNetwork(nodes);
+            networkConfiguration.getMirrornode()
+                    .map(mirrorNode -> List.of(mirrorNode))
+                    .ifPresent(mirrorNodes -> {
+                        try {
+                            client.setMirrorNetwork(mirrorNodes);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException("Error setting mirror network", e);
+                        }
+                    });
+            client.setOperator(accountId, privateKey);
+            return client;
+        } else {
+            return Client.forName(hederaNetwork.getName())
+                    .setOperator(accountId, privateKey);
+        }
     }
 
     @Produces

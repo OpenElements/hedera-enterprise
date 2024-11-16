@@ -3,10 +3,15 @@ package com.openelements.hedera.microprofile.test;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.eclipse.microprofile.config.spi.ConfigSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestConfigSource implements ConfigSource {
+
+    private final static Logger log = LoggerFactory.getLogger(TestConfigSource.class);
 
     private final Map<String, String> properties;
 
@@ -17,24 +22,32 @@ public class TestConfigSource implements ConfigSource {
 
         final String hederaAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
         if (hederaAccountIdByEnv != null) {
-            properties.put("hedera.accountId", hederaAccountIdByEnv);
+            properties.put("hiero.accountId", hederaAccountIdByEnv);
         } else {
-            properties.put("hedera.accountId", Dotenv.load().get("hedera.accountId"));
+            properties.put("hiero.accountId", Dotenv.load().get("hedera.accountId"));
         }
 
         final String hederaPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
         if (hederaPrivateKeyByEnv != null) {
-            properties.put("hedera.privateKey", hederaPrivateKeyByEnv);
+            properties.put("hiero.privateKey", hederaPrivateKeyByEnv);
         } else {
-            properties.put("hedera.privateKey", Dotenv.load().get("hedera.privateKey"));
+            properties.put("hiero.privateKey", Dotenv.load().get("hedera.privateKey"));
         }
 
         final String hederaNetwork = System.getenv("HEDERA_NETWORK");
         if (hederaNetwork != null) {
-            properties.put("hedera.network", hederaNetwork);
+            properties.put("hiero.network.name", hederaNetwork);
         } else {
-            properties.put("hedera.network", "testnet");
+            properties.put("hiero.network.name", Dotenv.load().get("hedera.network.name"));
         }
+
+        //TODO: Hardcoded for Solo tests,should be fixed later
+        if (Objects.equals(properties.get("hiero.network.name"), "solo")) {
+            properties.put("hiero.network.nodes", "127.0.0.1:50211:0.0.3");
+            properties.put("hiero.network.mirrornode", "http://localhost:8080");
+        }
+
+        properties.forEach((k, v) -> log.info("CONFIG: '" + k + "'->'" + v + "'"));
     }
 
     @Override
