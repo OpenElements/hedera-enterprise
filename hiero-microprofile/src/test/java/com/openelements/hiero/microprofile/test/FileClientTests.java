@@ -1,7 +1,8 @@
-package com.openelements.hiero.microprofile.test;
+package com.openelements.hedera.microprofile.test;
 
-import com.openelements.hiero.base.FileClient;
-import com.openelements.hiero.microprofile.ClientProvider;
+import com.hedera.hashgraph.sdk.FileId;
+import com.openelements.hedera.base.FileClient;
+import com.openelements.hedera.microprofile.ClientProvider;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.Configuration;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
@@ -29,7 +30,14 @@ public class FileClientTests {
 
     @Test
     void testFileClient() throws Exception {
+        //given
+        final byte[] contents = "Hello, Hedera!".getBytes();
         Assertions.assertNotNull(fileClient);
-        fileClient.createFile(new byte[0]);
+
+        //when
+        final FileId fileId = fileClient.createFile(contents);
+
+        //then
+        Assertions.assertNotNull(fileId);
     }
 }

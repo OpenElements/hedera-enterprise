@@ -1,83 +1,43 @@
-package com.openelements.hiero.microprofile;
+package com.openelements.hedera.microprofile;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.openelements.hiero.base.Account;
-import com.openelements.hiero.base.AccountClient;
-import com.openelements.hiero.base.ContractVerificationClient;
-import com.openelements.hiero.base.FileClient;
-import com.openelements.hiero.base.SmartContractClient;
-import com.openelements.hiero.base.implementation.AccountClientImpl;
-import com.openelements.hiero.base.implementation.FileClientImpl;
-import com.openelements.hiero.base.implementation.HederaNetwork;
-import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
-import com.openelements.hiero.base.implementation.SmartContractClientImpl;
-import com.openelements.hiero.base.protocol.ProtocolLayerClient;
-import com.openelements.hiero.microprofile.implementation.ContractVerificationClientImpl;
+import com.openelements.hedera.base.AccountClient;
+import com.openelements.hedera.base.ContractVerificationClient;
+import com.openelements.hedera.base.FileClient;
+import com.openelements.hedera.base.SmartContractClient;
+import com.openelements.hedera.base.config.HieroConfig;
+import com.openelements.hedera.base.implementation.AccountClientImpl;
+import com.openelements.hedera.base.implementation.FileClientImpl;
+import com.openelements.hedera.base.implementation.ProtocolLayerClientImpl;
+import com.openelements.hedera.base.implementation.SmartContractClientImpl;
+import com.openelements.hedera.base.protocol.ProtocolLayerClient;
+import com.openelements.hedera.microprofile.implementation.ContractVerificationClientImpl;
+import com.openelements.hedera.microprofile.implementation.HieroConfigImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import java.util.Arrays;
-import java.util.Objects;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.jspecify.annotations.NonNull;
 
 public class ClientProvider {
 
     @Inject
-    @ConfigProperty(name = "hedera.accountId")
-    private String accountIdAsString;
+    @ConfigProperties
+    private HieroOperatorConfiguration configuration;
 
     @Inject
-    @ConfigProperty(name = "hedera.privateKey")
-    private String privateKeyAsString;
+    @ConfigProperties
+    private HieroNetworkConfiguration networkConfiguration;
 
-    @Inject
-    @ConfigProperty(name = "hedera.network")
-    private String network;
-
-    private AccountId getAccountId() {
-        try {
-            return AccountId.fromString(accountIdAsString);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.newAccountId' property", e);
-        }
-    }
-
-    private PrivateKey getPrivateKey() {
-        try {
-            return PrivateKey.fromString(privateKeyAsString);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Can not parse 'hedera.privateKey' property", e);
-        }
-    }
-
-    private HederaNetwork getHederaNetwork() {
-        if (Arrays.stream(HederaNetwork.values()).anyMatch(v -> Objects.equals(v.getName(), network))) {
-            try {
-                return HederaNetwork.valueOf(network.toUpperCase());
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Can not parse 'hedera.network' property", e);
-            }
-        } else {
-            throw new IllegalArgumentException("'hedera.network' property must be set to a valid value");
-        }
-    }
-
-    private Client createClient() {
-        final AccountId accountId = getAccountId();
-        final PrivateKey privateKey = getPrivateKey();
-        final HederaNetwork hederaNetwork = getHederaNetwork();
-        return Client.forName(hederaNetwork.getName())
-                .setOperator(accountId, privateKey);
+    @Produces
+    @ApplicationScoped
+    HieroConfig createHieroConfig() {
+        return new HieroConfigImpl(configuration, networkConfiguration);
     }
 
     @Produces
     @ApplicationScoped
-    ProtocolLayerClient createProtocolLayerClient() {
-        final Account operator = Account.of(getAccountId(), getPrivateKey());
-        return new ProtocolLayerClientImpl(createClient(), operator);
+    ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroConfig hieroConfig) {
+        return new ProtocolLayerClientImpl(hieroConfig.createClient(), hieroConfig.getOperatorAccount());
     }
 
     @Produces
@@ -101,8 +61,7 @@ public class ClientProvider {
 
     @Produces
     @ApplicationScoped
-    ContractVerificationClient createContractVerificationClient(@NonNull final ProtocolLayerClient protocolLayerClient,
-            @NonNull final FileClient fileClient) {
-        return new ContractVerificationClientImpl(getHederaNetwork());
+    ContractVerificationClient createContractVerificationClient(@NonNull final HieroConfig hieroConfig) {
+        return new ContractVerificationClientImpl(hieroConfig.getNetwork());
     }
 }
