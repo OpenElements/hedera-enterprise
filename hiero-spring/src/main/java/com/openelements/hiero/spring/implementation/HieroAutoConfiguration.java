@@ -14,7 +14,7 @@ import com.openelements.hiero.base.config.HieroConfig;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
 import com.openelements.hiero.base.implementation.AccountRepositoryImpl;
 import com.openelements.hiero.base.implementation.FileClientImpl;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import com.openelements.hiero.base.implementation.NetworkRepositoryImpl;
 import com.openelements.hiero.base.implementation.NftClientImpl;
 import com.openelements.hiero.base.implementation.NftRepositoryImpl;
@@ -33,18 +33,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
 
 @AutoConfiguration
-@EnableConfigurationProperties({HederaProperties.class, HederaNetworkProperties.class})
-public class HederaAutoConfiguration {
+@EnableConfigurationProperties({HieroProperties.class, HieroNetworkProperties.class})
+public class HieroAutoConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(HederaAutoConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
 
     @Bean
-    HieroConfig hieroConfig(final HederaProperties properties) {
+    HieroConfig hieroConfig(final HieroProperties properties) {
         return new HieroConfigImpl(properties);
     }
 
     @Bean
-    HederaNetwork hederaNetwork(final HieroConfig hieroConfig) {
+    HieroNetwork hieroNetwork(final HieroConfig hieroConfig) {
         return hieroConfig.getNetwork();
     }
 
@@ -58,7 +58,7 @@ public class HederaAutoConfiguration {
         try {
             return hieroConfig.createClient();
         } catch (Exception e) {
-            throw new IllegalStateException("Can not create Hedera specific configuration", e);
+            throw new IllegalStateException("Can not create client", e);
         }
     }
 
@@ -88,7 +88,7 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+    @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
     MirrorNodeClient mirrorNodeClient(final HieroConfig hieroConfig) {
         final String mirrorNodeEndpoint;
@@ -124,21 +124,21 @@ public class HederaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+    @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
     NftRepository nftRepository(final MirrorNodeClient mirrorNodeClient) {
         return new NftRepositoryImpl(mirrorNodeClient);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+    @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
     AccountRepository accountRepository(final MirrorNodeClient mirrorNodeClient) {
         return new AccountRepositoryImpl(mirrorNodeClient);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.hedera", name = "mirrorNodeSupported",
+    @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
     NetworkRepository networkRepository(final MirrorNodeClient mirrorNodeClient) {
         return new NetworkRepositoryImpl(mirrorNodeClient);

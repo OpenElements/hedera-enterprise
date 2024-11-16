@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hiero.base.ContractVerificationClient;
 import com.openelements.hiero.base.ContractVerificationState;
 import com.openelements.hiero.base.SmartContractClient;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ContractVerificationClientImplementationTest {
 
     @Autowired
-    private HederaNetwork hederaNetwork;
+    private HieroNetwork hieroNetwork;
 
     @Autowired
     private SmartContractClient smartContractClient;
@@ -31,7 +31,7 @@ class ContractVerificationClientImplementationTest {
     }
 
     private boolean isNotSupportedChain() {
-        return hederaNetwork == HederaNetwork.CUSTOM;
+        return hieroNetwork == HieroNetwork.CUSTOM;
     }
 
     @Test

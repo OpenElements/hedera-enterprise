@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.openelements.hiero.base.Account;
 import com.openelements.hiero.base.AccountClient;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;
 import com.openelements.hiero.base.protocol.AccountBalanceResponse;
 import com.openelements.hiero.base.protocol.AccountCreateRequest;
@@ -24,27 +24,27 @@ public class AccountClientImpl implements AccountClient {
 
     @NonNull
     @Override
-    public Account createAccount(@NonNull Hbar initialBalance) throws HederaException {
+    public Account createAccount(@NonNull Hbar initialBalance) throws HieroException {
         final AccountCreateRequest request = AccountCreateRequest.of(initialBalance);
         final AccountCreateResult result = client.executeAccountCreateTransaction(request);
         return result.newAccount();
     }
 
     @Override
-    public void deleteAccount(@NonNull Account account) throws HederaException {
+    public void deleteAccount(@NonNull Account account) throws HieroException {
         final AccountDeleteRequest request = AccountDeleteRequest.of(account);
         client.executeAccountDeleteTransaction(request);
     }
 
     @Override
-    public void deleteAccount(@NonNull Account account, @NonNull Account toAccount) throws HederaException {
+    public void deleteAccount(@NonNull Account account, @NonNull Account toAccount) throws HieroException {
         final AccountDeleteRequest request = AccountDeleteRequest.of(account, toAccount);
         client.executeAccountDeleteTransaction(request);
     }
 
     @NonNull
     @Override
-    public Hbar getAccountBalance(@NonNull AccountId account) throws HederaException {
+    public Hbar getAccountBalance(@NonNull AccountId account) throws HieroException {
         final AccountBalanceRequest request = AccountBalanceRequest.of(account);
         final AccountBalanceResponse response = client.executeAccountBalanceQuery(request);
         return response.hbars();

@@ -7,7 +7,7 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hiero.base.ContractCallResult;
 import com.openelements.hiero.base.FileClient;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.SmartContractClient;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -87,7 +87,7 @@ public class ContractServiceTest {
         final byte[] content = "invalid".getBytes(StandardCharsets.UTF_8);
 
         //then
-        Assertions.assertThrows(HederaException.class, () -> smartContractClient.createContract(content));
+        Assertions.assertThrows(HieroException.class, () -> smartContractClient.createContract(content));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class ContractServiceTest {
         final Path path = Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
 
         //when
-        Assertions.assertThrows(HederaException.class, () -> smartContractClient.createContract(path, string("Hello")));
+        Assertions.assertThrows(HieroException.class, () -> smartContractClient.createContract(path, string("Hello")));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class ContractServiceTest {
         final ContractId contract = smartContractClient.createContract(path);
 
         //when
-        Assertions.assertThrows(HederaException.class,
+        Assertions.assertThrows(HieroException.class,
                 () -> smartContractClient.callContractFunction(contract, "invalid"));
     }
 
@@ -157,7 +157,7 @@ public class ContractServiceTest {
         final ContractId contract = smartContractClient.createContract(path);
 
         //then
-        Assertions.assertThrows(HederaException.class,
+        Assertions.assertThrows(HieroException.class,
                 () -> smartContractClient.callContractFunction(contract, "get", int256(123)));
     }
 

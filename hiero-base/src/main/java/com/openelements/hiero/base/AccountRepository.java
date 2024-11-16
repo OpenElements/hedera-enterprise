@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Interface for interacting with a Hedera network. This interface provides methods for searching for Accounts.
+ * Interface for interacting with a Hiero network. This interface provides methods for searching for Accounts.
  */
 public interface AccountRepository {
     /**
@@ -15,18 +15,18 @@ public interface AccountRepository {
      *
      * @param accountId id of the account
      * @return {@link Optional} containing the found AccountInfo or null
-     * @throws HederaException if the search fails
+     * @throws HieroException if the search fails
      */
-    Optional<AccountInfo> findById(@NonNull AccountId accountId) throws HederaException;
+    Optional<AccountInfo> findById(@NonNull AccountId accountId) throws HieroException;
 
     /**
      * Return the AccountInfo of a given accountId.
      *
      * @param accountId id of the account
      * @return {@link Optional} containing the found AccountInfo or null
-     * @throws HederaException if the search fails
+     * @throws HieroException if the search fails
      */
-    default Optional<AccountInfo> findById(@NonNull String accountId) throws HederaException {
+    default Optional<AccountInfo> findById(@NonNull String accountId) throws HieroException {
         Objects.requireNonNull(accountId, "accountId must not be null");
         return findById(AccountId.fromString(accountId));
     }

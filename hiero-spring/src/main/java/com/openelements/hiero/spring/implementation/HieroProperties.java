@@ -4,22 +4,22 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 @ConfigurationProperties(
-        prefix = "spring.hedera"
+        prefix = "spring.hiero"
 )
-public class HederaProperties {
+public class HieroProperties {
 
     /**
-     * Hedera account ID to use for transactions.
+     * Account ID to use for transactions (operator account).
      */
     private String accountId;
 
     /**
-     * Hedera private key to use for transactions.
+     * Private key to use for transactions (operator account).
      */
     private String privateKey;
 
     @NestedConfigurationProperty
-    private HederaNetworkProperties network = new HederaNetworkProperties();
+    private HieroNetworkProperties network = new HieroNetworkProperties();
 
     public String getAccountId() {
         return this.accountId;
@@ -37,11 +37,11 @@ public class HederaProperties {
         this.privateKey = privateKey;
     }
 
-    public HederaNetworkProperties getNetwork() {
+    public HieroNetworkProperties getNetwork() {
         return network;
     }
 
-    public void setNetwork(HederaNetworkProperties network) {
+    public void setNetwork(HieroNetworkProperties network) {
         this.network = network;
     }
 }

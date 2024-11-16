@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.openelements.hiero.base.Account;
 import com.openelements.hiero.base.config.ConsensusNode;
 import com.openelements.hiero.base.config.HieroConfig;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,9 +23,9 @@ public class HieroConfigImpl implements HieroConfig {
 
     private final Set<ConsensusNode> consensusNodes;
 
-    private final HederaNetwork hederaNetwork;
+    private final HieroNetwork hieroNetwork;
 
-    public HieroConfigImpl(@NonNull final HederaProperties properties) {
+    public HieroConfigImpl(@NonNull final HieroProperties properties) {
         Objects.requireNonNull(properties, "properties must not be null");
 
         Objects.requireNonNull(properties.getPrivateKey(), "privateKey must not be null");
@@ -36,15 +36,15 @@ public class HieroConfigImpl implements HieroConfig {
 
         operatorAccount = Account.of(operatorAccountId, operatorPrivateKey);
         networkName = properties.getNetwork().getName();
-        hederaNetwork = HederaNetwork.findByName(networkName)
-                .orElse(HederaNetwork.CUSTOM);
+        hieroNetwork = HieroNetwork.findByName(networkName)
+                .orElse(HieroNetwork.CUSTOM);
         final String mirrorNodeAddress = properties.getNetwork().getMirrorNode();
         if (mirrorNodeAddress != null && !mirrorNodeAddress.isBlank()) {
             mirrorNodeAddresses = List.of(mirrorNodeAddress);
         } else {
             mirrorNodeAddresses = List.of();
         }
-        final List<HederaNode> nodes = properties.getNetwork().getNodes();
+        final List<HieroNode> nodes = properties.getNetwork().getNodes();
         if (nodes == null || nodes.isEmpty()) {
             consensusNodes = Set.of();
         } else {
@@ -92,8 +92,8 @@ public class HieroConfigImpl implements HieroConfig {
     }
 
     @Override
-    public HederaNetwork getNetwork() {
-        return hederaNetwork;
+    public HieroNetwork getNetwork() {
+        return hieroNetwork;
     }
 
 }

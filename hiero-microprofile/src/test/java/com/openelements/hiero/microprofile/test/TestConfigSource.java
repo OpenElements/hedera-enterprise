@@ -20,25 +20,25 @@ public class TestConfigSource implements ConfigSource {
         properties.put("mp.initializer.allow", "true");
         properties.put("mp.initializer.no-warn", "true");
 
-        final String hederaAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
-        if (hederaAccountIdByEnv != null) {
-            properties.put("hiero.accountId", hederaAccountIdByEnv);
+        final String hieroAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
+        if (hieroAccountIdByEnv != null) {
+            properties.put("hiero.accountId", hieroAccountIdByEnv);
         } else {
-            properties.put("hiero.accountId", Dotenv.load().get("hedera.accountId"));
+            properties.put("hiero.accountId", Dotenv.load().get("hiero.accountId"));
         }
 
-        final String hederaPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
-        if (hederaPrivateKeyByEnv != null) {
-            properties.put("hiero.privateKey", hederaPrivateKeyByEnv);
+        final String hieroPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
+        if (hieroPrivateKeyByEnv != null) {
+            properties.put("hiero.privateKey", hieroPrivateKeyByEnv);
         } else {
-            properties.put("hiero.privateKey", Dotenv.load().get("hedera.privateKey"));
+            properties.put("hiero.privateKey", Dotenv.load().get("hiero.privateKey"));
         }
 
-        final String hederaNetwork = System.getenv("HEDERA_NETWORK");
-        if (hederaNetwork != null) {
-            properties.put("hiero.network.name", hederaNetwork);
+        final String hieroNetwork = System.getenv("HEDERA_NETWORK");
+        if (hieroNetwork != null) {
+            properties.put("hiero.network.name", hieroNetwork);
         } else {
-            properties.put("hiero.network.name", Dotenv.load().get("hedera.network.name"));
+            properties.put("hiero.network.name", Dotenv.load().get("hiero.network.name"));
         }
 
         //TODO: Hardcoded for Solo tests,should be fixed later

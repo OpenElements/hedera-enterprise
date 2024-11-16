@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HederaEndpoint {
+public class HieroEndpoint {
 
     private final AccountClient client;
 
-    public HederaEndpoint(final AccountClient client) {
+    public HieroEndpoint(final AccountClient client) {
         this.client = Objects.requireNonNull(client, "client must not be null");
     }
 

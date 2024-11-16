@@ -40,7 +40,7 @@ public class ProtocolLayerClientTests {
     private Account adminAccount;
 
     @Autowired
-    private HederaTestUtils hederaTestUtils;
+    private HieroTestUtils hieroTestUtils;
 
     @Test
     void testGetBalance() throws Exception {
@@ -184,7 +184,7 @@ public class ProtocolLayerClientTests {
         final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(
                 accountCreateRequest);
 
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
         final AccountDeleteRequest request = AccountDeleteRequest.of(accountCreateResult.newAccount());
 
         //then
@@ -209,7 +209,7 @@ public class ProtocolLayerClientTests {
         protocolLayerClient.executeAccountDeleteTransaction(request);
 
         //then
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
         final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(toTransferAccount.accountId());
         final AccountBalanceResponse accountBalanceResult = protocolLayerClient.executeAccountBalanceQuery(
                 accountBalanceRequest);
