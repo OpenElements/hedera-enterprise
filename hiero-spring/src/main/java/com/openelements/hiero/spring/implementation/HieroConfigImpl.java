@@ -1,11 +1,11 @@
-package com.openelements.hedera.spring.implementation;
+package com.openelements.hiero.spring.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.openelements.hedera.base.Account;
-import com.openelements.hedera.base.config.ConsensusNode;
-import com.openelements.hedera.base.config.HieroConfig;
-import com.openelements.hedera.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.config.ConsensusNode;
+import com.openelements.hiero.base.config.HieroConfig;
+import com.openelements.hiero.base.implementation.HederaNetwork;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

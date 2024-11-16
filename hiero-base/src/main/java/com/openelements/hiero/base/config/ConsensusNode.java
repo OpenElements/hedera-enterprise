@@ -1,4 +1,4 @@
-package com.openelements.hedera.base.config;
+package com.openelements.hiero.base.config;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import java.util.Objects;

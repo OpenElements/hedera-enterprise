@@ -1,8 +1,8 @@
-package com.openelements.hedera.microprofile.test;
+package com.openelements.hiero.microprofile.test;
 
 import com.hedera.hashgraph.sdk.FileId;
-import com.openelements.hedera.base.FileClient;
-import com.openelements.hedera.microprofile.ClientProvider;
+import com.openelements.hiero.base.FileClient;
+import com.openelements.hiero.microprofile.ClientProvider;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.Configuration;
 import io.helidon.microprofile.tests.junit5.HelidonTest;

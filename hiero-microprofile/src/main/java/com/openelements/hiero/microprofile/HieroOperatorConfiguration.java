@@ -1,4 +1,4 @@
-package com.openelements.hedera.microprofile;
+package com.openelements.hiero.microprofile;
 
 import jakarta.enterprise.context.Dependent;
 import org.eclipse.microprofile.config.inject.ConfigProperties;

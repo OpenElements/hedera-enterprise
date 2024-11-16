@@ -1,6 +1,6 @@
-package com.openelements.hedera.microprofile;
+package com.openelements.hiero.microprofile;
 
-import com.openelements.hedera.base.config.ConsensusNode;
+import com.openelements.hiero.base.config.ConsensusNode;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import java.util.Optional;

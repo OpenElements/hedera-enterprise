@@ -1,9 +1,9 @@
-package com.openelements.hedera.base.config;
+package com.openelements.hiero.base.config;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
-import com.openelements.hedera.base.Account;
-import com.openelements.hedera.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.implementation.HederaNetwork;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
