@@ -14,6 +14,7 @@ import com.openelements.hedera.base.config.HieroConfig;
 import com.openelements.hedera.base.implementation.AccountClientImpl;
 import com.openelements.hedera.base.implementation.AccountRepositoryImpl;
 import com.openelements.hedera.base.implementation.FileClientImpl;
+import com.openelements.hedera.base.implementation.HederaNetwork;
 import com.openelements.hedera.base.implementation.NetworkRepositoryImpl;
 import com.openelements.hedera.base.implementation.NftClientImpl;
 import com.openelements.hedera.base.implementation.NftRepositoryImpl;
@@ -40,6 +41,11 @@ public class HederaAutoConfiguration {
     @Bean
     HieroConfig hieroConfig(final HederaProperties properties) {
         return new HieroConfigImpl(properties);
+    }
+
+    @Bean
+    HederaNetwork hederaNetwork(final HieroConfig hieroConfig) {
+        return hieroConfig.getNetwork();
     }
 
     @Bean
