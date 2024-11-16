@@ -5,8 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.microprofile.config.spi.ConfigSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestConfigSource implements ConfigSource {
+
+    private final static Logger log = LoggerFactory.getLogger(TestConfigSource.class);
 
     private final Map<String, String> properties;
 
@@ -39,9 +43,8 @@ public class TestConfigSource implements ConfigSource {
             }
         } else {
             properties.put("hiero.network.name", Dotenv.load().get("hedera.network.name"));
-            properties.put("hiero.network.nodes", "127.0.0.1:50211:0.0.3");
-            properties.put("hiero.network.mirrornode", "http://localhost:8080");
         }
+        properties.forEach((k, v) -> log.info("CONFIG: '" + k + "'->'" + v + "'"));
     }
 
     @Override
