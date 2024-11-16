@@ -18,10 +18,10 @@ import com.openelements.hedera.microprofile.implementation.ContractVerificationC
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.jspecify.annotations.NonNull;
 
@@ -82,9 +82,8 @@ public class ClientProvider {
         final PrivateKey privateKey = getPrivateKey();
         final HederaNetwork hederaNetwork = getHederaNetwork();
         if (Objects.equals(HederaNetwork.CUSTOM, hederaNetwork)) {
-            final Map<String, AccountId> nodes = new HashMap<>();
-            networkConfiguration.getNodes()
-                    .forEach(node -> nodes.put(node.ip() + ":" + node.port(), AccountId.fromString(node.account())));
+            final Map<String, AccountId> nodes = networkConfiguration.getNodes()
+                    .stream().collect(Collectors.toMap(n -> n.getAddress(), n -> n.getAccountId()));
             Client client = Client.forNetwork(nodes);
             networkConfiguration.getMirrornode()
                     .map(mirrorNode -> List.of(mirrorNode))
