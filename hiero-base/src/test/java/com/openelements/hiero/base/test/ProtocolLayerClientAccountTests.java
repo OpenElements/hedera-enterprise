@@ -1,0 +1,89 @@
+package com.openelements.hiero.base.test;
+
+
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
+import com.openelements.hiero.base.protocol.AccountBalanceRequest;
+import com.openelements.hiero.base.protocol.AccountBalanceResponse;
+import com.openelements.hiero.base.protocol.AccountCreateRequest;
+import com.openelements.hiero.base.protocol.AccountCreateResult;
+import com.openelements.hiero.base.protocol.AccountDeleteRequest;
+import com.openelements.hiero.base.protocol.ProtocolLayerClient;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+public class ProtocolLayerClientAccountTests {
+
+    private static HederaTestContext hederaTestContext;
+
+    private static ProtocolLayerClient protocolLayerClient;
+
+    @BeforeAll
+    static void init() {
+        hederaTestContext = new HederaTestContext();
+        protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(),
+                hederaTestContext.getOperationalAccount());
+    }
+
+    @Test
+    void testAccountBalanceRequest() throws Exception {
+        //given
+        final Hbar amount = Hbar.from(1L);
+        final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of(amount);
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(
+                accountCreateRequest);
+        final AccountId accountId = accountCreateResult.newAccount().accountId();
+
+        //when
+        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
+        final AccountBalanceResponse accountBalanceResponse = protocolLayerClient.executeAccountBalanceQuery(
+                accountBalanceRequest);
+
+        //then
+        Assertions.assertNotNull(accountBalanceResponse);
+        Assertions.assertNotNull(accountBalanceResponse.hbars());
+        Assertions.assertEquals(amount, accountBalanceResponse.hbars());
+    }
+
+    @Test
+    void testAccountBalanceRequestForZeroBalance() throws Exception {
+        //given
+        final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of();
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(
+                accountCreateRequest);
+        final AccountId accountId = accountCreateResult.newAccount().accountId();
+
+        //when
+        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
+        final AccountBalanceResponse accountBalanceResponse = protocolLayerClient.executeAccountBalanceQuery(
+                accountBalanceRequest);
+
+        //then
+        Assertions.assertNotNull(accountBalanceResponse);
+        Assertions.assertNotNull(accountBalanceResponse.hbars());
+        Assertions.assertEquals(0L, accountBalanceResponse.hbars().toTinybars());
+    }
+
+    @Test
+    void testAccountBalanceRequestForNotExistingAccount() throws Exception {
+        //given
+        final AccountCreateRequest accountCreateRequest = AccountCreateRequest.of();
+        final AccountCreateResult accountCreateResult = protocolLayerClient.executeAccountCreateTransaction(
+                accountCreateRequest);
+        final Account account = accountCreateResult.newAccount();
+        AccountDeleteRequest accountDeleteRequest = AccountDeleteRequest.of(account);
+        protocolLayerClient.executeAccountDeleteTransaction(accountDeleteRequest);
+
+        //when
+        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(account.accountId());
+
+        //then
+        Assertions.assertThrows(HederaException.class,
+                () -> protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest));
+    }
+
+}

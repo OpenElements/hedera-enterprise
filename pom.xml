@@ -4,13 +4,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.open-elements.hedera</groupId>
-  <artifactId>hedera-enterprise</artifactId>
+  <groupId>com.open-elements.hiero</groupId>
+  <artifactId>hiero-enterprise</artifactId>
   <version>0.12.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Hedera Enterprise</name>
-  <description>Java Library to work with Hedera in Spring and JakartaEE</description>
+  <name>Hiero Enterprise</name>
+  <description>Java Library to work with Hiero in Spring and JakartaEE</description>
   <url>https://github.com/OpenElements/hedera-enterprise</url>
   <licenses>
     <license>
@@ -59,12 +59,12 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hedera-base</artifactId>
+        <artifactId>hiero-base</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hedera-spring</artifactId>
+        <artifactId>hiero-spring</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -141,10 +141,10 @@
   </dependencyManagement>
 
   <modules>
-    <module>hedera-base</module>
-    <module>hedera-spring</module>
-    <module>hedera-microprofile</module>
-    <module>hedera-spring-sample</module>
+    <module>hiero-base</module>
+    <module>hiero-spring</module>
+    <module>hiero-microprofile</module>
+    <module>hiero-spring-sample</module>
   </modules>
 
   <build>
