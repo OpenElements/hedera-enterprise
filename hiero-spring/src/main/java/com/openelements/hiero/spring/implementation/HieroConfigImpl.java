@@ -44,9 +44,14 @@ public class HieroConfigImpl implements HieroConfig {
         } else {
             mirrorNodeAddresses = List.of();
         }
-        consensusNodes = properties.getNetwork().getNodes().stream()
-                .map(node -> new ConsensusNode(node.getIp(), node.getPort() + "", node.getAccount()))
-                .collect(Collectors.toUnmodifiableSet());
+        final List<HederaNode> nodes = properties.getNetwork().getNodes();
+        if (nodes == null || nodes.isEmpty()) {
+            consensusNodes = Set.of();
+        } else {
+            consensusNodes = properties.getNetwork().getNodes().stream()
+                    .map(node -> new ConsensusNode(node.getIp(), node.getPort() + "", node.getAccount()))
+                    .collect(Collectors.toUnmodifiableSet());
+        }
     }
 
     private static AccountId parseAccountId(final String accountId) {
