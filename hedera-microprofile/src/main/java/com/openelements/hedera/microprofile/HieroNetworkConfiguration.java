@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -19,7 +20,7 @@ public class HieroNetworkConfiguration {
 
     @Inject
     @ConfigProperty(name = "nodes")
-    private Optional<Set<String>> nodes;
+    private Optional<String> nodes;
 
     @ConfigProperty(name = "mirrornode")
     private Optional<String> mirrornode;
@@ -33,10 +34,9 @@ public class HieroNetworkConfiguration {
     }
 
     public Set<Node> getNodes() {
-        if (!nodes.isPresent()) {
-            return Set.of();
-        }
-        return nodes.get().stream()
+        return nodes.map(n -> n.split(","))
+                .map(n -> Stream.of(n))
+                .orElse(Stream.empty())
                 .map(n -> {
                     // 172.234.134.4:8080:0.0.3
                     final String[] split = n.split(":");
