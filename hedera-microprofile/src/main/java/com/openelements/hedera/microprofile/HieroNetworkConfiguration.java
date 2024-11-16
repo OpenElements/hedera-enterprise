@@ -18,10 +18,10 @@ public class HieroNetworkConfiguration {
     private String name;
 
     @Inject
-    @ConfigProperty(defaultValue = " ") //TODO: We need a better default value
+    @ConfigProperty(name = "nodes", defaultValue = " ") //TODO: We need a better default value
     private String[] nodes;
 
-    @ConfigProperty(defaultValue = " ") //TODO: We need a better default value
+    @ConfigProperty(name = "mirrornode", defaultValue = " ") //TODO: We need a better default value
     private String mirrornode;
 
     public String getName() {

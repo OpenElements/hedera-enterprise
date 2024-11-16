@@ -38,7 +38,7 @@ public class TestConfigSource implements ConfigSource {
                 properties.put("hiero.network.mirrornode", "http://localhost:8080");
             }
         } else {
-            properties.put("hiero.network.name", "testnet");
+            properties.put("hiero.network.name", Dotenv.load().get("hedera.network.name"));
         }
     }
 
