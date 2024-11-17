@@ -7,26 +7,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hiero.base.HederaException;
 import com.openelements.hiero.base.Nft;
-import com.openelements.hiero.base.mirrornode.AccountInfo;
-import com.openelements.hiero.base.mirrornode.ExchangeRate;
-import com.openelements.hiero.base.mirrornode.ExchangeRates;
-import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
-import com.openelements.hiero.base.mirrornode.NetworkFee;
-import com.openelements.hiero.base.mirrornode.NetworkStake;
-import com.openelements.hiero.base.mirrornode.NetworkSupplies;
-import com.openelements.hiero.base.mirrornode.Page;
-import com.openelements.hiero.base.mirrornode.TransactionInfo;
-import java.io.IOException;
-import java.net.URI;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
-import java.util.stream.StreamSupport;
+import com.openelements.hiero.base.mirrornode.*;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -34,6 +15,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
+
+import java.io.IOException;
+import java.net.URI;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.StreamSupport;
 
 public class MirrorNodeClientImpl implements MirrorNodeClient {
 
@@ -77,8 +65,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, @NonNull final long serialNumber)
-            throws HederaException {
+    public Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, @NonNull final long serialNumber) throws HederaException {
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         if (serialNumber <= 0) {
             throw new IllegalArgumentException("serialNumber must be positive");
@@ -88,11 +75,9 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId,
-            @NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
+    public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId, @NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
-        return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
-                .filter(nft -> Objects.equals(nft.owner(), accountId));
+        return queryNftsByTokenIdAndSerial(tokenId, serialNumber).filter(nft -> Objects.equals(nft.owner(), accountId));
     }
 
     @Override
@@ -107,10 +92,18 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HederaException {
         Objects.requireNonNull(transactionId, "transactionId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/transactions/" + transactionId);
+        TransactionInfo transactionInfo;
+
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
-        return Optional.of(new TransactionInfo(transactionId));
+        try {
+            transactionInfo = objectMapper.treeToValue(jsonNode, TransactionInfo.class);
+            return Optional.ofNullable(transactionInfo);
+        } catch (JsonProcessingException jsonProcessingException) {
+            System.err.println("Error parsing transaction data: " + jsonProcessingException.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -159,16 +152,11 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HederaException {
-        final ResponseEntity<String> responseEntity = restClient.get()
-                .uri(uriBuilder -> uriFunction.apply(uriBuilder))
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    if (!HttpStatus.NOT_FOUND.equals(response.getStatusCode())) {
-                        throw new RuntimeException("Client error: " + response.getStatusText());
-                    }
-                })
-                .toEntity(String.class);
+        final ResponseEntity<String> responseEntity = restClient.get().uri(uriBuilder -> uriFunction.apply(uriBuilder)).accept(MediaType.APPLICATION_JSON).retrieve().onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+            if (!HttpStatus.NOT_FOUND.equals(response.getStatusCode())) {
+                throw new RuntimeException("Client error: " + response.getStatusText());
+            }
+        }).toEntity(String.class);
         final String body = responseEntity.getBody();
         try {
             if (HttpStatus.NOT_FOUND.equals(responseEntity.getStatusCode())) {
@@ -184,9 +172,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         if (rootNode == null || !rootNode.fieldNames().hasNext()) {
             return List.of();
         }
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(rootNode.get("nfts").iterator(), Spliterator.ORDERED),
-                false).map(nftNode -> {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(rootNode.get("nfts").iterator(), Spliterator.ORDERED), false).map(nftNode -> {
             try {
                 return jsonNodeToNft(nftNode);
             } catch (final Exception e) {
@@ -257,20 +243,13 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         try {
             final int currentCentEquivalent = jsonNode.get("current_rate").get("cent_equivalent").asInt();
             final int currentHbarEquivalent = jsonNode.get("current_rate").get("hbar_equivalent").asInt();
-            final Instant currentExpirationTime = Instant.ofEpochSecond(
-                    jsonNode.get("current_rate").get("expiration_time").asLong()
-            );
+            final Instant currentExpirationTime = Instant.ofEpochSecond(jsonNode.get("current_rate").get("expiration_time").asLong());
 
             final int nextCentEquivalent = jsonNode.get("next_rate").get("cent_equivalent").asInt();
             final int nextHbarEquivalent = jsonNode.get("next_rate").get("hbar_equivalent").asInt();
-            final Instant nextExpirationTime = Instant.ofEpochSecond(
-                    jsonNode.get("next_rate").get("expiration_time").asLong()
-            );
+            final Instant nextExpirationTime = Instant.ofEpochSecond(jsonNode.get("next_rate").get("expiration_time").asLong());
 
-            return new ExchangeRates(
-                    new ExchangeRate(currentCentEquivalent, currentHbarEquivalent, currentExpirationTime),
-                    new ExchangeRate(nextCentEquivalent, nextHbarEquivalent, nextExpirationTime)
-            );
+            return new ExchangeRates(new ExchangeRate(currentCentEquivalent, currentHbarEquivalent, currentExpirationTime), new ExchangeRate(nextCentEquivalent, nextHbarEquivalent, nextExpirationTime));
         } catch (final Exception e) {
             throw new IllegalArgumentException("Error parsing ExchangeRates from JSON '" + jsonNode + "'", e);
         }
@@ -287,10 +266,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }
 
         try {
-            return StreamSupport
-                    .stream(Spliterators.spliteratorUnknownSize(feesNode.iterator(), Spliterator.ORDERED), false)
-                    .map(this::jsonNodeToNetworkFee)
-                    .toList();
+            return StreamSupport.stream(Spliterators.spliteratorUnknownSize(feesNode.iterator(), Spliterator.ORDERED), false).map(this::jsonNodeToNetworkFee).toList();
         } catch (final Exception e) {
             throw new HederaException("Error parsing NetworkFees from JSON '" + jsonNode + "'", e);
         }
@@ -334,28 +310,13 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
             final long stakingStartThreshold = jsonNode.get("staking_start_threshold").asLong();
             final long unreservedStakingRewardBalance = jsonNode.get("unreserved_staking_reward_balance").asLong();
 
-            return new NetworkStake(
-                    maxStakeReward,
-                    maxStakeRewardPerHbar,
-                    maxTotalReward,
-                    nodeRewardFeeFraction,
-                    reservedStakingRewards,
-                    rewardBalanceThreshold,
-                    stakeTotal,
-                    stakingPeriodDuration,
-                    stakingPeriodsStored,
-                    stakingRewardFeeFraction,
-                    stakingRewardRate,
-                    stakingStartThreshold,
-                    unreservedStakingRewardBalance
-            );
+            return new NetworkStake(maxStakeReward, maxStakeRewardPerHbar, maxTotalReward, nodeRewardFeeFraction, reservedStakingRewards, rewardBalanceThreshold, stakeTotal, stakingPeriodDuration, stakingPeriodsStored, stakingRewardFeeFraction, stakingRewardRate, stakingStartThreshold, unreservedStakingRewardBalance);
         } catch (final Exception e) {
             throw new IllegalArgumentException("Error parsing NetworkStake from JSON '" + jsonNode + "'", e);
         }
     }
 
-    private @NonNull Optional<NetworkSupplies> jsonNodeToOptionalNetworkSupplies(JsonNode jsonNode)
-            throws HederaException {
+    private @NonNull Optional<NetworkSupplies> jsonNodeToOptionalNetworkSupplies(JsonNode jsonNode) throws HederaException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
@@ -385,15 +346,13 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         if (!nftsNode.isArray()) {
             throw new IllegalArgumentException("NFTs node is not an array: " + nftsNode);
         }
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(nftsNode.iterator(), Spliterator.ORDERED),
-                        false)
-                .map(nftNode -> {
-                    try {
-                        return jsonNodeToNft(nftNode);
-                    } catch (final Exception e) {
-                        throw new RuntimeException("Error parsing NFT from JSON '" + nftNode + "'", e);
-                    }
-                }).toList();
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(nftsNode.iterator(), Spliterator.ORDERED), false).map(nftNode -> {
+            try {
+                return jsonNodeToNft(nftNode);
+            } catch (final Exception e) {
+                throw new RuntimeException("Error parsing NFT from JSON '" + nftNode + "'", e);
+            }
+        }).toList();
     }
 
     private List<TransactionInfo> extractTransactionInfoFromJsonNode(JsonNode jsonNode) {
