@@ -13,25 +13,25 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HederaTestContext {
+public class HieroTestContext {
 
-    private static final Logger log = LoggerFactory.getLogger(HederaTestContext.class);
+    private static final Logger log = LoggerFactory.getLogger(HieroTestContext.class);
 
     private final Account operationalAccount;
 
     private final Client client;
 
-    public HederaTestContext() {
-        final String hederaAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
-        final String hederaPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
-        final String hederaNetwork = System.getenv("HEDERA_NETWORK");
+    public HieroTestContext() {
+        final String hieroAccountIdByEnv = System.getenv("HEDERA_ACCOUNT_ID");
+        final String hieroPrivateKeyByEnv = System.getenv("HEDERA_PRIVATE_KEY");
+        final String hieroNetwork = System.getenv("HEDERA_NETWORK");
 
-        if (hederaAccountIdByEnv != null && hederaPrivateKeyByEnv != null) {
-            final AccountId accountId = AccountId.fromString(hederaAccountIdByEnv);
-            final PrivateKey privateKey = PrivateKey.fromString(hederaPrivateKeyByEnv);
+        if (hieroAccountIdByEnv != null && hieroPrivateKeyByEnv != null) {
+            final AccountId accountId = AccountId.fromString(hieroAccountIdByEnv);
+            final PrivateKey privateKey = PrivateKey.fromString(hieroPrivateKeyByEnv);
             final PublicKey publicKey = privateKey.getPublicKey();
             operationalAccount = new Account(accountId, publicKey, privateKey);
-            if (Objects.equals(hederaNetwork, "testnet")) {
+            if (Objects.equals(hieroNetwork, "testnet")) {
                 client = Client.forTestnet();
                 client.setOperator(accountId, privateKey);
             } else {
@@ -48,8 +48,8 @@ public class HederaTestContext {
             }
         } else {
             final Dotenv dotenv = Dotenv.load();
-            final String accountIdAsString = dotenv.get("hedera.accountId");
-            final String privateKeyAsString = dotenv.get("hedera.privateKey");
+            final String accountIdAsString = dotenv.get("hiero.accountId");
+            final String privateKeyAsString = dotenv.get("hiero.privateKey");
             final AccountId accountId = AccountId.fromString(accountIdAsString);
             final PrivateKey privateKey = PrivateKey.fromString(privateKeyAsString);
             final PublicKey publicKey = privateKey.getPublicKey();

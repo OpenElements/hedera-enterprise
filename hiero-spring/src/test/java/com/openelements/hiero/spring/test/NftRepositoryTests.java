@@ -29,7 +29,7 @@ public class NftRepositoryTests {
     private NftRepository nftRepository;
 
     @Autowired
-    private HederaTestUtils hederaTestUtils;
+    private HieroTestUtils hieroTestUtils;
 
     @Autowired
     private AccountClient accountClient;
@@ -70,7 +70,7 @@ public class NftRepositoryTests {
         final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Page<Nft> slice = nftRepository.findByType(tokenId);
@@ -99,7 +99,7 @@ public class NftRepositoryTests {
             final int end = Math.min(i + batchSize, metadata.size());
             nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
         }
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Page<Nft> slice = nftRepository.findByType(tokenId);
@@ -126,7 +126,7 @@ public class NftRepositoryTests {
             final int end = Math.min(i + batchSize, metadata.size());
             nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
         }
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Page<Nft> slice = nftRepository.findByType(tokenId);
@@ -143,7 +143,7 @@ public class NftRepositoryTests {
         final String name = "Tokemon cards";
         final String symbol = "TOK";
         final TokenId tokenId = nftClient.createNftType(name, symbol);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Page<Nft> slice = nftRepository.findByType(tokenId);
@@ -171,7 +171,7 @@ public class NftRepositoryTests {
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
         nftClient.transferNft(tokenId, serial.get(0), adminAccountId, adminAccountPrivateKey, newOwner);
         nftClient.transferNft(tokenId, serial.get(1), adminAccountId, adminAccountPrivateKey, newOwner);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Page<Nft> slice = nftRepository.findByOwner(newOwner);
@@ -206,7 +206,7 @@ public class NftRepositoryTests {
             final List<Long> serial = nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
             nftClient.transferNfts(tokenId, serial, operatorAccount, newOwnerId);
         }
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         // when
         final Page<Nft> slice = nftRepository.findByOwner(newOwnerId);
@@ -228,7 +228,7 @@ public class NftRepositoryTests {
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         // when
         final Page<Nft> slice = nftRepository.findByOwner(newOwner);
@@ -257,7 +257,7 @@ public class NftRepositoryTests {
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
         nftClient.transferNft(tokenId, serial.get(0), adminAccountId, adminAccountPrivateKey, newOwner);
         nftClient.transferNft(tokenId, serial.get(1), adminAccountId, adminAccountPrivateKey, newOwner);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwner, tokenId);
@@ -291,7 +291,7 @@ public class NftRepositoryTests {
             final List<Long> serial = nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
             nftClient.transferNfts(tokenId, serial, operatorAccount, newOwnerId);
         }
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         // when
         final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwnerId, tokenId);
@@ -312,7 +312,7 @@ public class NftRepositoryTests {
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Page<Nft> slice = nftRepository.findByOwnerAndType(newOwner, tokenId);
@@ -331,7 +331,7 @@ public class NftRepositoryTests {
         final byte[] metadata = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final long serial = nftClient.mintNft(tokenId, metadata);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Optional<Nft> result = nftRepository.findByTypeAndSerial(tokenId, serial);
@@ -351,7 +351,7 @@ public class NftRepositoryTests {
         final String symbol = "TOK";
         final String metadata = "https://example.com/metadata1";
         final TokenId tokenId = nftClient.createNftType(name, symbol);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Optional<Nft> result = nftRepository.findByTypeAndSerial(tokenId, 10);
@@ -376,7 +376,7 @@ public class NftRepositoryTests {
         final PrivateKey newOwnerPrivateKey = account.privateKey();
         nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
         nftClient.transferNft(tokenId, serial, adminAccountId, adminAccountPrivateKey, newOwner);
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Optional<Nft> result = nftRepository.findByOwnerAndTypeAndSerial(newOwner, tokenId, serial);
@@ -397,7 +397,7 @@ public class NftRepositoryTests {
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
-        hederaTestUtils.waitForMirrorNodeRecords();
+        hieroTestUtils.waitForMirrorNodeRecords();
 
         //when
         final Optional<Nft> result = nftRepository.findByOwnerAndTypeAndSerial(newOwner, tokenId, 10);

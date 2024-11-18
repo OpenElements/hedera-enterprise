@@ -1,6 +1,6 @@
 package com.openelements.hiero.spring.test;
 
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.NetworkRepository;
 import com.openelements.hiero.base.mirrornode.ExchangeRates;
 import com.openelements.hiero.base.mirrornode.NetworkFee;
@@ -20,7 +20,7 @@ public class NetworkRepositoryTest {
     private NetworkRepository networkRepository;
 
     @Test
-    void findExchangeRates() throws HederaException {
+    void findExchangeRates() throws HieroException {
         Optional<ExchangeRates> result = networkRepository.exchangeRates();
 
         Assertions.assertNotNull(result);
@@ -28,7 +28,7 @@ public class NetworkRepositoryTest {
     }
 
     @Test
-    void findNetworkFees() throws HederaException {
+    void findNetworkFees() throws HieroException {
         List<NetworkFee> result = networkRepository.fees();
 
         Assertions.assertNotNull(result);
@@ -36,7 +36,7 @@ public class NetworkRepositoryTest {
     }
 
     @Test
-    void findNetworkStake() throws HederaException {
+    void findNetworkStake() throws HieroException {
         Optional<NetworkStake> result = networkRepository.stake();
 
         Assertions.assertNotNull(result);
@@ -45,7 +45,7 @@ public class NetworkRepositoryTest {
 
     @Test
     @Disabled
-    void findNetworkSupplies() throws HederaException {
+    void findNetworkSupplies() throws HieroException {
         Optional<NetworkSupplies> result = networkRepository.supplies();
 
         Assertions.assertNotNull(result);

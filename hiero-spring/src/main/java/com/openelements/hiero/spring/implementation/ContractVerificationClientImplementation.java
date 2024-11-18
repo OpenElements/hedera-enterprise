@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.openelements.hiero.base.ContractVerificationClient;
 import com.openelements.hiero.base.ContractVerificationState;
-import com.openelements.hiero.base.HederaException;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -29,25 +29,25 @@ public class ContractVerificationClientImplementation implements ContractVerific
                                  Map<String, String> files) {
     }
 
-    private final HederaNetwork hederaNetwork;
+    private final HieroNetwork hieroNetwork;
 
     private final ObjectMapper objectMapper;
 
     private final RestClient restClient;
 
-    public ContractVerificationClientImplementation(@NonNull final HederaNetwork hederaNetwork) {
-        this.hederaNetwork = Objects.requireNonNull(hederaNetwork, "hederaNetwork must not be null");
+    public ContractVerificationClientImplementation(@NonNull final HieroNetwork hieroNetwork) {
+        this.hieroNetwork = Objects.requireNonNull(hieroNetwork, "hieroNetwork must not be null");
         objectMapper = new ObjectMapper();
         restClient = RestClient.create();
     }
 
     @NonNull
-    private String getChainId() throws HederaException {
-        if (hederaNetwork == HederaNetwork.CUSTOM) {
-            throw new HederaException(
-                    "A custom Hedera network is not supported for smart contract verification. Please use MainNet, TestNet or PreviewNet.");
+    private String getChainId() throws HieroException {
+        if (hieroNetwork == HieroNetwork.CUSTOM) {
+            throw new HieroException(
+                    "A custom Hiero network is not supported for smart contract verification. Please use Hedera MainNet, Hedera TestNet or Hedera PreviewNet.");
         }
-        return hederaNetwork.getChainId() + "";
+        return hieroNetwork.getChainId() + "";
     }
 
     private void handleError(@NonNull final HttpRequest request, @NonNull final ClientHttpResponse response)
@@ -80,7 +80,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     @Override
     public ContractVerificationState verify(@NonNull final ContractId contractId, @NonNull final String contractName,
-            @NonNull final Map<String, String> files) throws HederaException {
+            @NonNull final Map<String, String> files) throws HieroException {
         Objects.requireNonNull(contractId, "contractId must not be null");
         Objects.requireNonNull(contractName, "contractName must not be null");
         Objects.requireNonNull(files, "files must not be null");
@@ -137,12 +137,12 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 throw new RuntimeException("No result in response");
             }
         } catch (Exception e) {
-            throw new HederaException("Error verification step", e);
+            throw new HieroException("Error verification step", e);
         }
     }
 
     @Override
-    public ContractVerificationState checkVerification(@NonNull final ContractId contractId) throws HederaException {
+    public ContractVerificationState checkVerification(@NonNull final ContractId contractId) throws HieroException {
         Objects.requireNonNull(contractId, "contractId must not be null");
 
         final String uri =
@@ -183,13 +183,13 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 throw new RuntimeException("Result is not an array");
             }
         } catch (Exception e) {
-            throw new HederaException("Error verification step", e);
+            throw new HieroException("Error verification step", e);
         }
     }
 
     @Override
     public boolean checkVerification(@NonNull final ContractId contractId, @NonNull final String fileName,
-            @NonNull final String fileContent) throws HederaException {
+            @NonNull final String fileContent) throws HieroException {
         Objects.requireNonNull(contractId, "contractId must not be null");
         Objects.requireNonNull(fileName, "fileName must not be null");
         Objects.requireNonNull(fileContent, "fileContent must not be null");
@@ -230,7 +230,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
                 throw new RuntimeException("Result is not an array");
             }
         } catch (Exception e) {
-            throw new HederaException("Error verification step", e);
+            throw new HieroException("Error verification step", e);
         }
     }
 }

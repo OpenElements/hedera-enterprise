@@ -2,7 +2,7 @@ package com.openelements.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hiero.base.FileClient;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.protocol.FileAppendRequest;
 import com.openelements.hiero.base.protocol.FileContentsRequest;
 import com.openelements.hiero.base.protocol.FileContentsResponse;
@@ -32,21 +32,21 @@ public class FileClientImpl implements FileClient {
     }
 
     @Override
-    public FileId createFile(@NonNull final byte[] contents) throws HederaException {
+    public FileId createFile(@NonNull final byte[] contents) throws HieroException {
         return createFileImpl(contents, null);
     }
 
     @Override
     public FileId createFile(@NonNull final byte[] contents, @NonNull final Instant expirationTime)
-            throws HederaException {
+            throws HieroException {
         return createFileImpl(contents, expirationTime);
     }
 
     private FileId createFileImpl(@NonNull final byte[] contents, @Nullable final Instant expirationTime)
-            throws HederaException {
+            throws HieroException {
         Objects.requireNonNull(contents, "fileId must not be null");
         if (contents.length > FileCreateRequest.FILE_MAX_SIZE) {
-            throw new HederaException("File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
+            throw new HieroException("File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
         }
         if (expirationTime != null && expirationTime.isBefore(Instant.now())) {
             throw new IllegalArgumentException("Expiration time must be in the future");
@@ -85,34 +85,34 @@ public class FileClientImpl implements FileClient {
 
     @NonNull
     @Override
-    public byte[] readFile(@NonNull final FileId fileId) throws HederaException {
+    public byte[] readFile(@NonNull final FileId fileId) throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
         try {
             final FileContentsRequest request = FileContentsRequest.of(fileId);
             final FileContentsResponse response = protocolLayerClient.executeFileContentsQuery(request);
             return response.contents();
         } catch (Exception e) {
-            throw new HederaException("Failed to read file with fileId " + fileId, e);
+            throw new HieroException("Failed to read file with fileId " + fileId, e);
         }
     }
 
     @Override
-    public void deleteFile(@NonNull final FileId fileId) throws HederaException {
+    public void deleteFile(@NonNull final FileId fileId) throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
         try {
             final FileDeleteRequest request = FileDeleteRequest.of(fileId);
             protocolLayerClient.executeFileDeleteTransaction(request);
         } catch (Exception e) {
-            throw new HederaException("Failed to delete file with fileId " + fileId, e);
+            throw new HieroException("Failed to delete file with fileId " + fileId, e);
         }
     }
 
     @Override
-    public void updateFile(@NonNull final FileId fileId, @NonNull final byte[] content) throws HederaException {
+    public void updateFile(@NonNull final FileId fileId, @NonNull final byte[] content) throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
         Objects.requireNonNull(content, "content must not be null");
         if (content.length > FileCreateRequest.FILE_MAX_SIZE) {
-            throw new HederaException("File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
+            throw new HieroException("File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
         }
         if (content.length <= FileCreateRequest.FILE_CREATE_MAX_SIZE) {
             final FileUpdateRequest request = FileUpdateRequest.of(fileId, content);
@@ -140,7 +140,7 @@ public class FileClientImpl implements FileClient {
 
     @Override
     public void updateExpirationTime(@NonNull final FileId fileId, @NonNull final Instant expirationTime)
-            throws HederaException {
+            throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
         Objects.requireNonNull(expirationTime, "expirationTime must not be null");
 
@@ -152,7 +152,7 @@ public class FileClientImpl implements FileClient {
     }
 
     @Override
-    public boolean isDeleted(@NonNull final FileId fileId) throws HederaException {
+    public boolean isDeleted(@NonNull final FileId fileId) throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
         final FileInfoRequest request = FileInfoRequest.of(fileId);
         final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
@@ -160,7 +160,7 @@ public class FileClientImpl implements FileClient {
     }
 
     @Override
-    public int getSize(@NonNull final FileId fileId) throws HederaException {
+    public int getSize(@NonNull final FileId fileId) throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
         final FileInfoRequest request = FileInfoRequest.of(fileId);
         final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
@@ -168,7 +168,7 @@ public class FileClientImpl implements FileClient {
     }
 
     @Override
-    public Instant getExpirationTime(@NonNull final FileId fileId) throws HederaException {
+    public Instant getExpirationTime(@NonNull final FileId fileId) throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
         final FileInfoRequest request = FileInfoRequest.of(fileId);
         final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);

@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.openelements.hiero.base.Account;
 import com.openelements.hiero.base.config.ConsensusNode;
 import com.openelements.hiero.base.config.HieroConfig;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import com.openelements.hiero.microprofile.HieroNetworkConfiguration;
 import com.openelements.hiero.microprofile.HieroOperatorConfiguration;
 import java.util.Collections;
@@ -29,7 +29,7 @@ public class HieroConfigImpl implements HieroConfig {
 
     private final Set<ConsensusNode> consensusNodes;
 
-    private final HederaNetwork hederaNetwork;
+    private final HieroNetwork hieroNetwork;
 
     public HieroConfigImpl(@NonNull final HieroOperatorConfiguration configuration,
             @NonNull final HieroNetworkConfiguration networkConfiguration) {
@@ -42,8 +42,8 @@ public class HieroConfigImpl implements HieroConfig {
         networkName = networkConfiguration.getName().orElse(null);
         mirrorNodeAddresses = networkConfiguration.getMirrornode().map(List::of).orElse(List.of());
         consensusNodes = Collections.unmodifiableSet(networkConfiguration.getNodes());
-        hederaNetwork = HederaNetwork.findByName(networkName)
-                .orElse(HederaNetwork.CUSTOM);
+        hieroNetwork = HieroNetwork.findByName(networkName)
+                .orElse(HieroNetwork.CUSTOM);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class HieroConfigImpl implements HieroConfig {
     }
 
     @Override
-    public @NonNull HederaNetwork getNetwork() {
-        return hederaNetwork;
+    public @NonNull HieroNetwork getNetwork() {
+        return hieroNetwork;
     }
 }

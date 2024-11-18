@@ -1,6 +1,6 @@
 package com.openelements.hiero.spring.implementation;
 
-public class HederaNode {
+public class HieroNode {
 
     private String ip;
 

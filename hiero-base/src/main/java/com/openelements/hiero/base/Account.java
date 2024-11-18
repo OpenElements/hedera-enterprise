@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Represents a Hedera account.
+ * Represents an account of a Hiero network.
  *
  * @param accountId  the ID of the account
  * @param publicKey  the public key of the account

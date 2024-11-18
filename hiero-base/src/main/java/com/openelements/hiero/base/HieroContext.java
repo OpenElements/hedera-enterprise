@@ -6,7 +6,7 @@ import com.openelements.hiero.base.protocol.TransactionType;
 import java.time.Duration;
 import org.jspecify.annotations.NonNull;
 
-public interface HederaContext {
+public interface HieroContext {
 
     @NonNull
     Account getOperatorAccount();

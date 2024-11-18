@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.Nft;
 import com.openelements.hiero.base.mirrornode.AccountInfo;
 import com.openelements.hiero.base.mirrornode.ExchangeRate;
@@ -53,7 +53,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HederaException {
+    public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HieroException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         final String path = "/api/v1/accounts/" + accountId + "/nfts";
         final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
@@ -78,7 +78,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     @Override
     public Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, @NonNull final long serialNumber)
-            throws HederaException {
+            throws HieroException {
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         if (serialNumber <= 0) {
             throw new IllegalArgumentException("serialNumber must be positive");
@@ -89,14 +89,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
 
     @Override
     public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId,
-            @NonNull final TokenId tokenId, final long serialNumber) throws HederaException {
+            @NonNull final TokenId tokenId, final long serialNumber) throws HieroException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
                 .filter(nft -> Objects.equals(nft.owner(), accountId));
     }
 
     @Override
-    public Page<TransactionInfo> queryTransactionsByAccount(@NonNull final AccountId accountId) throws HederaException {
+    public Page<TransactionInfo> queryTransactionsByAccount(@NonNull final AccountId accountId) throws HieroException {
         Objects.requireNonNull(accountId, "accountId must not be null");
         final String path = "/api/v1/transactions?account.id=" + accountId.toString();
         final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction = this::extractTransactionInfoFromJsonNode;
@@ -104,7 +104,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HederaException {
+    public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HieroException {
         Objects.requireNonNull(transactionId, "transactionId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/transactions/" + transactionId);
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
@@ -114,37 +114,37 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     @Override
-    public @NonNull Optional<AccountInfo> queryAccount(@NonNull AccountId accountId) throws HederaException {
+    public @NonNull Optional<AccountInfo> queryAccount(@NonNull AccountId accountId) throws HieroException {
         Objects.requireNonNull(accountId, "accountId must not be null");
         final JsonNode jsonNode = doGetCall("/api/v1/accounts/" + accountId);
         return jsonNodeToOptionalAccountINfo(jsonNode);
     }
 
     @Override
-    public @NonNull Optional<ExchangeRates> queryExchangeRates() throws HederaException {
+    public @NonNull Optional<ExchangeRates> queryExchangeRates() throws HieroException {
         final JsonNode jsonNode = doGetCall("/api/v1/network/exchangerate");
         return jsonNodeToOptionalExchangeRates(jsonNode);
     }
 
     @Override
-    public @NonNull List<NetworkFee> queryNetworkFees() throws HederaException {
+    public @NonNull List<NetworkFee> queryNetworkFees() throws HieroException {
         final JsonNode jsonNode = doGetCall("/api/v1/network/fees");
         return jsonNodeToListNetworkFee(jsonNode);
     }
 
     @Override
-    public @NonNull Optional<NetworkStake> queryNetworkStake() throws HederaException {
+    public @NonNull Optional<NetworkStake> queryNetworkStake() throws HieroException {
         final JsonNode jsonNode = doGetCall("/api/v1/network/stake");
         return jsonNodeToOptionalNetworkStake(jsonNode);
     }
 
     @Override
-    public @NonNull Optional<NetworkSupplies> queryNetworkSupplies() throws HederaException {
+    public @NonNull Optional<NetworkSupplies> queryNetworkSupplies() throws HieroException {
         final JsonNode jsonNode = doGetCall("/api/v1/network/supply");
         return jsonNodeToOptionalNetworkSupplies(jsonNode);
     }
 
-    private JsonNode doGetCall(String path, Map<String, ?> params) throws HederaException {
+    private JsonNode doGetCall(String path, Map<String, ?> params) throws HieroException {
         return doGetCall(builder -> {
             UriBuilder uriBuilder = builder.path(path);
             for (Map.Entry<String, ?> entry : params.entrySet()) {
@@ -154,11 +154,11 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         });
     }
 
-    private JsonNode doGetCall(String path) throws HederaException {
+    private JsonNode doGetCall(String path) throws HieroException {
         return doGetCall(builder -> builder.path(path).build());
     }
 
-    private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HederaException {
+    private JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HieroException {
         final ResponseEntity<String> responseEntity = restClient.get()
                 .uri(uriBuilder -> uriFunction.apply(uriBuilder))
                 .accept(MediaType.APPLICATION_JSON)
@@ -176,7 +176,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
             }
             return objectMapper.readTree(body);
         } catch (JsonProcessingException e) {
-            throw new HederaException("Error parsing body as JSON: " + body, e);
+            throw new HieroException("Error parsing body as JSON: " + body, e);
         }
     }
 
@@ -195,14 +195,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }).toList();
     }
 
-    private Optional<Nft> jsonNodeToOptionalNft(final JsonNode jsonNode) throws HederaException {
+    private Optional<Nft> jsonNodeToOptionalNft(final JsonNode jsonNode) throws HieroException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
         try {
             return Optional.of(jsonNodeToNft(jsonNode));
         } catch (final Exception e) {
-            throw new HederaException("Error parsing NFT from JSON '" + jsonNode + "'", e);
+            throw new HieroException("Error parsing NFT from JSON '" + jsonNode + "'", e);
         }
     }
 
@@ -218,14 +218,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }
     }
 
-    private @NonNull Optional<AccountInfo> jsonNodeToOptionalAccountINfo(JsonNode jsonNode) throws HederaException {
+    private @NonNull Optional<AccountInfo> jsonNodeToOptionalAccountINfo(JsonNode jsonNode) throws HieroException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
         try {
             return Optional.of(jsonNodeToAccountInfo(jsonNode));
         } catch (final Exception e) {
-            throw new HederaException("Error parsing AccountInfo from JSON '" + jsonNode + "'", e);
+            throw new HieroException("Error parsing AccountInfo from JSON '" + jsonNode + "'", e);
         }
     }
 
@@ -242,14 +242,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }
     }
 
-    private @NonNull Optional<ExchangeRates> jsonNodeToOptionalExchangeRates(JsonNode jsonNode) throws HederaException {
+    private @NonNull Optional<ExchangeRates> jsonNodeToOptionalExchangeRates(JsonNode jsonNode) throws HieroException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
         try {
             return Optional.of(jsonNodeToExchangeRates(jsonNode));
         } catch (final Exception e) {
-            throw new HederaException("Error parsing ExchangeRates from JSON '" + jsonNode + "'", e);
+            throw new HieroException("Error parsing ExchangeRates from JSON '" + jsonNode + "'", e);
         }
     }
 
@@ -276,7 +276,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }
     }
 
-    private List<NetworkFee> jsonNodeToListNetworkFee(JsonNode jsonNode) throws HederaException {
+    private List<NetworkFee> jsonNodeToListNetworkFee(JsonNode jsonNode) throws HieroException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext() || !jsonNode.has("fees")) {
             return List.of();
         }
@@ -292,7 +292,7 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                     .map(this::jsonNodeToNetworkFee)
                     .toList();
         } catch (final Exception e) {
-            throw new HederaException("Error parsing NetworkFees from JSON '" + jsonNode + "'", e);
+            throw new HieroException("Error parsing NetworkFees from JSON '" + jsonNode + "'", e);
         }
     }
 
@@ -307,14 +307,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         }
     }
 
-    private @NonNull Optional<NetworkStake> jsonNodeToOptionalNetworkStake(JsonNode jsonNode) throws HederaException {
+    private @NonNull Optional<NetworkStake> jsonNodeToOptionalNetworkStake(JsonNode jsonNode) throws HieroException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
         try {
             return Optional.of(jsonNodeToNetworkStake(jsonNode));
         } catch (final Exception e) {
-            throw new HederaException("Error parsing NetworkStake from JSON '" + jsonNode + "'", e);
+            throw new HieroException("Error parsing NetworkStake from JSON '" + jsonNode + "'", e);
         }
     }
 
@@ -355,14 +355,14 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
     }
 
     private @NonNull Optional<NetworkSupplies> jsonNodeToOptionalNetworkSupplies(JsonNode jsonNode)
-            throws HederaException {
+            throws HieroException {
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }
         try {
             return Optional.of(jsonNodeToNetworkSupplies(jsonNode));
         } catch (final Exception e) {
-            throw new HederaException("Error parsing NetworkSupplies from JSON '" + jsonNode + "'", e);
+            throw new HieroException("Error parsing NetworkSupplies from JSON '" + jsonNode + "'", e);
         }
     }
 

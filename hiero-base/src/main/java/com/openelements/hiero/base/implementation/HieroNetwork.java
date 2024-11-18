@@ -4,11 +4,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public enum HederaNetwork {
+public enum HieroNetwork {
 
-    PREVIEWNET("previewnet", 297, "https://previewnet.mirrornode.hedera.com/", "https://previewnet.hashio.io/api"),
-    TESTNET("testnet", 296, "https://testnet.mirrornode.hedera.com/", "https://testnet.hashio.io/api"),
-    MAINNET("mainnet", 295, "https://mainnet.mirrornode.hedera.com/", "https://mainnet.hashio.io/api"),
+    HEDERA_PREVIEWNET("hedera-previewnet", 297, "https://previewnet.mirrornode.hedera.com/",
+            "https://previewnet.hashio.io/api"),
+    HEDERA_TESTNET("hedera-testnet", 296, "https://testnet.mirrornode.hedera.com/", "https://testnet.hashio.io/api"),
+    HEDERA_MAINNET("hedera-mainnet", 295, "https://mainnet.mirrornode.hedera.com/", "https://mainnet.hashio.io/api"),
     CUSTOM("custom", -1, null, null);
 
     /**
@@ -23,14 +24,13 @@ public enum HederaNetwork {
     private final String relayUrl;
 
     /**
-     * Name of the Hedera node. Compatible with {@link com.hedera.hashgraph.sdk.Client#forName(String)} and similar
-     * methods.
+     * Name of the Hiero network.
      */
     private final String name;
 
     private final String mirrornodeEndpoint;
 
-    HederaNetwork(final String name, final long chainId, final String mirrornodeEndpoint, final String relayUrl) {
+    HieroNetwork(final String name, final long chainId, final String mirrornodeEndpoint, final String relayUrl) {
         this.name = name;
         this.chainId = chainId;
         this.mirrornodeEndpoint = mirrornodeEndpoint;
@@ -53,9 +53,9 @@ public enum HederaNetwork {
         return mirrornodeEndpoint;
     }
 
-    public static Optional<HederaNetwork> findByName(final String name) {
+    public static Optional<HieroNetwork> findByName(final String name) {
         Objects.requireNonNull(name, "name must not be null");
-        return Stream.of(HederaNetwork.values())
+        return Stream.of(HieroNetwork.values())
                 .filter(v -> Objects.equals(v.name.toLowerCase(), name.toLowerCase()))
                 .findAny();
     }

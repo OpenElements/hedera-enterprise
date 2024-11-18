@@ -1,17 +1,16 @@
 package com.openelements.hiero.base.implementation;
 
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.NetworkRepository;
 import com.openelements.hiero.base.mirrornode.ExchangeRates;
 import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import com.openelements.hiero.base.mirrornode.NetworkFee;
 import com.openelements.hiero.base.mirrornode.NetworkStake;
 import com.openelements.hiero.base.mirrornode.NetworkSupplies;
-import org.jspecify.annotations.NonNull;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 public class NetworkRepositoryImpl implements NetworkRepository {
     private final MirrorNodeClient mirrorNodeClient;
@@ -21,22 +20,22 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     }
 
     @Override
-    public Optional<ExchangeRates> exchangeRates() throws HederaException {
+    public Optional<ExchangeRates> exchangeRates() throws HieroException {
         return mirrorNodeClient.queryExchangeRates();
     }
 
     @Override
-    public List<NetworkFee> fees() throws HederaException {
+    public List<NetworkFee> fees() throws HieroException {
         return mirrorNodeClient.queryNetworkFees();
     }
 
     @Override
-    public Optional<NetworkStake> stake() throws HederaException {
+    public Optional<NetworkStake> stake() throws HieroException {
         return mirrorNodeClient.queryNetworkStake();
     }
 
     @Override
-    public Optional<NetworkSupplies> supplies() throws HederaException {
+    public Optional<NetworkSupplies> supplies() throws HieroException {
         return mirrorNodeClient.queryNetworkSupplies();
     }
 }

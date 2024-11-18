@@ -16,15 +16,15 @@ import org.junit.jupiter.api.Test;
 
 public class ProtocolLayerClientTokenTests {
 
-    private static HederaTestContext hederaTestContext;
+    private static HieroTestContext hieroTestContext;
 
     private static ProtocolLayerClient protocolLayerClient;
 
     @BeforeAll
     static void init() {
-        hederaTestContext = new HederaTestContext();
-        protocolLayerClient = new ProtocolLayerClientImpl(hederaTestContext.getClient(),
-                hederaTestContext.getOperationalAccount());
+        hieroTestContext = new HieroTestContext();
+        protocolLayerClient = new ProtocolLayerClientImpl(hieroTestContext.getClient(),
+                hieroTestContext.getOperationalAccount());
     }
 
     @Test
@@ -32,19 +32,19 @@ public class ProtocolLayerClientTokenTests {
         //given
         final TokenCreateRequest tokenCreateRequest = TokenCreateRequest.of("Test NFT", "TST",
                 TokenType.NON_FUNGIBLE_UNIQUE,
-                hederaTestContext.getOperationalAccount());
+                hieroTestContext.getOperationalAccount());
         final TokenCreateResult tokenCreateResult = protocolLayerClient.executeTokenCreateTransaction(
                 tokenCreateRequest);
         final TokenId tokenId = tokenCreateResult.tokenId();
 
         final TokenMintRequest tokenMintRequest = TokenMintRequest.of(tokenId,
-                hederaTestContext.getOperationalAccount().privateKey(), "https://example.com/metadata");
+                hieroTestContext.getOperationalAccount().privateKey(), "https://example.com/metadata");
         final TokenMintResult tokenMintResult = protocolLayerClient.executeMintTokenTransaction(tokenMintRequest);
         final Long serial = tokenMintResult.serials().get(0);
 
         //when
         final TokenBurnRequest tokenBurnRequest = TokenBurnRequest.of(tokenId, serial,
-                hederaTestContext.getOperationalAccount().privateKey());
+                hieroTestContext.getOperationalAccount().privateKey());
 
         //then
         Assertions.assertDoesNotThrow(() -> protocolLayerClient.executeBurnTokenTransaction(tokenBurnRequest));

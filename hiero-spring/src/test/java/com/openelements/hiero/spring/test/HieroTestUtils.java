@@ -2,7 +2,7 @@ package com.openelements.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.openelements.hiero.base.HederaException;
+import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import com.openelements.hiero.base.protocol.ProtocolLayerClient;
 import com.openelements.hiero.base.protocol.TransactionListener;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class HederaTestUtils {
+public class HieroTestUtils {
 
     private final MirrorNodeClient mirrorNodeClient;
 
@@ -21,7 +21,7 @@ public class HederaTestUtils {
 
     private final AtomicBoolean initialized = new AtomicBoolean();
 
-    public HederaTestUtils(MirrorNodeClient mirrorNodeClient, ProtocolLayerClient protocolLayerClient) {
+    public HieroTestUtils(MirrorNodeClient mirrorNodeClient, ProtocolLayerClient protocolLayerClient) {
         this.mirrorNodeClient = mirrorNodeClient;
         this.protocolLayerClient = protocolLayerClient;
     }
@@ -45,7 +45,7 @@ public class HederaTestUtils {
         });
     }
 
-    public void waitForMirrorNodeRecords() throws HederaException {
+    public void waitForMirrorNodeRecords() throws HieroException {
         final TransactionId transactionId = transactionIdRef.get();
         if (transactionId != null) {
             LocalDateTime start = LocalDateTime.now();
@@ -57,12 +57,12 @@ public class HederaTestUtils {
                 done = mirrorNodeClient.queryTransaction(transactionIdString).isPresent();
                 if (!done) {
                     if (LocalDateTime.now().isAfter(start.plusSeconds(30))) {
-                        throw new HederaException("Timeout waiting for transaction");
+                        throw new HieroException("Timeout waiting for transaction");
                     }
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                        throw new HederaException("Interrupted while waiting for transaction", e);
+                        throw new HieroException("Interrupted while waiting for transaction", e);
                     }
                 }
             }

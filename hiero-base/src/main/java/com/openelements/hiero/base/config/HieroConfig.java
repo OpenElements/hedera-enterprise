@@ -3,7 +3,7 @@ package com.openelements.hiero.base.config;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.openelements.hiero.base.Account;
-import com.openelements.hiero.base.implementation.HederaNetwork;
+import com.openelements.hiero.base.implementation.HieroNetwork;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,19 +25,21 @@ public interface HieroConfig {
 
     @NonNull Set<ConsensusNode> getConsensusNodes();
 
-    @NonNull HederaNetwork getNetwork();
+    @NonNull HieroNetwork getNetwork();
 
     @NonNull
     default Client createClient() {
-        final HederaNetwork hederaNetwork = getNetwork();
-        if (hederaNetwork != HederaNetwork.CUSTOM) {
+        final HieroNetwork hieroNetwork = getNetwork();
+        if (hieroNetwork != HieroNetwork.CUSTOM) {
             try {
-                log.debug("Hedera network '{}' will be used", hederaNetwork.getName());
-                Client client = Client.forName(hederaNetwork.getName());
+                log.debug("Hiero network '{}' will be used", hieroNetwork.getName());
+
+                //TODO: Hack since the Client is still Hedera specific and not migrated to Hiero
+                Client client = Client.forName(hieroNetwork.getName().substring("hedera-".length()));
                 client.setOperator(getOperatorAccount().accountId(), getOperatorAccount().privateKey());
                 return client;
             } catch (Exception e) {
-                throw new IllegalArgumentException("Can not create client for network " + hederaNetwork.getName(),
+                throw new IllegalArgumentException("Can not create client for network " + hieroNetwork.getName(),
                         e);
             }
         } else {
