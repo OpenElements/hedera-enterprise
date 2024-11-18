@@ -24,8 +24,7 @@ public enum HieroNetwork {
     private final String relayUrl;
 
     /**
-     * Name of the Hiero network. Compatible with {@link com.hedera.hashgraph.sdk.Client#forName(String)} and similar
-     * methods.
+     * Name of the Hiero network.
      */
     private final String name;
 

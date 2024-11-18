@@ -33,7 +33,9 @@ public interface HieroConfig {
         if (hieroNetwork != HieroNetwork.CUSTOM) {
             try {
                 log.debug("Hiero network '{}' will be used", hieroNetwork.getName());
-                Client client = Client.forName(hieroNetwork.getName());
+
+                //TODO: Hack since the Client is still Hedera specific and not migrated to Hiero
+                Client client = Client.forName(hieroNetwork.getName().substring("hedera-".length()));
                 client.setOperator(getOperatorAccount().accountId(), getOperatorAccount().privateKey());
                 return client;
             } catch (Exception e) {

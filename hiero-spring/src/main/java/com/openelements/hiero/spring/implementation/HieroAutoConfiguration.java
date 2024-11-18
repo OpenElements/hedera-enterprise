@@ -24,6 +24,8 @@ import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import com.openelements.hiero.base.protocol.ProtocolLayerClient;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -90,14 +92,16 @@ public class HieroAutoConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
-    MirrorNodeClient mirrorNodeClient(final HieroConfig hieroConfig) {
+    MirrorNodeClient mirrorNodeClient(final Client client, final HieroNetwork hieroNetwork) {
         final String mirrorNodeEndpoint;
-        if (!hieroConfig.getMirrornodeAddresses().isEmpty()) {
-            mirrorNodeEndpoint = hieroConfig.getMirrornodeAddresses().get(0);
-        } else if (hieroConfig.getNetwork().getMirrornodeEndpoint() != null) {
-            mirrorNodeEndpoint = hieroConfig.getNetwork().getMirrornodeEndpoint();
+        if (Objects.equals(hieroNetwork, HieroNetwork.CUSTOM)) {
+            final List<String> mirrorNetwork = client.getMirrorNetwork();
+            if (mirrorNetwork.isEmpty()) {
+                throw new IllegalArgumentException("Mirror node endpoint must be set");
+            }
+            mirrorNodeEndpoint = mirrorNetwork.get(0);
         } else {
-            throw new IllegalArgumentException("Mirror node endpoint must be set");
+            mirrorNodeEndpoint = hieroNetwork.getMirrornodeEndpoint();
         }
 
         final String baseUri;
