@@ -1,7 +1,7 @@
 package com.openelements.hiero.spring.test;
 
-import static com.openelements.hiero.base.ContractParam.int256;
-import static com.openelements.hiero.base.ContractParam.string;
+import static com.openelements.hiero.base.data.ContractParam.int256;
+import static com.openelements.hiero.base.data.ContractParam.string;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;

@@ -2,7 +2,8 @@ package com.openelements.hiero.base.config;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.HieroContext;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.implementation.HieroNetwork;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +18,37 @@ public interface HieroConfig {
 
     final static Logger log = LoggerFactory.getLogger(HieroConfig.class);
 
-    @NonNull Account getOperatorAccount();
+    @NonNull
+    Account getOperatorAccount();
 
-    @NonNull Optional<String> getNetworkName();
+    @NonNull
+    Optional<String> getNetworkName();
 
-    @NonNull List<String> getMirrornodeAddresses();
+    @NonNull
+    List<String> getMirrornodeAddresses();
 
-    @NonNull Set<ConsensusNode> getConsensusNodes();
+    @NonNull
+    Set<ConsensusNode> getConsensusNodes();
 
-    @NonNull HieroNetwork getNetwork();
+    @NonNull
+    HieroNetwork getNetwork();
+
+    @NonNull
+    default HieroContext createHieroContext() {
+        final Account operatorAccount = getOperatorAccount();
+        final Client client = createClient();
+        return new HieroContext() {
+            @Override
+            public @NonNull Account getOperatorAccount() {
+                return operatorAccount;
+            }
+
+            @Override
+            public @NonNull Client getClient() {
+                return client;
+            }
+        };
+    }
 
     @NonNull
     default Client createClient() {

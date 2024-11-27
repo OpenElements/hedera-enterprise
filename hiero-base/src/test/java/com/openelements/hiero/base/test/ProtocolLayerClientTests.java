@@ -1,36 +1,38 @@
 package com.openelements.hiero.base.test;
 
-import com.openelements.hiero.base.protocol.ProtocolLayerClient;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.HieroContext;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
+import com.openelements.hiero.base.protocol.ProtocolLayerClient;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ProtocolLayerClientTests {
 
     @Test
     void testNullConstructorParam() {
-        //given
-        final Client client = Client.forTestnet();
-        final Account account = new Account(AccountId.fromString("0.0.12345"),
-                PrivateKey.generateED25519().getPublicKey(), PrivateKey.generateED25519());
-
-        //then
-        Assertions.assertThrows(NullPointerException.class, () -> new ProtocolLayerClientImpl(client, null));
-        Assertions.assertThrows(NullPointerException.class, () -> new ProtocolLayerClientImpl(null, account));
-        Assertions.assertThrows(NullPointerException.class, () -> new ProtocolLayerClientImpl(null, null));
+        Assertions.assertThrows(NullPointerException.class, () -> new ProtocolLayerClientImpl(null));
     }
 
     @Test
     void testNullParams() {
         //given
-        final Account account = new Account(AccountId.fromString("0.0.12345"),
-                PrivateKey.generateED25519().getPublicKey(), PrivateKey.generateED25519());
-        final ProtocolLayerClient client = new ProtocolLayerClientImpl(Client.forTestnet(), account);
+        final HieroContext context = new HieroContext() {
+            @Override
+            public @NonNull Account getOperatorAccount() {
+                return null;
+            }
+
+            @Override
+            public @NonNull Client getClient() {
+                return null;
+            }
+        };
+        final ProtocolLayerClient client = new ProtocolLayerClientImpl(context);
 
         //then
         Assertions.assertThrows(NullPointerException.class, () -> client.executeAccountBalanceQuery(null));

@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenType;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;

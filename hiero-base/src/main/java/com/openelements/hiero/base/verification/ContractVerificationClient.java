@@ -1,6 +1,7 @@
-package com.openelements.hiero.base;
+package com.openelements.hiero.base.verification;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import com.openelements.hiero.base.HieroException;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
 

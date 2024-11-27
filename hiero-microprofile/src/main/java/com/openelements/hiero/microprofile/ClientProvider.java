@@ -1,8 +1,8 @@
 package com.openelements.hiero.microprofile;
 
 import com.openelements.hiero.base.AccountClient;
-import com.openelements.hiero.base.ContractVerificationClient;
 import com.openelements.hiero.base.FileClient;
+import com.openelements.hiero.base.HieroContext;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.config.HieroConfig;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
@@ -10,6 +10,7 @@ import com.openelements.hiero.base.implementation.FileClientImpl;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.implementation.SmartContractClientImpl;
 import com.openelements.hiero.base.protocol.ProtocolLayerClient;
+import com.openelements.hiero.base.verification.ContractVerificationClient;
 import com.openelements.hiero.microprofile.implementation.ContractVerificationClientImpl;
 import com.openelements.hiero.microprofile.implementation.HieroConfigImpl;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,8 +37,14 @@ public class ClientProvider {
 
     @Produces
     @ApplicationScoped
-    ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroConfig hieroConfig) {
-        return new ProtocolLayerClientImpl(hieroConfig.createClient(), hieroConfig.getOperatorAccount());
+    HieroContext createHieroContext(@NonNull final HieroConfig hieroConfig) {
+        return hieroConfig.createHieroContext();
+    }
+
+    @Produces
+    @ApplicationScoped
+    ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroContext hieroContext) {
+        return new ProtocolLayerClientImpl(hieroContext);
     }
 
     @Produces

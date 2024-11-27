@@ -4,18 +4,16 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.HieroContext;
+import com.openelements.hiero.base.data.Account;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NonNull;
 
-public class HieroTestContext {
-
-    private static final Logger log = LoggerFactory.getLogger(HieroTestContext.class);
+public class HieroTestContext implements HieroContext {
 
     private final Account operationalAccount;
 
@@ -42,7 +40,7 @@ public class HieroTestContext {
                 try {
                     client.setMirrorNetwork(List.of("localhost:8080"));
                 } catch (Exception e) {
-                    log.error("Error setting mirror network", e);
+                    throw new IllegalStateException("Error setting mirror network", e);
                 }
                 client.setOperator(accountId, privateKey);
             }
@@ -59,7 +57,8 @@ public class HieroTestContext {
         }
     }
 
-    public Account getOperationalAccount() {
+    @Override
+    public @NonNull Account getOperatorAccount() {
         return operationalAccount;
     }
 

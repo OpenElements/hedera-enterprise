@@ -2,20 +2,21 @@ package com.openelements.hiero.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.openelements.hiero.base.data.Account;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Interface for interacting with a Hiero network. This interface provides methods for interacting with Hedera
- * accounts, like creating and deleting accounts. An implementation of this interface is using an internal account to
- * interact with a Hiero network. That account is the account that is used to pay for the transactions that are sent
- * to the network and called 'operator account'.
+ * Interface for interacting with a Hiero network. This interface provides methods for interacting with Hedera accounts,
+ * like creating and deleting accounts. An implementation of this interface is using an internal account to interact
+ * with a Hiero network. That account is the account that is used to pay for the transactions that are sent to the
+ * network and called 'operator account'.
  */
 public interface AccountClient {
 
     /**
-     * Creates a new account. The account is created with an initial balance of 0 hbar. The account is created by
-     * the operator account.
+     * Creates a new account. The account is created with an initial balance of 0 hbar. The account is created by the
+     * operator account.
      *
      * @return the created account
      * @throws HieroException if the account could not be created
@@ -36,8 +37,7 @@ public interface AccountClient {
     Account createAccount(@NonNull Hbar initialBalance) throws HieroException;
 
     /**
-     * Creates a new account with the given initial balance (in HBAR). The account is created by the operator
-     * account.
+     * Creates a new account with the given initial balance (in HBAR). The account is created by the operator account.
      *
      * @param initialBalanceInHbar the initial balance of the account in HBAR
      * @return the created account

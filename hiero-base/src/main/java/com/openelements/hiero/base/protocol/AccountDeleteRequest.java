@@ -1,7 +1,7 @@
 package com.openelements.hiero.base.protocol;
 
 import com.hedera.hashgraph.sdk.Hbar;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;

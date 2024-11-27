@@ -2,7 +2,7 @@ package com.openelements.hiero.base.protocol;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.openelements.hiero.base.ContractParam;
+import com.openelements.hiero.base.data.ContractParam;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;

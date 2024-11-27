@@ -1,14 +1,9 @@
 package com.openelements.hiero.spring.implementation;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.openelements.hiero.base.Account;
 import com.openelements.hiero.base.AccountClient;
-import com.openelements.hiero.base.AccountRepository;
-import com.openelements.hiero.base.ContractVerificationClient;
 import com.openelements.hiero.base.FileClient;
-import com.openelements.hiero.base.NetworkRepository;
+import com.openelements.hiero.base.HieroContext;
 import com.openelements.hiero.base.NftClient;
-import com.openelements.hiero.base.NftRepository;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.config.HieroConfig;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
@@ -20,8 +15,12 @@ import com.openelements.hiero.base.implementation.NftClientImpl;
 import com.openelements.hiero.base.implementation.NftRepositoryImpl;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.implementation.SmartContractClientImpl;
+import com.openelements.hiero.base.mirrornode.AccountRepository;
 import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
+import com.openelements.hiero.base.mirrornode.NetworkRepository;
+import com.openelements.hiero.base.mirrornode.NftRepository;
 import com.openelements.hiero.base.protocol.ProtocolLayerClient;
+import com.openelements.hiero.base.verification.ContractVerificationClient;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -33,6 +32,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.context.annotation.ApplicationScope;
 
 @AutoConfiguration
 @EnableConfigurationProperties({HieroProperties.class, HieroNetworkProperties.class})
@@ -41,6 +41,7 @@ public class HieroAutoConfiguration {
     private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
 
     @Bean
+    @ApplicationScope
     HieroConfig hieroConfig(final HieroProperties properties) {
         return new HieroConfigImpl(properties);
     }
@@ -51,22 +52,14 @@ public class HieroAutoConfiguration {
     }
 
     @Bean
-    Account operationalAccount(final HieroConfig hieroConfig) {
-        return hieroConfig.getOperatorAccount();
+    @ApplicationScope
+    HieroContext hieroContext(final HieroConfig hieroConfig) {
+        return hieroConfig.createHieroContext();
     }
 
     @Bean
-    Client client(final HieroConfig hieroConfig) {
-        try {
-            return hieroConfig.createClient();
-        } catch (Exception e) {
-            throw new IllegalStateException("Can not create client", e);
-        }
-    }
-
-    @Bean
-    ProtocolLayerClient protocolLevelClient(final Client client, final Account operationalAccount) {
-        return new ProtocolLayerClientImpl(client, operationalAccount);
+    ProtocolLayerClient protocolLevelClient(final HieroContext hieroContext) {
+        return new ProtocolLayerClientImpl(hieroContext);
     }
 
     @Bean
@@ -85,17 +78,17 @@ public class HieroAutoConfiguration {
     }
 
     @Bean
-    NftClient nftClient(final ProtocolLayerClient protocolLayerClient, Account operationalAccount) {
-        return new NftClientImpl(protocolLayerClient, operationalAccount);
+    NftClient nftClient(final ProtocolLayerClient protocolLayerClient, HieroContext hieroContext) {
+        return new NftClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "spring.hiero", name = "mirrorNodeSupported",
             havingValue = "true", matchIfMissing = true)
-    MirrorNodeClient mirrorNodeClient(final Client client, final HieroNetwork hieroNetwork) {
+    MirrorNodeClient mirrorNodeClient(final HieroContext hieroContext, final HieroNetwork hieroNetwork) {
         final String mirrorNodeEndpoint;
         if (Objects.equals(hieroNetwork, HieroNetwork.CUSTOM)) {
-            final List<String> mirrorNetwork = client.getMirrorNetwork();
+            final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
             if (mirrorNetwork.isEmpty()) {
                 throw new IllegalArgumentException("Mirror node endpoint must be set");
             }

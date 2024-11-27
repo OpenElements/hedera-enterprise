@@ -3,12 +3,13 @@ package com.openelements.hiero.spring.test;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
-import com.openelements.hiero.base.Account;
 import com.openelements.hiero.base.AccountClient;
-import com.openelements.hiero.base.Nft;
+import com.openelements.hiero.base.HieroContext;
 import com.openelements.hiero.base.NftClient;
-import com.openelements.hiero.base.NftRepository;
-import com.openelements.hiero.base.mirrornode.Page;
+import com.openelements.hiero.base.data.Account;
+import com.openelements.hiero.base.data.Nft;
+import com.openelements.hiero.base.data.Page;
+import com.openelements.hiero.base.mirrornode.NftRepository;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class NftRepositoryTests {
     private AccountClient accountClient;
 
     @Autowired
-    private Account operatorAccount;
+    private HieroContext hieroContext;
 
     private <T> List<T> getAll(Page<T> page) {
         if (!page.isFirst()) {
@@ -163,8 +164,8 @@ public class NftRepositoryTests {
         final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
-        final AccountId adminAccountId = operatorAccount.accountId();
-        final PrivateKey adminAccountPrivateKey = operatorAccount.privateKey();
+        final AccountId adminAccountId = hieroContext.getOperatorAccount().accountId();
+        final PrivateKey adminAccountPrivateKey = hieroContext.getOperatorAccount().privateKey();
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
@@ -204,7 +205,7 @@ public class NftRepositoryTests {
             final int start = i;
             final int end = Math.min(i + transferBatchSize, metadata.size());
             final List<Long> serial = nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
-            nftClient.transferNfts(tokenId, serial, operatorAccount, newOwnerId);
+            nftClient.transferNfts(tokenId, serial, hieroContext.getOperatorAccount(), newOwnerId);
         }
         hieroTestUtils.waitForMirrorNodeRecords();
 
@@ -249,8 +250,8 @@ public class NftRepositoryTests {
         final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
-        final AccountId adminAccountId = operatorAccount.accountId();
-        final PrivateKey adminAccountPrivateKey = operatorAccount.privateKey();
+        final AccountId adminAccountId = hieroContext.getOperatorAccount().accountId();
+        final PrivateKey adminAccountPrivateKey = hieroContext.getOperatorAccount().privateKey();
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();
@@ -289,7 +290,7 @@ public class NftRepositoryTests {
             final int start = i;
             final int end = Math.min(i + transferBatchSize, metadata.size());
             final List<Long> serial = nftClient.mintNfts(tokenId, metadata.subList(start, end).toArray(new byte[0][]));
-            nftClient.transferNfts(tokenId, serial, operatorAccount, newOwnerId);
+            nftClient.transferNfts(tokenId, serial, hieroContext.getOperatorAccount(), newOwnerId);
         }
         hieroTestUtils.waitForMirrorNodeRecords();
 
@@ -369,8 +370,8 @@ public class NftRepositoryTests {
         final byte[] metadata = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
         final TokenId tokenId = nftClient.createNftType(name, symbol);
         final long serial = nftClient.mintNft(tokenId, metadata);
-        final AccountId adminAccountId = operatorAccount.accountId();
-        final PrivateKey adminAccountPrivateKey = operatorAccount.privateKey();
+        final AccountId adminAccountId = hieroContext.getOperatorAccount().accountId();
+        final PrivateKey adminAccountPrivateKey = hieroContext.getOperatorAccount().privateKey();
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         final PrivateKey newOwnerPrivateKey = account.privateKey();

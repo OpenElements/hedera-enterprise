@@ -36,16 +36,6 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hedera.sdk-version>2.32.0</hedera.sdk-version>
-    <grpc.version>1.58.0</grpc.version>
-    <spring.version>6.1.8</spring.version>
-    <spring.boot.version>3.3.0</spring.boot.version>
-    <jspecify.version>1.0.0</jspecify.version>
-    <dotenv.version>3.0.0</dotenv.version>
-    <junit.version>5.10.3</junit.version>
-    <slf4j.version>2.0.13</slf4j.version>
-    <helidon.version>3.2.10</helidon.version>
-    <jakarta.enterprise.version>3.0.1</jakarta.enterprise.version>
   </properties>
 
   <dependencyManagement>

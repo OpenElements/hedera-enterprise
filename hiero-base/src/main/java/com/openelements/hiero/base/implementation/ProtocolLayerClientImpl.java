@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
@@ -21,21 +20,24 @@ import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.Query;
+import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenBurnTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
+import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
-import com.openelements.hiero.base.Account;
-import com.openelements.hiero.base.ContractParam;
+import com.openelements.hiero.base.HieroContext;
 import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.data.Account;
+import com.openelements.hiero.base.data.ContractParam;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;
 import com.openelements.hiero.base.protocol.AccountBalanceResponse;
 import com.openelements.hiero.base.protocol.AccountCreateRequest;
@@ -75,6 +77,8 @@ import com.openelements.hiero.base.protocol.TopicCreateRequest;
 import com.openelements.hiero.base.protocol.TopicCreateResult;
 import com.openelements.hiero.base.protocol.TopicDeleteRequest;
 import com.openelements.hiero.base.protocol.TopicDeleteResult;
+import com.openelements.hiero.base.protocol.TopicMessageRequest;
+import com.openelements.hiero.base.protocol.TopicMessageResult;
 import com.openelements.hiero.base.protocol.TopicSubmitMessageRequest;
 import com.openelements.hiero.base.protocol.TopicSubmitMessageResult;
 import com.openelements.hiero.base.protocol.TransactionListener;
@@ -93,15 +97,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
     public static final int DEFAULT_GAS = 1_000_000;
 
-    private final Client client;
-
     private final List<TransactionListener> listeners;
 
-    private final Account operationalAccount;
+    private final HieroContext hieroContext;
 
-    public ProtocolLayerClientImpl(@NonNull final Client client, @NonNull final Account operationalAccount) {
-        this.client = Objects.requireNonNull(client, "client must not be null");
-        this.operationalAccount = Objects.requireNonNull(operationalAccount, "operationalAccount must not be null");
+    public ProtocolLayerClientImpl(@NonNull final HieroContext hieroContext) {
+        this.hieroContext = Objects.requireNonNull(hieroContext, "hieroContext must not be null");
         listeners = new CopyOnWriteArrayList<>();
     }
 
@@ -154,7 +155,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
                 .setTransactionValidDuration(request.transactionValidDuration())
                 .setContents(request.contents())
                 .setTransactionMemo(request.fileMemo())
-                .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()));
+                .setKeys(Objects.requireNonNull(hieroContext.getOperatorAccount().publicKey()));
         if (request.expirationTime() != null) {
             transaction.setExpirationTime(request.expirationTime());
         }
@@ -299,8 +300,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             transaction.setTransferAccountId(request.transferFoundsToAccount().accountId());
             sign(transaction, request.toDelete().privateKey(), request.transferFoundsToAccount().privateKey());
         } else {
-            transaction.setTransferAccountId(operationalAccount.accountId());
-            sign(transaction, request.toDelete().privateKey(), operationalAccount.privateKey());
+            transaction.setTransferAccountId(hieroContext.getOperatorAccount().accountId());
+            sign(transaction, request.toDelete().privateKey(), hieroContext.getOperatorAccount().privateKey());
         }
         final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
         return new AccountDeleteResult(record.transactionId, record.receipt.status,
@@ -351,6 +352,28 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             return new TopicSubmitMessageResult(receipt.transactionId, receipt.status);
         } catch (final Exception e) {
             throw new HieroException("Failed to execute submit message transaction", e);
+        }
+    }
+
+    @Override
+    public TopicMessageResult executeTopicMessageQuery(TopicMessageRequest request) throws HieroException {
+        Objects.requireNonNull(request, "request must not be null");
+        try {
+            final TopicMessageQuery query = new TopicMessageQuery()
+                    .setTopicId(request.topicId());
+            if (request.startTime() != null) {
+                query.setStartTime(request.startTime());
+            }
+            if (request.endTime() != null) {
+                query.setEndTime(request.endTime());
+            }
+            if (request.limit() >= 0) {
+                query.setLimit(request.limit());
+            }
+            final SubscriptionHandle subscribe = query.subscribe(hieroContext.getClient(), request.subscription());
+            return new TopicMessageResult();
+        } catch (final Exception e) {
+            throw new HieroException("Failed to execute query message transaction", e);
         }
     }
 
@@ -456,7 +479,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     @NonNull
     private <T extends Transaction<T>> Transaction<T> sign(Transaction<T> transaction, final PrivateKey... keys) {
         if (keys != null) {
-            transaction.freezeWith(client);
+            transaction.freezeWith(hieroContext.getClient());
             for (PrivateKey key : keys) {
                 transaction.sign(key);
             }
@@ -480,7 +503,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         Objects.requireNonNull(transaction, "transaction must not be null");
         try {
             log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
-            final TransactionResponse response = transaction.execute(client);
+            final TransactionResponse response = transaction.execute(hieroContext.getClient());
             listeners.forEach(listener -> {
                 try {
                     listener.transactionSubmitted(TransactionType.ACCOUNT_CREATE, response.transactionId);
@@ -491,7 +514,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             try {
                 log.debug("Waiting for receipt of transaction '{}' of type {}", response.transactionId,
                         transaction.getClass().getSimpleName());
-                final TransactionReceipt receipt = response.getReceipt(client);
+                final TransactionReceipt receipt = response.getReceipt(hieroContext.getClient());
                 listeners.forEach(listener -> {
                     try {
                         listener.transactionHandled(TransactionType.ACCOUNT_CREATE, response.transactionId,
@@ -519,7 +542,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         try {
             log.debug("Waiting for record of transaction '{}' of type {}", receipt.transactionId,
                     transaction.getClass().getSimpleName());
-            return receipt.transactionId.getRecord(client);
+            return receipt.transactionId.getRecord(hieroContext.getClient());
         } catch (final Exception e) {
             throw new HieroException("Failed to receive record of transaction '" + receipt.transactionId + "' of type "
                     + transaction.getClass(), e);
@@ -531,7 +554,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         Objects.requireNonNull(query, "query must not be null");
         try {
             log.debug("Sending query of type {}", query.getClass().getSimpleName());
-            return query.execute(client);
+            return query.execute(hieroContext.getClient());
         } catch (Exception e) {
             throw new HieroException("Failed to execute query", e);
         }

@@ -23,8 +23,7 @@ public class ProtocolLayerClientTokenTests {
     @BeforeAll
     static void init() {
         hieroTestContext = new HieroTestContext();
-        protocolLayerClient = new ProtocolLayerClientImpl(hieroTestContext.getClient(),
-                hieroTestContext.getOperationalAccount());
+        protocolLayerClient = new ProtocolLayerClientImpl(hieroTestContext);
     }
 
     @Test
@@ -32,19 +31,19 @@ public class ProtocolLayerClientTokenTests {
         //given
         final TokenCreateRequest tokenCreateRequest = TokenCreateRequest.of("Test NFT", "TST",
                 TokenType.NON_FUNGIBLE_UNIQUE,
-                hieroTestContext.getOperationalAccount());
+                hieroTestContext.getOperatorAccount());
         final TokenCreateResult tokenCreateResult = protocolLayerClient.executeTokenCreateTransaction(
                 tokenCreateRequest);
         final TokenId tokenId = tokenCreateResult.tokenId();
 
         final TokenMintRequest tokenMintRequest = TokenMintRequest.of(tokenId,
-                hieroTestContext.getOperationalAccount().privateKey(), "https://example.com/metadata");
+                hieroTestContext.getOperatorAccount().privateKey(), "https://example.com/metadata");
         final TokenMintResult tokenMintResult = protocolLayerClient.executeMintTokenTransaction(tokenMintRequest);
         final Long serial = tokenMintResult.serials().get(0);
 
         //when
         final TokenBurnRequest tokenBurnRequest = TokenBurnRequest.of(tokenId, serial,
-                hieroTestContext.getOperationalAccount().privateKey());
+                hieroTestContext.getOperatorAccount().privateKey());
 
         //then
         Assertions.assertDoesNotThrow(() -> protocolLayerClient.executeBurnTokenTransaction(tokenBurnRequest));

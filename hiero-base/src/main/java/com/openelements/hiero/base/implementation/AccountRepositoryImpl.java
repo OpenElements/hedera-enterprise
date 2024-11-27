@@ -1,9 +1,9 @@
 package com.openelements.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import com.openelements.hiero.base.AccountRepository;
+import com.openelements.hiero.base.mirrornode.AccountRepository;
 import com.openelements.hiero.base.HieroException;
-import com.openelements.hiero.base.mirrornode.AccountInfo;
+import com.openelements.hiero.base.data.AccountInfo;
 import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import java.util.Objects;
 import java.util.Optional;

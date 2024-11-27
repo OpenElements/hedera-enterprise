@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hiero.base.ContractCallResult;
-import com.openelements.hiero.base.ContractParam;
+import com.openelements.hiero.base.data.ContractParam;
 import com.openelements.hiero.base.FileClient;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.SmartContractClient;

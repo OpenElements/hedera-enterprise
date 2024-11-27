@@ -1,8 +1,8 @@
 package com.openelements.hiero.spring.implementation;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hiero.base.ContractVerificationClient;
-import com.openelements.hiero.base.ContractVerificationState;
+import com.openelements.hiero.base.verification.ContractVerificationClient;
+import com.openelements.hiero.base.verification.ContractVerificationState;
 import com.openelements.hiero.base.HieroException;
 import java.util.Map;
 import java.util.Objects;

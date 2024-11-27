@@ -3,8 +3,8 @@ package com.openelements.hiero.base.test;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.openelements.hiero.base.Account;
 import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;
 import com.openelements.hiero.base.protocol.AccountBalanceResponse;
@@ -25,8 +25,7 @@ public class ProtocolLayerClientAccountTests {
     @BeforeAll
     static void init() {
         hieroTestContext = new HieroTestContext();
-        protocolLayerClient = new ProtocolLayerClientImpl(hieroTestContext.getClient(),
-                hieroTestContext.getOperationalAccount());
+        protocolLayerClient = new ProtocolLayerClientImpl(hieroTestContext);
     }
 
     @Test
