@@ -3,6 +3,7 @@ package com.openelements.hiero.spring.test;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
+import com.openelements.hiero.base.HieroContext;
 import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;
 import com.openelements.hiero.base.protocol.AccountBalanceResponse;
@@ -37,7 +38,7 @@ public class ProtocolLayerClientTests {
     private ProtocolLayerClient protocolLayerClient;
 
     @Autowired
-    private Account adminAccount;
+    private HieroContext hieroContext;
 
     @Autowired
     private HieroTestUtils hieroTestUtils;
@@ -45,7 +46,8 @@ public class ProtocolLayerClientTests {
     @Test
     void testGetBalance() throws Exception {
         //given
-        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(adminAccount.accountId());
+        final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(
+                hieroContext.getOperatorAccount().accountId());
 
         //when
         final AccountBalanceResponse accountBalanceResult = protocolLayerClient.executeAccountBalanceQuery(

@@ -47,7 +47,6 @@ public class HieroAutoConfiguration {
     }
 
     @Bean
-    @ApplicationScope
     HieroNetwork hieroNetwork(final HieroConfig hieroConfig) {
         return hieroConfig.getNetwork();
     }
