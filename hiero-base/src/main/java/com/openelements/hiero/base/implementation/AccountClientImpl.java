@@ -2,7 +2,7 @@ package com.openelements.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.AccountClient;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;

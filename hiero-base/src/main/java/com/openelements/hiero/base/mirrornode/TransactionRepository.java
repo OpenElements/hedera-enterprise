@@ -1,8 +1,9 @@
-package com.openelements.hiero.base;
+package com.openelements.hiero.base.mirrornode;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import com.openelements.hiero.base.mirrornode.Page;
-import com.openelements.hiero.base.mirrornode.TransactionInfo;
+import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.data.Page;
+import com.openelements.hiero.base.data.TransactionInfo;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;

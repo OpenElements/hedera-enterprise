@@ -1,9 +1,9 @@
 package com.openelements.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.ContractCallResult;
-import com.openelements.hiero.base.ContractParam;
+import com.openelements.hiero.base.data.ContractParam;
 import com.openelements.hiero.base.SmartContractClient;
 import java.math.BigInteger;
 import java.nio.file.Path;

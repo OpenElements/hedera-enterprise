@@ -1,7 +1,7 @@
 package com.openelements.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.TokenId;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.AccountClient;
 import com.openelements.hiero.base.NftClient;
 import java.nio.charset.StandardCharsets;

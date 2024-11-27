@@ -1,4 +1,4 @@
-package com.openelements.hiero.base.mirrornode;
+package com.openelements.hiero.base.data;
 
 import org.jspecify.annotations.NonNull;
 

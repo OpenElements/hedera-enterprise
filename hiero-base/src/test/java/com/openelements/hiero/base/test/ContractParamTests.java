@@ -1,6 +1,6 @@
 package com.openelements.hiero.base.test;
 
-import com.openelements.hiero.base.ContractParam;
+import com.openelements.hiero.base.data.ContractParam;
 import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;

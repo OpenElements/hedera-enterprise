@@ -1,6 +1,6 @@
 package com.openelements.hiero.spring.test;
 
-import com.openelements.hiero.base.ContractVerificationClient;
+import com.openelements.hiero.base.verification.ContractVerificationClient;
 import com.openelements.hiero.base.FileClient;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.protocol.ProtocolLayerClient;

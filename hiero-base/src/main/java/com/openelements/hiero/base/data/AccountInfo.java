@@ -1,4 +1,4 @@
-package com.openelements.hiero.base.mirrornode;
+package com.openelements.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountId;

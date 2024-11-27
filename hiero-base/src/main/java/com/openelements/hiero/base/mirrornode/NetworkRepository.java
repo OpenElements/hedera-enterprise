@@ -1,9 +1,10 @@
-package com.openelements.hiero.base;
+package com.openelements.hiero.base.mirrornode;
 
-import com.openelements.hiero.base.mirrornode.ExchangeRates;
-import com.openelements.hiero.base.mirrornode.NetworkFee;
-import com.openelements.hiero.base.mirrornode.NetworkStake;
-import com.openelements.hiero.base.mirrornode.NetworkSupplies;
+import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.data.ExchangeRates;
+import com.openelements.hiero.base.data.NetworkFee;
+import com.openelements.hiero.base.data.NetworkStake;
+import com.openelements.hiero.base.data.NetworkSupplies;
 import java.util.List;
 import java.util.Optional;
 

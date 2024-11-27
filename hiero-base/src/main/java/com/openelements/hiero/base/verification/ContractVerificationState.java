@@ -1,4 +1,4 @@
-package com.openelements.hiero.base;
+package com.openelements.hiero.base.verification;
 
 /**
  * Enumerates the possible states of contract verification.

@@ -1,10 +1,10 @@
 package com.openelements.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.AccountClient;
-import com.openelements.hiero.base.AccountRepository;
-import com.openelements.hiero.base.mirrornode.AccountInfo;
+import com.openelements.hiero.base.mirrornode.AccountRepository;
+import com.openelements.hiero.base.data.AccountInfo;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = TestConfig.class)
 public class AccountRepositoryTest {
-    
+
     @Autowired
     private AccountRepository accountRepository;
 

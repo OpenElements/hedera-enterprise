@@ -213,6 +213,9 @@ public interface ProtocolLayerClient {
     TopicSubmitMessageResult executeTopicMessageSubmitTransaction(@NonNull TopicSubmitMessageRequest request)
             throws HieroException;
 
+    TopicMessageResult executeTopicMessageQuery(TopicMessageRequest request) throws HieroException;
+
+
     /**
      * Adds a transaction listener to the protocol layer client. The listener will be notified when a transaction is
      * executed.
@@ -222,4 +225,5 @@ public interface ProtocolLayerClient {
      */
     @NonNull
     Runnable addTransactionListener(@NonNull TransactionListener listener);
+
 }

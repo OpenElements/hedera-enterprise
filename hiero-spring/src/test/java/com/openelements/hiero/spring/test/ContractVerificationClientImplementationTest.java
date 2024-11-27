@@ -1,8 +1,8 @@
 package com.openelements.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import com.openelements.hiero.base.ContractVerificationClient;
-import com.openelements.hiero.base.ContractVerificationState;
+import com.openelements.hiero.base.verification.ContractVerificationClient;
+import com.openelements.hiero.base.verification.ContractVerificationState;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.implementation.HieroNetwork;
 import java.nio.charset.StandardCharsets;

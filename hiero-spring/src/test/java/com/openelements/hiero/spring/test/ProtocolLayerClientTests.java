@@ -3,7 +3,7 @@ package com.openelements.hiero.spring.test;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;
 import com.openelements.hiero.base.protocol.AccountBalanceResponse;
 import com.openelements.hiero.base.protocol.AccountCreateRequest;

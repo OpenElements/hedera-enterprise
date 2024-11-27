@@ -2,15 +2,16 @@ package com.openelements.hiero.base;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
+import com.openelements.hiero.base.data.ContractParam;
 import java.nio.file.Path;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A client for interacting with the smart contract service on a Hiero network. An implementation of this interface
- * is using an internal account to interact with a Hiero network. That account is the account that is used to pay for
- * the transactions that are sent to a Hiero network and called 'operator account'.
+ * A client for interacting with the smart contract service on a Hiero network. An implementation of this interface is
+ * using an internal account to interact with a Hiero network. That account is the account that is used to pay for the
+ * transactions that are sent to a Hiero network and called 'operator account'.
  */
 public interface SmartContractClient {
 

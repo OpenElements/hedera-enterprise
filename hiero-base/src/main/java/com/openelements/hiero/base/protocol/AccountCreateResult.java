@@ -3,7 +3,7 @@ package com.openelements.hiero.base.protocol;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.openelements.hiero.base.Account;
+import com.openelements.hiero.base.data.Account;
 import java.time.Instant;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;

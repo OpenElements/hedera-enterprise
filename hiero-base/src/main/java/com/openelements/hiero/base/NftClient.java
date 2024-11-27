@@ -3,6 +3,7 @@ package com.openelements.hiero.base;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
+import com.openelements.hiero.base.data.Account;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -10,8 +11,8 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * Interface for interacting with a Hiero network. This interface provides methods for interacting with Hedera NFTs,
- * like creating and deleting NFTs. An implementation of this interface is using an internal account to interact with
- * a Hiero network. That account is the account that is used to pay for the transactions that are sent to the Hedera
+ * like creating and deleting NFTs. An implementation of this interface is using an internal account to interact with a
+ * Hiero network. That account is the account that is used to pay for the transactions that are sent to the Hedera
  * network and called 'operator account'.
  */
 public interface NftClient {
