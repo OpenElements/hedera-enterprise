@@ -11,7 +11,7 @@
 
   <name>Hiero Enterprise</name>
   <description>Java Library to work with Hiero in Spring and JakartaEE</description>
-  <url>https://github.com/OpenElements/hedera-enterprise</url>
+  <url>https://github.com/OpenElements/hiero-enterprise-java</url>
   <licenses>
     <license>
       <name>Apache-2.0</name>
@@ -26,9 +26,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:https://github.com/OpenElements/hedera-enterprise.git</connection>
-    <developerConnection>scm:git:https://github.com/OpenElements/hedera-enterprise.git</developerConnection>
-    <url>https://github.com/OpenElements/hedera-enterprise.git</url>
+    <connection>scm:git:https://github.com/OpenElements/hiero-enterprise-java.git</connection>
+    <developerConnection>scm:git:https://github.com/OpenElements/hiero-enterprise-java.git</developerConnection>
+    <url>https://github.com/OpenElements/hiero-enterprise-java.git</url>
     <tag>HEAD</tag>
   </scm>
 

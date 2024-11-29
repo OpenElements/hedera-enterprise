@@ -13,4 +13,4 @@ releaseRepository = true
 [release.github]
 enabled = true
 owner = "OpenElements"
-name = "hedera-enterprise"
+name = "hiero-enterprise-java"
