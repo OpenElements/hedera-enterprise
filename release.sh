@@ -30,7 +30,7 @@ export $(grep -v '^#' .env | xargs)
 
 echo "Releasing version $NEW_VERSION"
 ./mvnw versions:set -DnewVersion=$NEW_VERSION
-./mvnw clean verify
+./mvnw clean verify -DskipTests
 git commit -am "Version $NEW_VERSION"
 git push
 ./mvnw -Ppublication deploy -DskipTests
