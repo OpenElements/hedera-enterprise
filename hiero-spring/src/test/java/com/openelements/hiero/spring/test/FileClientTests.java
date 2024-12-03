@@ -26,6 +26,7 @@ public class FileClientTests {
         Assertions.assertThrows(NullPointerException.class, () -> fileClient.readFile((FileId) null));
         Assertions.assertThrows(NullPointerException.class, () -> fileClient.deleteFile((String) null));
         Assertions.assertThrows(NullPointerException.class, () -> fileClient.deleteFile((FileId) null));
+        Assertions.assertThrows(NullPointerException.class, () -> fileClient.getExpirationTime(null));
     }
 
     @Test
@@ -198,6 +199,14 @@ public class FileClientTests {
         //then
         Assertions.assertTrue(expirationTime.isAfter(definedExpirationTime.minusSeconds(1)));
         Assertions.assertTrue(expirationTime.isBefore(definedExpirationTime.plusSeconds(1)));
+    }
+
+    @Test
+    void testGetExpirationTimeForFailures() {
+        //given
+        final FileId invalidFileId = FileId.fromString("1.2.3");
+        //then
+        Assertions.assertThrows(HieroException.class, () -> fileClient.getExpirationTime(invalidFileId));
     }
 
     @Test
