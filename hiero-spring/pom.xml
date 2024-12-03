@@ -15,7 +15,7 @@
 
   <name>Hiero Enterprise Spring</name>
   <description>Library to work with Hiero in Spring</description>
-  <url>https://github.com/OpenElements/hedera-enterprise</url>
+  <url>https://github.com/OpenElements/hiero-enterprise-java</url>
 
   <dependencies>
     <dependency>
