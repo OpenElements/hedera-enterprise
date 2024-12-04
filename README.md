@@ -15,7 +15,7 @@ To use this module, you need to add the following dependency to your project:
 ```xml 
 <dependency>
     <groupId>com.open-elements.hiero</groupId>
-    <artifactId>hiero-spring</artifactId>
+    <artifactId>hiero-enterprise-spring</artifactId>
     <version>VERSION</version> 
 </dependency>
 ```
@@ -78,7 +78,7 @@ For asynchronous operations, you can easily wrap calls by use the [`@Async` anno
 
 ### Hiero Spring Sample
 
-A sample application that uses the Hiero Spring module can be found in the `hiero-spring-sample` module.
+A sample application that uses the Hiero Spring module can be found in the `hiero-enterprise-spring-sample` module.
 The sample application is a simple Spring Boot application that reads has a REST endpoint at `localhost:8080/` and  shows the hbar balance of the account `0.0.100` on the Hedera testnet.
 To use the application, you need to have created a Hedera testnet account at the [Hedera portal](https://portal.hedera.com/).
 The account information can be added to the `application.properties` file in the `hedera-spring-sample` module:

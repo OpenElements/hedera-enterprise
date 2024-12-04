@@ -6,7 +6,7 @@
 
   <groupId>com.open-elements.hiero</groupId>
   <artifactId>hiero-enterprise</artifactId>
-  <version>0.14.0-SNAPSHOT</version>
+  <version>0.14.0</version>
   <packaging>pom</packaging>
 
   <name>Hiero Enterprise</name>
@@ -90,17 +90,17 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hiero-base</artifactId>
+        <artifactId>hiero-enterprise-base</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hiero-spring</artifactId>
+        <artifactId>hiero-enterprise-spring</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>hiero-microprofile</artifactId>
+        <artifactId>hiero-enterprise-microprofile</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -188,11 +188,11 @@
   </dependencyManagement>
 
   <modules>
-    <module>hiero-base</module>
-    <module>hiero-spring</module>
-    <module>hiero-microprofile</module>
-    <module>hiero-spring-sample</module>
-    <module>hiero-microprofile-sample</module>
+    <module>hiero-enterprise-base</module>
+    <module>hiero-enterprise-spring</module>
+    <module>hiero-enterprise-microprofile</module>
+    <module>hiero-enterprise-spring-sample</module>
+    <module>hiero-enterprise-microprofile-sample</module>
   </modules>
 
   <build>

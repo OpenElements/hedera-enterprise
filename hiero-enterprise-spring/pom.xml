@@ -7,40 +7,41 @@
   <parent>
     <groupId>com.open-elements.hiero</groupId>
     <artifactId>hiero-enterprise</artifactId>
-    <version>0.14.0-SNAPSHOT</version>
+    <version>0.14.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>hiero-base</artifactId>
+  <artifactId>hiero-enterprise-spring</artifactId>
 
-  <name>Hiero Enterprise Base</name>
-  <description>Base Library to work with Hiero in Spring and JakartaEE</description>
+  <name>Hiero Enterprise Spring</name>
+  <description>Library to work with Hiero in Spring</description>
   <url>https://github.com/OpenElements/hiero-enterprise-java</url>
-
 
   <dependencies>
     <dependency>
-      <groupId>com.hedera.hashgraph</groupId>
-      <artifactId>sdk</artifactId>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.github.cdimascio</groupId>
-      <artifactId>dotenv-java</artifactId>
-      <scope>test</scope>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jspecify</groupId>
-      <artifactId>jspecify</artifactId>
-      <scope>compile</scope>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <scope>test</scope>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hiero-enterprise-base</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
@@ -53,8 +54,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
