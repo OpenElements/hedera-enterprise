@@ -1,21 +1,25 @@
-package com.openelements.hiero.spring.sample;
+package com.openelements.hiero.microprofile.sample;
 
 import com.openelements.hiero.base.AccountClient;
 import com.openelements.hiero.base.data.Account;
-import java.util.Objects;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
-@RestController
+@Path("/")
 public class HieroEndpoint {
 
     private final AccountClient client;
 
+    @Inject
     public HieroEndpoint(final AccountClient client) {
-        this.client = Objects.requireNonNull(client, "client must not be null");
+        this.client = client;
     }
 
-    @GetMapping("/")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
     public String createAccount() {
         try {
             final Account account = client.createAccount();
