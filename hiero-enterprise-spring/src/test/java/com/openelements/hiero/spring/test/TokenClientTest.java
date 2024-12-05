@@ -77,5 +77,4 @@ public class TokenClientTest {
 
         Assertions.assertDoesNotThrow(() -> tokenClient.transferToken(tokenId,  toAccount.accountId(), totalSupply));
     }
-
 }
