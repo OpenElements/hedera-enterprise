@@ -9,6 +9,7 @@ import com.openelements.hiero.base.data.NetworkFee;
 import com.openelements.hiero.base.data.NetworkStake;
 import com.openelements.hiero.base.data.NetworkSupplies;
 import com.openelements.hiero.base.data.Nft;
+import com.openelements.hiero.base.data.NftMetadata;
 import com.openelements.hiero.base.data.Page;
 import com.openelements.hiero.base.data.TransactionInfo;
 import java.util.List;
@@ -231,4 +232,13 @@ public interface MirrorNodeClient {
      */
     @NonNull
     Optional<NetworkSupplies> queryNetworkSupplies() throws HieroException;
+
+    @NonNull
+    NftMetadata getNftMetadata(TokenId tokenId) throws HieroException;
+
+    @NonNull
+    Page<NftMetadata> findNftTypesByOwner(AccountId ownerId);
+
+    @NonNull
+    Page<NftMetadata> findAllNftTypes();
 }
