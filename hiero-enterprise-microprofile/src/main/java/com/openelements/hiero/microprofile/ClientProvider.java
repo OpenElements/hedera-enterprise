@@ -3,10 +3,12 @@ package com.openelements.hiero.microprofile;
 import com.openelements.hiero.base.AccountClient;
 import com.openelements.hiero.base.FileClient;
 import com.openelements.hiero.base.HieroContext;
+import com.openelements.hiero.base.NftClient;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.config.HieroConfig;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
 import com.openelements.hiero.base.implementation.FileClientImpl;
+import com.openelements.hiero.base.implementation.NftClientImpl;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.implementation.SmartContractClientImpl;
 import com.openelements.hiero.base.protocol.ProtocolLayerClient;
@@ -62,6 +64,13 @@ public class ClientProvider {
 
     @Produces
     @ApplicationScoped
+    NftClient createNftClient(@NonNull final ProtocolLayerClient protocolLayerClient,
+            @NonNull final HieroContext hieroContext) {
+        return new NftClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
+    }
+
+    @Produces
+    @ApplicationScoped
     AccountClient createAccountClient(@NonNull final ProtocolLayerClient protocolLayerClient) {
         return new AccountClientImpl(protocolLayerClient);
     }
@@ -71,4 +80,5 @@ public class ClientProvider {
     ContractVerificationClient createContractVerificationClient(@NonNull final HieroConfig hieroConfig) {
         return new ContractVerificationClientImpl(hieroConfig.getNetwork());
     }
+
 }
