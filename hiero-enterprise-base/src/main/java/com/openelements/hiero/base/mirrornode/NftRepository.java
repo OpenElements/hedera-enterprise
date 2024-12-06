@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.data.Nft;
+import com.openelements.hiero.base.data.NftMetadata;
 import com.openelements.hiero.base.data.Page;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,6 +14,19 @@ import org.jspecify.annotations.NonNull;
  * Interface for interacting with a Hiero network. This interface provides methods for searching for NFTs.
  */
 public interface NftRepository {
+
+    Page<NftMetadata> findAllTypes() throws HieroException;
+
+
+    @NonNull
+    Page<NftMetadata> findTypesByOwner(@NonNull AccountId ownerId) throws HieroException;
+
+    @NonNull
+    default Page<NftMetadata> findTypesByOwner(@NonNull String ownerId) throws HieroException {
+        Objects.requireNonNull(ownerId, "ownerId must not be null");
+        return findTypesByOwner(AccountId.fromString(ownerId));
+    }
+
 
     /**
      * Return all NFTs that are owned by the given owner.
@@ -139,5 +153,17 @@ public interface NftRepository {
         Objects.requireNonNull(owner, "owner must not be null");
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         return findByOwnerAndTypeAndSerial(AccountId.fromString(owner), TokenId.fromString(tokenId), serialNumber);
+    }
+
+    default NftMetadata getNftMetadata(String tokenId) throws HieroException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        return getNftMetadata(TokenId.fromString(tokenId));
+    }
+
+    NftMetadata getNftMetadata(TokenId tokenId) throws HieroException;
+
+    default NftMetadata getNftMetadata(Nft nft) throws HieroException {
+        Objects.requireNonNull(nft, "nft must not be null");
+        return getNftMetadata(nft.tokenId());
     }
 }

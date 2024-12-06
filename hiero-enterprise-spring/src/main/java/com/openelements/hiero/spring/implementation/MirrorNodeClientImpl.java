@@ -6,16 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hiero.base.HieroException;
-import com.openelements.hiero.base.data.Nft;
 import com.openelements.hiero.base.data.AccountInfo;
 import com.openelements.hiero.base.data.ExchangeRate;
 import com.openelements.hiero.base.data.ExchangeRates;
-import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import com.openelements.hiero.base.data.NetworkFee;
 import com.openelements.hiero.base.data.NetworkStake;
 import com.openelements.hiero.base.data.NetworkSupplies;
+import com.openelements.hiero.base.data.Nft;
+import com.openelements.hiero.base.data.NftMetadata;
 import com.openelements.hiero.base.data.Page;
 import com.openelements.hiero.base.data.TransactionInfo;
+import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
@@ -414,5 +415,20 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                         throw new RuntimeException("Error parsing transaction from JSON '" + transactionNode + "'", e);
                     }
                 }).toList();
+    }
+
+    @Override
+    public @NonNull NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public @NonNull Page<NftMetadata> findNftTypesByOwner(AccountId ownerId) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public @NonNull Page<NftMetadata> findAllNftTypes() {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }
