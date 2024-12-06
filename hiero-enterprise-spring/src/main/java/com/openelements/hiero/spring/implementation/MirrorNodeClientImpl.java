@@ -145,6 +145,21 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         return jsonNodeToOptionalNetworkSupplies(jsonNode);
     }
 
+    @Override
+    public @NonNull NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public @NonNull Page<NftMetadata> findNftTypesByOwner(AccountId ownerId) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public @NonNull Page<NftMetadata> findAllNftTypes() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
     private JsonNode doGetCall(String path, Map<String, ?> params) throws HieroException {
         return doGetCall(builder -> {
             UriBuilder uriBuilder = builder.path(path);
@@ -415,20 +430,5 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
                         throw new RuntimeException("Error parsing transaction from JSON '" + transactionNode + "'", e);
                     }
                 }).toList();
-    }
-
-    @Override
-    public @NonNull NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public @NonNull Page<NftMetadata> findNftTypesByOwner(AccountId ownerId) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public @NonNull Page<NftMetadata> findAllNftTypes() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }
