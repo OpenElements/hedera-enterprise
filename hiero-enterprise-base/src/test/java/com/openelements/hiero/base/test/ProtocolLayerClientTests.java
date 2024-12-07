@@ -55,6 +55,6 @@ public class ProtocolLayerClientTests {
         Assertions.assertThrows(NullPointerException.class, () -> client.executeTokenCreateTransaction(null));
         Assertions.assertThrows(NullPointerException.class, () -> client.executeBurnTokenTransaction(null));
         Assertions.assertThrows(NullPointerException.class, () -> client.executeMintTokenTransaction(null));
-        Assertions.assertThrows(NullPointerException.class, () -> client.executeTransferTransactionForNft(null));
+        Assertions.assertThrows(NullPointerException.class, () -> client.executeTransferTransaction(null));
     }
 }

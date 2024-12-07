@@ -430,7 +430,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             }
 
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
-            return new TokenBurnResult(receipt.transactionId, receipt.status);
+            return new TokenBurnResult(receipt.transactionId, receipt.status, receipt.totalSupply);
         } catch (final Exception e) {
             throw new HieroException("Failed to execute burn token transaction", e);
         }
@@ -452,22 +452,29 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             }
             sign(transaction, request.supplyKey());
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
-            return new TokenMintResult(receipt.transactionId, receipt.status, receipt.serials);
+            return new TokenMintResult(receipt.transactionId, receipt.status, receipt.serials, receipt.totalSupply);
         } catch (final Exception e) {
             throw new HieroException("Failed to execute mint token transaction", e);
         }
     }
 
-    public TokenTransferResult executeTransferTransactionForNft(@NonNull final TokenTransferRequest request)
+    public TokenTransferResult executeTransferTransaction(@NonNull final TokenTransferRequest request)
             throws HieroException {
         Objects.requireNonNull(request, "request must not be null");
         try {
             final TransferTransaction transaction = new TransferTransaction()
                     .setMaxTransactionFee(request.maxTransactionFee())
                     .setTransactionValidDuration(request.transactionValidDuration());
-            request.serials().forEach(
-                    serial -> transaction.addNftTransfer(new NftId(request.tokenId(), serial), request.sender(),
-                            request.receiver()));
+            if (!request.serials().isEmpty()) {
+                request.serials().forEach(
+                        serial -> transaction.addNftTransfer(new NftId(request.tokenId(), serial), request.sender(),
+                                request.receiver()));
+            } else if (request.amount() != null) {
+                transaction.addTokenTransfer(request.tokenId(), request.sender(), request.amount() * -1);
+                transaction.addTokenTransfer(request.tokenId(), request.receiver(), request.amount());
+            } else {
+                throw new IllegalArgumentException("either amount or serial must be provided");
+            }
             sign(transaction, request.senderKey());
             final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
             return new TokenTransferResult(receipt.transactionId, receipt.status);

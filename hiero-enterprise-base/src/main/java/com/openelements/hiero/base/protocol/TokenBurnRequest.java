@@ -31,4 +31,9 @@ public record TokenBurnRequest(@NonNull Hbar maxTransactionFee,
         return new TokenBurnRequest(TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
                 TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION, tokenId, supplyKey, null, serials);
     }
+
+    public static TokenBurnRequest of(TokenId tokenId, PrivateKey supplyKey, long amount) {
+        return new TokenBurnRequest(TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
+                TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION, tokenId, supplyKey, amount, null);
+    }
 }
