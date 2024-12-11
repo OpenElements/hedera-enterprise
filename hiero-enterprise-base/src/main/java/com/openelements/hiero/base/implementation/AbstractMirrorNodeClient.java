@@ -1,0 +1,69 @@
+package com.openelements.hiero.base.implementation;
+
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.TokenId;
+import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.data.AccountInfo;
+import com.openelements.hiero.base.data.ExchangeRates;
+import com.openelements.hiero.base.data.NetworkFee;
+import com.openelements.hiero.base.data.NetworkStake;
+import com.openelements.hiero.base.data.NetworkSupplies;
+import com.openelements.hiero.base.data.Nft;
+import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import org.jspecify.annotations.NonNull;
+
+public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient {
+
+    @NonNull
+    protected abstract MirrorNodeRestClient<JSON> getRestClient();
+
+    @NonNull
+    protected abstract MirrorNodeJsonConverter<JSON> getJsonConverter();
+
+    @Override
+    public @NonNull
+    final Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, final long serialNumber)
+            throws HieroException {
+        final JSON json = getRestClient().queryNftsByTokenIdAndSerial(tokenId, serialNumber);
+        return getJsonConverter().toNft(json);
+    }
+
+    @Override
+    public @NonNull
+    final Optional<AccountInfo> queryAccount(@NonNull final AccountId accountId) throws HieroException {
+        Objects.requireNonNull(accountId, "accountId must not be null");
+        final JSON json = getRestClient().queryAccount(accountId);
+        return getJsonConverter().toAccountInfo(json);
+    }
+
+    @Override
+    public @NonNull
+    final Optional<ExchangeRates> queryExchangeRates() throws HieroException {
+        final JSON json = getRestClient().queryExchangeRates();
+        return getJsonConverter().toExchangeRates(json);
+    }
+
+    @Override
+    public @NonNull
+    final List<NetworkFee> queryNetworkFees() throws HieroException {
+        final JSON json = getRestClient().queryNetworkFees();
+        return getJsonConverter().toNetworkFees(json);
+    }
+
+    @Override
+    public @NonNull
+    final Optional<NetworkStake> queryNetworkStake() throws HieroException {
+        final JSON json = getRestClient().queryNetworkStake();
+        return getJsonConverter().toNetworkStake(json);
+    }
+
+    @Override
+    public @NonNull
+    final Optional<NetworkSupplies> queryNetworkSupplies() throws HieroException {
+        final JSON json = getRestClient().queryNetworkSupplies();
+        return getJsonConverter().toNetworkSupplies(json);
+    }
+}
