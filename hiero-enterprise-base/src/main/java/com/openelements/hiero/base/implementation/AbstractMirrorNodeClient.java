@@ -9,6 +9,7 @@ import com.openelements.hiero.base.data.NetworkFee;
 import com.openelements.hiero.base.data.NetworkStake;
 import com.openelements.hiero.base.data.NetworkSupplies;
 import com.openelements.hiero.base.data.Nft;
+import com.openelements.hiero.base.data.NftMetadata;
 import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
 import java.util.List;
 import java.util.Objects;
@@ -66,4 +67,10 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
         final JSON json = getRestClient().queryNetworkSupplies();
         return getJsonConverter().toNetworkSupplies(json);
     }
+
+    @Override
+    public @NonNull Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
 }

@@ -96,11 +96,6 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
     }
 
     @Override
-    public @NonNull NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
     public @NonNull Page<NftMetadata> findNftTypesByOwner(AccountId ownerId) {
         throw new UnsupportedOperationException("Not yet implemented");
     }

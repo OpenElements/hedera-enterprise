@@ -1,6 +1,6 @@
 package com.openelements.hiero.base.implementation;
 
-import com.openelements.hiero.base.TokenClient;
+import com.openelements.hiero.base.FungibleTokenClient;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -12,12 +12,12 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
-public class TokenClientImpl implements TokenClient {
+public class FungibleTokenClientImpl implements FungibleTokenClient {
     private final ProtocolLayerClient client;
 
     private final Account operationalAccount;
 
-    public TokenClientImpl(@NonNull final ProtocolLayerClient client, @NonNull final Account operationalAccount) {
+    public FungibleTokenClientImpl(@NonNull final ProtocolLayerClient client, @NonNull final Account operationalAccount) {
         this.client = Objects.requireNonNull(client, "client must not be null");
         this.operationalAccount = Objects.requireNonNull(operationalAccount, "operationalAccount must not be null");
     }

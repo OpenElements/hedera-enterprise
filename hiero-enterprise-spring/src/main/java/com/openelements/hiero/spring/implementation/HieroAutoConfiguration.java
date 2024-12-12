@@ -2,18 +2,18 @@ package com.openelements.hiero.spring.implementation;
 
 import com.openelements.hiero.base.AccountClient;
 import com.openelements.hiero.base.FileClient;
+import com.openelements.hiero.base.FungibleTokenClient;
 import com.openelements.hiero.base.HieroContext;
 import com.openelements.hiero.base.NftClient;
-import com.openelements.hiero.base.TokenClient;
 import com.openelements.hiero.base.SmartContractClient;
 import com.openelements.hiero.base.config.HieroConfig;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
 import com.openelements.hiero.base.implementation.AccountRepositoryImpl;
 import com.openelements.hiero.base.implementation.FileClientImpl;
+import com.openelements.hiero.base.implementation.FungibleTokenClientImpl;
 import com.openelements.hiero.base.implementation.HieroNetwork;
 import com.openelements.hiero.base.implementation.NetworkRepositoryImpl;
 import com.openelements.hiero.base.implementation.NftClientImpl;
-import com.openelements.hiero.base.implementation.TokenClientImpl;
 import com.openelements.hiero.base.implementation.NftRepositoryImpl;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.implementation.SmartContractClientImpl;
@@ -85,8 +85,8 @@ public class HieroAutoConfiguration {
     }
 
     @Bean
-    TokenClient tokenClient(final ProtocolLayerClient protocolLayerClient, HieroContext hieroContext) {
-        return new TokenClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
+    FungibleTokenClient tokenClient(final ProtocolLayerClient protocolLayerClient, HieroContext hieroContext) {
+        return new FungibleTokenClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
     }
 
     @Bean

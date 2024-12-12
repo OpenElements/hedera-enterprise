@@ -65,11 +65,6 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     }
 
     @Override
-    public @NonNull NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
     public @NonNull Page<NftMetadata> findNftTypesByOwner(AccountId ownerId) {
         throw new RuntimeException("Not implemented");
     }

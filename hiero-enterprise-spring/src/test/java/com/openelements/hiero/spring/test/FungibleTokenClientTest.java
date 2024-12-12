@@ -4,16 +4,17 @@ import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.AccountClient;
 import com.openelements.hiero.base.HieroException;
-import com.openelements.hiero.base.TokenClient;
+import com.openelements.hiero.base.FungibleTokenClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = TestConfig.class)
-public class TokenClientTest {
+public class FungibleTokenClientTest {
+
     @Autowired
-    private TokenClient tokenClient;
+    private FungibleTokenClient tokenClient;
 
     @Autowired
     private AccountClient accountClient;

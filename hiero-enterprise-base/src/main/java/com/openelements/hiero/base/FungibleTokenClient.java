@@ -7,8 +7,14 @@ import com.openelements.hiero.base.data.Account;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
-public interface TokenClient {
-
+/**
+ * Interface for interacting with a Hiero network. This interface provides methods for interacting with Hedera Fungible
+ * Tokens, like creating and deleting Token. An implementation of this interface is using an internal account to
+ * interact with a Hiero network. That account is the account that is used to pay for the transactions that are sent to
+ * the Hedera network and called 'operator account'.
+ */
+public interface FungibleTokenClient extends TokenClient {
+    
     /**
      * Create a new token. The operator account is used as suppler account and as treasury account for the token.
      *
@@ -214,4 +220,164 @@ public interface TokenClient {
         associateToken(tokenId, account.accountId(), account.privateKey());
     }
 
+    /**
+     * Mint a Token.
+     *
+     * @param tokenId the ID of the token
+     * @param amount  amount to mint to the Treasury Account
+     * @return totalSupply for the token
+     * @throws HieroException if the token could not be minted
+     */
+    long mintToken(@NonNull TokenId tokenId, long amount) throws HieroException;
+
+    /**
+     * Mint a Token.
+     *
+     * @param tokenId the ID of the token
+     * @param amount  amount to mint to the Treasury Account
+     * @return totalSupply for the token
+     * @throws HieroException if the token could not be minted
+     */
+    default long mintToken(@NonNull String tokenId, long amount) throws HieroException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        return mintToken(TokenId.fromString(tokenId), amount);
+    }
+
+    /**
+     * Mint a Token.
+     *
+     * @param tokenId   the ID of the token
+     * @param amount    amount to mint to the Treasury Account
+     * @param supplyKey the private key of the supply account
+     * @return totalSupply for the token
+     * @throws HieroException if the token could not be minted
+     */
+    long mintToken(@NonNull TokenId tokenId, @NonNull PrivateKey supplyKey, long amount) throws HieroException;
+
+    /**
+     * Mint a Token.
+     *
+     * @param tokenId   the ID of the token
+     * @param amount    amount to mint to the Treasury Account
+     * @param supplyKey the private key of the supply account
+     * @return totalSupply for the token
+     * @throws HieroException if the token could not be minted
+     */
+    default long mintToken(@NonNull String tokenId, @NonNull String supplyKey, long amount)
+            throws HieroException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        Objects.requireNonNull(supplyKey, "supplyKey must not be null");
+        return mintToken(TokenId.fromString(tokenId), PrivateKey.fromString(supplyKey), amount);
+    }
+
+    /**
+     * Burn a Token.
+     *
+     * @param tokenId the ID of the token
+     * @param amount  amount to burn
+     * @return totalSupply for the token
+     * @throws HieroException if the token could not be burned
+     */
+    long burnToken(@NonNull TokenId tokenId, long amount) throws HieroException;
+
+    /**
+     * Burn a Token.
+     *
+     * @param tokenId   the ID of the token
+     * @param amount    amount to burn
+     * @param supplyKey the private key of the supply account
+     * @return totalSupply for the token
+     * @throws HieroException if the token could not be burned
+     */
+    long burnToken(@NonNull TokenId tokenId, long amount, @NonNull PrivateKey supplyKey) throws HieroException;
+
+    /**
+     * Burn a Token.
+     *
+     * @param tokenId   the ID of the token
+     * @param amount    amount to burn
+     * @param supplyKey the private key of the supply account
+     * @return totalSupply for the token
+     * @throws HieroException if the token could not be burned
+     */
+    default long burnToken(@NonNull TokenId tokenId, long amount, @NonNull String supplyKey) throws HieroException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        Objects.requireNonNull(supplyKey, "supplyKey must not be null");
+        return burnToken(tokenId, amount, PrivateKey.fromString(supplyKey));
+    }
+
+    /**
+     * Transfer a Token to another account.
+     *
+     * @param tokenId     the ID of the token
+     * @param amount      the value of token to transfer
+     * @param toAccountId the ID of the account that should receive the token
+     * @throws HieroException if the token could not be transferred
+     */
+    void transferToken(@NonNull TokenId tokenId, @NonNull AccountId toAccountId, long amount) throws HieroException;
+
+    /**
+     * Transfer a Token to another account.
+     *
+     * @param tokenId     the ID of the token
+     * @param amount      the value of token to transfer
+     * @param toAccountId the ID of the account that should receive the token
+     * @throws HieroException if the token could not be transferred
+     */
+    default void transferToken(@NonNull TokenId tokenId, @NonNull String toAccountId, long amount)
+            throws HieroException {
+        transferToken(tokenId, AccountId.fromString(toAccountId), amount);
+    }
+
+
+    /**
+     * Transfer a Token to another account.
+     *
+     * @param tokenId        the ID of the token
+     * @param amount         the value of token to transfer
+     * @param fromAccountId  the ID of the account that holds the token
+     * @param fromAccountKey the private key of the account that holds the token
+     * @param toAccountId    the ID of the account that should receive the token
+     * @throws HieroException if the token could not be transferred
+     */
+    void transferToken(@NonNull TokenId tokenId, @NonNull AccountId fromAccountId, @NonNull PrivateKey fromAccountKey,
+            @NonNull AccountId toAccountId, long amount) throws HieroException;
+
+    /**
+     * Transfer a Token to another account.
+     *
+     * @param tokenId     the ID of the token
+     * @param amount      the value of token to transfer
+     * @param fromAccount the account that holds the token
+     * @param toAccountId the ID of the account that should receive the token
+     * @throws HieroException if the token could not be transferred
+     */
+    default void transferToken(@NonNull TokenId tokenId, @NonNull Account fromAccount, @NonNull AccountId toAccountId,
+            long amount)
+            throws HieroException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+        Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+        transferToken(tokenId, fromAccount.accountId(), fromAccount.privateKey(), toAccountId, amount);
+    }
+
+    /**
+     * Transfer a Token to another account.
+     *
+     * @param tokenId        the ID of the token
+     * @param amount         the value of token to transfer
+     * @param fromAccountId  the ID of the account that holds the token
+     * @param fromAccountKey the private key of the account that holds the token
+     * @param toAccountId    the ID of the account that should receive the token
+     * @throws HieroException if the token could not be transferred
+     */
+    default void transferToken(@NonNull TokenId tokenId, @NonNull String fromAccountId, @NonNull String fromAccountKey,
+            @NonNull String toAccountId, long amount) throws HieroException {
+        Objects.requireNonNull(tokenId, "tokenId must not be null");
+        Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
+        Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
+        Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+        transferToken(tokenId, AccountId.fromString(fromAccountId), PrivateKey.fromString(fromAccountKey),
+                AccountId.fromString(toAccountId), amount);
+    }
 }

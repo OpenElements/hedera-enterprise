@@ -238,7 +238,7 @@ public interface MirrorNodeClient {
     Optional<NetworkSupplies> queryNetworkSupplies() throws HieroException;
 
     @NonNull
-    NftMetadata getNftMetadata(TokenId tokenId) throws HieroException;
+    Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException;
 
     @NonNull
     Page<NftMetadata> findNftTypesByOwner(AccountId ownerId);
