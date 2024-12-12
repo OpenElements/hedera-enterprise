@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.data.Nft;
+import com.openelements.hiero.base.data.NftMetadata;
 import com.openelements.hiero.base.data.Page;
 import com.openelements.hiero.base.data.TransactionInfo;
 import com.openelements.hiero.base.implementation.AbstractMirrorNodeClient;
@@ -94,4 +95,18 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
         return Optional.of(new TransactionInfo(transactionId));
     }
 
+    @Override
+    public @NonNull NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public @NonNull Page<NftMetadata> findNftTypesByOwner(AccountId ownerId) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public @NonNull Page<NftMetadata> findAllNftTypes() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

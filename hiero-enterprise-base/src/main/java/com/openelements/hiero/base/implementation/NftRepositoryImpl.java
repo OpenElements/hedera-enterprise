@@ -4,9 +4,10 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.data.Nft;
-import com.openelements.hiero.base.mirrornode.NftRepository;
-import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
+import com.openelements.hiero.base.data.NftMetadata;
 import com.openelements.hiero.base.data.Page;
+import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
+import com.openelements.hiero.base.mirrornode.NftRepository;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
@@ -50,5 +51,22 @@ public class NftRepositoryImpl implements NftRepository {
     public Optional<Nft> findByOwnerAndTypeAndSerial(@NonNull final AccountId owner, @NonNull final TokenId tokenId,
             final long serialNumber) throws HieroException {
         return mirrorNodeClient.queryNftsByAccountAndTokenIdAndSerial(owner, tokenId, serialNumber);
+    }
+
+    @NonNull
+    @Override
+    public NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
+        return mirrorNodeClient.getNftMetadata(tokenId);
+    }
+
+    @NonNull
+    @Override
+    public Page<NftMetadata> findTypesByOwner(@NonNull AccountId ownerId) throws HieroException {
+        return mirrorNodeClient.findNftTypesByOwner(ownerId);
+    }
+
+    @Override
+    public Page<NftMetadata> findAllTypes() throws HieroException {
+        return mirrorNodeClient.findAllNftTypes();
     }
 }
