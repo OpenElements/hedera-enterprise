@@ -545,12 +545,14 @@ public class ProtocolLayerDataCreationTests {
         final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
         final Status status = Status.SUCCESS;
         final List<Long> serials = List.of(1L, 2L, 3L);
+        final Long totalSupply = 1L;
 
         // Then
-        Assertions.assertDoesNotThrow(() -> new TokenMintResult(transactionId, status, serials));
-        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(null, status, serials));
-        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(transactionId, null, serials));
-        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(transactionId, status, null));
+        Assertions.assertDoesNotThrow(() -> new TokenMintResult(transactionId, status, serials, totalSupply));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(null, status, serials, totalSupply));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(transactionId, null, serials, totalSupply));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(transactionId, status, null, totalSupply));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenMintResult(transactionId, status, serials, null));
     }
 
     @Test
@@ -572,11 +574,13 @@ public class ProtocolLayerDataCreationTests {
         //Given
         final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
         final Status status = Status.SUCCESS;
+        final Long totalSupply = 1L;
 
         //Then
-        Assertions.assertDoesNotThrow(() -> new TokenBurnResult(transactionId, status));
-        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnResult(null, status));
-        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnResult(transactionId, null));
+        Assertions.assertDoesNotThrow(() -> new TokenBurnResult(transactionId, status, totalSupply));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnResult(null, status, totalSupply));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnResult(transactionId, null, totalSupply));
+        Assertions.assertThrows(NullPointerException.class, () -> new TokenBurnResult(transactionId, status, null));
     }
 
     @Test
@@ -677,37 +681,44 @@ public class ProtocolLayerDataCreationTests {
         final PrivateKey senderKey = PrivateKey.generateECDSA();
         final List<Long> emptySerials = List.of();
         final List<Long> negativeSerials = List.of(-1L);
+        final Long amount = 1l;
 
         //then
         Assertions.assertDoesNotThrow(
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, sender,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, emptySerials, amount, sender,
+                        receiver, senderKey));
+        Assertions.assertDoesNotThrow(
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, null, sender,
                         receiver, senderKey));
         Assertions.assertDoesNotThrow(() -> TokenTransferRequest.of(tokenId, 1L, sender, receiver, senderKey));
         Assertions.assertThrows(NullPointerException.class,
-                () -> new TokenTransferRequest(null, transactionValidDuration, tokenId, serials, sender, receiver,
+                () -> new TokenTransferRequest(null, transactionValidDuration, tokenId, serials, amount, sender, receiver,
                         senderKey));
         Assertions.assertThrows(NullPointerException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, null, tokenId, serials, sender, receiver, senderKey));
+                () -> new TokenTransferRequest(maxTransactionFee, null, tokenId, serials, null, sender, receiver, senderKey));
         Assertions.assertThrows(NullPointerException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, null, serials, sender,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, null, serials, null, sender,
                         receiver, senderKey));
         Assertions.assertThrows(NullPointerException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, null, sender,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, null, amount, sender,
                         receiver, senderKey));
         Assertions.assertThrows(NullPointerException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, null,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials,null, null,
                         receiver, senderKey));
         Assertions.assertThrows(NullPointerException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, sender,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, null, sender,
                         null, senderKey));
         Assertions.assertThrows(NullPointerException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, sender,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, serials, null, sender,
                         receiver, null));
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, emptySerials,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, emptySerials, null,
                         sender, receiver, senderKey));
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, negativeSerials,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, negativeSerials, null,
+                        sender, receiver, senderKey));
+        Assertions.assertThrows(NullPointerException.class,
+                () -> new TokenTransferRequest(maxTransactionFee, transactionValidDuration, tokenId, null, null,
                         sender, receiver, senderKey));
     }
 

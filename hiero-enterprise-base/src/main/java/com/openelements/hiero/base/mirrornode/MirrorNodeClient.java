@@ -132,8 +132,12 @@ public interface MirrorNodeClient {
      * @throws HieroException if an error occurs
      */
     @NonNull
-    Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull AccountId accountId, @NonNull TokenId tokenId,
-            long serialNumber) throws HieroException;
+    default Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull AccountId accountId, @NonNull TokenId tokenId,
+            long serialNumber) throws HieroException {
+        Objects.requireNonNull(accountId, "newAccountId must not be null");
+        return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
+                .filter(nft -> Objects.equals(nft.owner(), accountId));
+    }
 
     /**
      * Queries the NFTs owned by an account for a specific token ID and serial number.

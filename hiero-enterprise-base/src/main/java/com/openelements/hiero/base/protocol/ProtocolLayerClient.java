@@ -179,7 +179,7 @@ public interface ProtocolLayerClient {
      * @throws HieroException if the transaction could not be executed
      */
     @NonNull
-    TokenTransferResult executeTransferTransactionForNft(@NonNull final TokenTransferRequest request)
+    TokenTransferResult executeTransferTransaction(@NonNull final TokenTransferRequest request)
             throws HieroException;
 
     /**

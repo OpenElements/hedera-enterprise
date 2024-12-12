@@ -2,9 +2,9 @@ package com.openelements.hiero.spring.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.config.ConsensusNode;
 import com.openelements.hiero.base.config.HieroConfig;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.implementation.HieroNetwork;
 import java.util.List;
 import java.util.Objects;
@@ -82,7 +82,7 @@ public class HieroConfigImpl implements HieroConfig {
     }
 
     @Override
-    public List<String> getMirrornodeAddresses() {
+    public List<String> getMirrorNodeAddresses() {
         return mirrorNodeAddresses;
     }
 

@@ -9,9 +9,12 @@ import com.openelements.hiero.base.config.HieroConfig;
 import com.openelements.hiero.base.implementation.AccountClientImpl;
 import com.openelements.hiero.base.implementation.AccountRepositoryImpl;
 import com.openelements.hiero.base.implementation.FileClientImpl;
+import com.openelements.hiero.base.implementation.HieroNetwork;
+import com.openelements.hiero.base.implementation.NetworkRepositoryImpl;
 import com.openelements.hiero.base.implementation.NetworkRepositoryImpl;
 import com.openelements.hiero.base.implementation.NftRepositoryImpl;
 import com.openelements.hiero.base.implementation.NftClientImpl;
+import com.openelements.hiero.base.implementation.NftRepositoryImpl;
 import com.openelements.hiero.base.implementation.ProtocolLayerClientImpl;
 import com.openelements.hiero.base.implementation.SmartContractClientImpl;
 import com.openelements.hiero.base.implementation.TransactionRepositoryImpl;
@@ -24,6 +27,9 @@ import com.openelements.hiero.base.protocol.ProtocolLayerClient;
 import com.openelements.hiero.base.verification.ContractVerificationClient;
 import com.openelements.hiero.microprofile.implementation.ContractVerificationClientImpl;
 import com.openelements.hiero.microprofile.implementation.HieroConfigImpl;
+import com.openelements.hiero.microprofile.implementation.MirrorNodeClientImpl;
+import com.openelements.hiero.microprofile.implementation.MirrorNodeJsonConverterImpl;
+import com.openelements.hiero.microprofile.implementation.MirrorNodeRestClientImpl;
 import com.openelements.hiero.microprofile.implementation.MirrorNodeClientImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
@@ -41,30 +47,35 @@ public class ClientProvider {
     @ConfigProperties
     private HieroNetworkConfiguration networkConfiguration;
 
+    @NonNull
     @Produces
     @ApplicationScoped
     HieroConfig createHieroConfig() {
         return new HieroConfigImpl(configuration, networkConfiguration);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     HieroContext createHieroContext(@NonNull final HieroConfig hieroConfig) {
         return hieroConfig.createHieroContext();
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroContext hieroContext) {
         return new ProtocolLayerClientImpl(hieroContext);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     FileClient createFileClient(@NonNull final ProtocolLayerClient protocolLayerClient) {
         return new FileClientImpl(protocolLayerClient);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     SmartContractClient createSmartContractClient(@NonNull final ProtocolLayerClient protocolLayerClient,
@@ -72,6 +83,7 @@ public class ClientProvider {
         return new SmartContractClientImpl(protocolLayerClient, fileClient);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     NftClient createNftClient(@NonNull final ProtocolLayerClient protocolLayerClient,
@@ -79,42 +91,58 @@ public class ClientProvider {
         return new NftClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     AccountClient createAccountClient(@NonNull final ProtocolLayerClient protocolLayerClient) {
         return new AccountClientImpl(protocolLayerClient);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     ContractVerificationClient createContractVerificationClient(@NonNull final HieroConfig hieroConfig) {
         return new ContractVerificationClientImpl(hieroConfig.getNetwork());
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
-    MirrorNodeClient createMirrorNodeClient() {
-        return new MirrorNodeClientImpl();
+    MirrorNodeClient createMirrorNodeClient(@NonNull final HieroConfig hieroConfig) {
+        final HieroNetwork network = hieroConfig.getNetwork();
+        final String target;
+        if (network == HieroNetwork.CUSTOM) {
+            target = hieroConfig.getMirrorNodeAddresses().get(0);
+        } else {
+            target = network.getMirrornodeEndpoint();
+        }
+        final MirrorNodeRestClientImpl restClient = new MirrorNodeRestClientImpl(target);
+        final MirrorNodeJsonConverterImpl jsonConverter = new MirrorNodeJsonConverterImpl();
+        return new MirrorNodeClientImpl(restClient, jsonConverter);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     AccountRepository createAccountRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
         return new AccountRepositoryImpl(mirrorNodeClient);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     NetworkRepository createNetworkRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
         return new NetworkRepositoryImpl(mirrorNodeClient);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     NftRepository createNftRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
         return new NftRepositoryImpl(mirrorNodeClient);
     }
 
+    @NonNull
     @Produces
     @ApplicationScoped
     TransactionRepository createTransactionRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {

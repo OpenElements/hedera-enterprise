@@ -1,11 +1,11 @@
 package com.openelements.hiero.spring.implementation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.openelements.hiero.base.HieroException;
+import com.openelements.hiero.base.data.Nft;
 import com.openelements.hiero.base.data.AccountInfo;
 import com.openelements.hiero.base.data.ExchangeRate;
 import com.openelements.hiero.base.data.ExchangeRates;
@@ -17,30 +17,25 @@ import com.openelements.hiero.base.data.NftMetadata;
 import com.openelements.hiero.base.data.Page;
 import com.openelements.hiero.base.data.TransactionInfo;
 import com.openelements.hiero.base.mirrornode.MirrorNodeClient;
-import java.io.IOException;
-import java.net.URI;
-import java.time.Instant;
+import com.openelements.hiero.base.implementation.AbstractMirrorNodeClient;
+import com.openelements.hiero.base.implementation.MirrorNodeJsonConverter;
+import com.openelements.hiero.base.implementation.MirrorNodeRestClient;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.Function;
-import java.util.stream.StreamSupport;
 import org.jspecify.annotations.NonNull;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriBuilder;
 
-public class MirrorNodeClientImpl implements MirrorNodeClient {
+public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
 
     private final ObjectMapper objectMapper;
 
     private final RestClient restClient;
+
+    private final MirrorNodeRestClientImpl mirrorNodeRestClient;
+
+    private final MirrorNodeJsonConverter<JsonNode> jsonConverter;
 
     /**
      * Constructor.
@@ -49,15 +44,27 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
      */
     public MirrorNodeClientImpl(final RestClient.Builder restClientBuilder) {
         Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null");
+        mirrorNodeRestClient = new MirrorNodeRestClientImpl(restClientBuilder);
+        jsonConverter = new MirrorNodeJsonConverterImpl();
         objectMapper = new ObjectMapper();
         restClient = restClientBuilder.build();
+    }
+
+    @Override
+    protected final MirrorNodeRestClient<JsonNode> getRestClient() {
+        return mirrorNodeRestClient;
+    }
+
+    @Override
+    protected final MirrorNodeJsonConverter<JsonNode> getJsonConverter() {
+        return jsonConverter;
     }
 
     @Override
     public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HieroException {
         Objects.requireNonNull(accountId, "newAccountId must not be null");
         final String path = "/api/v1/accounts/" + accountId + "/nfts";
-        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> jsonConverter.toNfts(node);
         return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
     }
 
@@ -66,48 +73,30 @@ public class MirrorNodeClientImpl implements MirrorNodeClient {
         Objects.requireNonNull(accountId, "accountId must not be null");
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         final String path = "/api/v1/tokens/" + tokenId + "/nfts/?account.id=" + accountId;
-        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> jsonConverter.toNfts(node);
         return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
     }
 
     @Override
     public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) {
         final String path = "/api/v1/tokens/" + tokenId + "/nfts";
-        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> getNfts(node);
+        final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> jsonConverter.toNfts(node);
         return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
-    }
-
-    @Override
-    public Optional<Nft> queryNftsByTokenIdAndSerial(@NonNull final TokenId tokenId, @NonNull final long serialNumber)
-            throws HieroException {
-        Objects.requireNonNull(tokenId, "tokenId must not be null");
-        if (serialNumber <= 0) {
-            throw new IllegalArgumentException("serialNumber must be positive");
-        }
-        final JsonNode jsonNode = doGetCall("/api/v1/tokens/" + tokenId + "/nfts/" + serialNumber);
-        return jsonNodeToOptionalNft(jsonNode);
-    }
-
-    @Override
-    public Optional<Nft> queryNftsByAccountAndTokenIdAndSerial(@NonNull final AccountId accountId,
-            @NonNull final TokenId tokenId, final long serialNumber) throws HieroException {
-        Objects.requireNonNull(accountId, "newAccountId must not be null");
-        return queryNftsByTokenIdAndSerial(tokenId, serialNumber)
-                .filter(nft -> Objects.equals(nft.owner(), accountId));
     }
 
     @Override
     public Page<TransactionInfo> queryTransactionsByAccount(@NonNull final AccountId accountId) throws HieroException {
         Objects.requireNonNull(accountId, "accountId must not be null");
-        final String path = "/api/v1/transactions?account.id=" + accountId.toString();
-        final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction = this::extractTransactionInfoFromJsonNode;
+        final String path = "/api/v1/transactions?account.id=" + accountId;
+        final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction = n -> jsonConverter.toTransactionInfos(
+                n);
         return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
     }
 
     @Override
     public Optional<TransactionInfo> queryTransaction(@NonNull final String transactionId) throws HieroException {
-        Objects.requireNonNull(transactionId, "transactionId must not be null");
-        final JsonNode jsonNode = doGetCall("/api/v1/transactions/" + transactionId);
+        final JsonNode jsonNode = mirrorNodeRestClient.queryTransaction(transactionId);
+        //TODO: I assume there is a better check
         if (jsonNode == null || !jsonNode.fieldNames().hasNext()) {
             return Optional.empty();
         }

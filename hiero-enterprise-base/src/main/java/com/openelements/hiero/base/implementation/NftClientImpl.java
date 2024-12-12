@@ -116,7 +116,7 @@ public class NftClientImpl implements NftClient {
             @NonNull final PrivateKey fromAccountKey, @NonNull final AccountId toAccountId) throws HieroException {
         final TokenTransferRequest request = TokenTransferRequest.of(tokenId, serialNumber, fromAccountId, toAccountId,
                 fromAccountKey);
-        client.executeTransferTransactionForNft(request);
+        client.executeTransferTransaction(request);
     }
 
 
