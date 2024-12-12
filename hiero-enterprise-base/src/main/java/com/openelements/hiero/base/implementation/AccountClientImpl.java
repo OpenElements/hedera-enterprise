@@ -1,4 +1,5 @@
 package com.openelements.hiero.base.implementation;
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.AccountClient;
@@ -42,7 +43,7 @@ public class AccountClientImpl implements AccountClient {
 
     @NonNull
     @Override
-    public Hbar getAccountBalance(com.hedera.hashgraph.sdk.AccountId account) throws HieroException {
+    public Hbar getAccountBalance(@NonNull AccountId account) throws HieroException {
         final AccountBalanceRequest request = AccountBalanceRequest.of(account);
         final AccountBalanceResponse response = client.executeAccountBalanceQuery(request);
         return response.hbars();

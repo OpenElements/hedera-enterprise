@@ -1,5 +1,7 @@
 package com.openelements.hiero.base.test;
+
 import com.openelements.hiero.base.implementation.AccountClientImpl;
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.protocol.AccountBalanceRequest;
@@ -25,8 +27,7 @@ public class AccountClientImplTest {
 
     @Test
     public void testGetAccountBalance_ValidPositiveBalance() throws HieroException {
-        // Fully qualify AccountId to ensure no ambiguity
-        com.hedera.hashgraph.sdk.AccountId accountId = com.hedera.hashgraph.sdk.AccountId.fromString("0.0.12345");
+        AccountId accountId = AccountId.fromString("0.0.12345");
         Hbar expectedBalance = new Hbar(10);
 
         // Mock the response
@@ -37,7 +38,6 @@ public class AccountClientImplTest {
                 ArgumentMatchers.any(AccountBalanceRequest.class)
         )).thenReturn(mockResponse);
 
-        // Explicit cast ensures we're calling the correct method
         Hbar balance = accountClientImpl.getAccountBalance(accountId);
 
         assertEquals(expectedBalance, balance);
@@ -45,7 +45,7 @@ public class AccountClientImplTest {
 
     @Test
     public void testGetAccountBalance_ZeroBalance() throws HieroException {
-        com.hedera.hashgraph.sdk.AccountId accountId = com.hedera.hashgraph.sdk.AccountId.fromString("0.0.67890");
+        AccountId accountId = AccountId.fromString("0.0.67890");
         Hbar expectedBalance = new Hbar(0);
 
         AccountBalanceResponse mockResponse = mock(AccountBalanceResponse.class);
@@ -62,30 +62,27 @@ public class AccountClientImplTest {
 
     @Test
     public void testGetAccountBalance_InvalidAccount_ThrowsException() throws HieroException {
-        // Use a valid but non-existing account ID to simulate invalid behavior
-        com.hedera.hashgraph.sdk.AccountId invalidAccountId = com.hedera.hashgraph.sdk.AccountId.fromString("0.0.9999999"); // Simulate invalid or non-existing account
-    
+        AccountId invalidAccountId = AccountId.fromString("0.0.9999999");
+
         when(mockProtocolLayerClient.executeAccountBalanceQuery(
                 ArgumentMatchers.any(AccountBalanceRequest.class)
         )).thenThrow(new HieroException("Invalid account"));
-    
+
         assertThrows(HieroException.class, () -> {
             accountClientImpl.getAccountBalance(invalidAccountId);
         });
     }
-    
 
     @Test
     public void testGetAccountBalance_NullThrowsException() {
         assertThrows(NullPointerException.class, () -> {
-            accountClientImpl.getAccountBalance((com.hedera.hashgraph.sdk.AccountId) null);
+            accountClientImpl.getAccountBalance((AccountId) null);
         });
     }
-    
 
     @Test
     public void testGetAccountBalance_ProtocolLayerClientFails() throws HieroException {
-        com.hedera.hashgraph.sdk.AccountId accountId = com.hedera.hashgraph.sdk.AccountId.fromString("0.0.12345");
+        AccountId accountId = AccountId.fromString("0.0.12345");
 
         when(mockProtocolLayerClient.executeAccountBalanceQuery(
                 ArgumentMatchers.any(AccountBalanceRequest.class)
