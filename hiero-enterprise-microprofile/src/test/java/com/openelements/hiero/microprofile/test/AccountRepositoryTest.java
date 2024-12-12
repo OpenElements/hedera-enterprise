@@ -41,8 +41,8 @@ public class AccountRepositoryTest {
         final Account account = accountClient.createAccount();
         final AccountId newOwner = account.accountId();
         //TODO: fix sleep
-        Thread.sleep(5_000);
-        
+        Thread.sleep(10_000);
+
         //when
         final Optional<AccountInfo> result = accountRepository.findById(newOwner);
 
