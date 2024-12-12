@@ -2,9 +2,9 @@ package com.openelements.hiero.microprofile.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.config.ConsensusNode;
 import com.openelements.hiero.base.config.HieroConfig;
+import com.openelements.hiero.base.data.Account;
 import com.openelements.hiero.base.implementation.HieroNetwork;
 import com.openelements.hiero.microprofile.HieroNetworkConfiguration;
 import com.openelements.hiero.microprofile.HieroOperatorConfiguration;
@@ -57,7 +57,7 @@ public class HieroConfigImpl implements HieroConfig {
     }
 
     @Override
-    public @NonNull List<String> getMirrornodeAddresses() {
+    public @NonNull List<String> getMirrorNodeAddresses() {
         return mirrorNodeAddresses;
     }
 
