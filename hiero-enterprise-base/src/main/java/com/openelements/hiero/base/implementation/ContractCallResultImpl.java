@@ -2,7 +2,7 @@ package com.openelements.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.openelements.hiero.base.ContractCallResult;
+import com.openelements.hiero.base.data.ContractCallResult;
 import java.math.BigInteger;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;

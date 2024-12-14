@@ -2,6 +2,7 @@ package com.openelements.hiero.base;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
+import com.openelements.hiero.base.data.ContractCallResult;
 import com.openelements.hiero.base.data.ContractParam;
 import java.nio.file.Path;
 import java.util.Objects;

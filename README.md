@@ -87,6 +87,15 @@ spring.hiero.accountId=0.0.3447271
 spring.hiero.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
 ```
 
+The module supports a `.env` file in the root of the module to define the account information.
+The file is added to the `.gitignore` file and is not committed to the repository.
+By doing that you can define the account information in the `.env` file without the risk of committing it to the repository.
+The `.env` file should look like this:
+```properties
+spring.hiero.accountId=0.0.3447271
+spring.hiero.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
+```
+
 Alternatively, you can provide the account information as environment variables:
 ```shell
 export HEDERA_ACCOUNT_ID=0.0.3447271
@@ -95,19 +104,37 @@ export HEDERA_PRIVATE_KEY=2130020100312346052b8104400304220420c236508c429395a818
 
 ## Microservice support
 
-The support for Microprofile is still in development and can not be used yet.
+To use this module, you need to add the following dependency to your project:
+
+```xml 
+<dependency>
+    <groupId>com.open-elements.hiero</groupId>
+    <artifactId>hiero-enterprise-microprofile</artifactId>
+    <version>VERSION</version> 
+</dependency>
+```
+
+The `hiero-enterprise-microprofile-sample` module contains a sample application that uses the Hiero Microprofile module.
+The sample application is a simple Quarkus application that reads has a REST endpoint at `localhost:8080/` and  shows
+the hbar balance of the account `0.0.100` on the Hedera testnet.
+For most of the part, the sample application is the same as the Spring Boot sample application.
 
 ## Managed services
 
 The module provides a set of managed services that can be used to interact with a Hiero network.
 The following services are available in spring and microprofile:
 
+- `com.openelements.hiero.base.HieroContext`: component that provides the information about the Hiero network and the operator account
 - `com.openelements.hiero.base.AccountClient`: to interact with accounts
 - `com.openelements.hiero.base.FileClient`: to interact with files
-- `com.openelements.hiero.base.SmartContractClient`: to interact with smart contracts
-- `com.openelements.hiero.base.ContractVerificationClient`: to verify smart contracts
+- `com.openelements.hiero.base.FungibleTokenClient`: to interact with fungible tokens
 - `com.openelements.hiero.base.NftClient`: to interact with NFTs
-- `com.openelements.hiero.base.NftRepository`: to query NFTs
+- `com.openelements.hiero.base.SmartContractClient`: to interact with smart contracts
+- `com.openelements.hiero.base.verifcation.ContractVerificationClient`: to verify smart contracts
+- `com.openelements.hiero.base.mirrornode.AccountRepository`: to query accounts
+- `com.openelements.hiero.base.mirrornode.NetworkRepository`: to query network information
+- `com.openelements.hiero.base.mirrornode.NftRepository`: to query NFTs
+- `com.openelements.hiero.base.mirrornode.TransactionRepository`: to query transaction information
 
 Next to that the following low-level services are available:
 
@@ -137,6 +164,7 @@ export HEDERA_NETWORK=testnet
 ```
 
 As an alternative you can define the information in a `.env` file in each sub-module that contains tests.
+The files are added to the `.gitignore` file and will not be committed to the repository.
 The file should look like this:
 
 ```
@@ -163,6 +191,7 @@ How that environment variables are defined can be found in the
 [this blog post](https://foojay.io/today/how-to-release-a-java-module-with-jreleaser-to-maven-central-with-github-actions/).
 
 On a unix based system the environment variables can be defined in the `.env` file in the root of the project.
+The file is added to the `.gitignore` file and is not committed to the repository.
 
 Once that is done you can use the `release.sh` script in the root folder of the repos to create a release:
 

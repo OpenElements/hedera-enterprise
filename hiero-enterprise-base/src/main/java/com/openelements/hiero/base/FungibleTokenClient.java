@@ -13,8 +13,8 @@ import org.jspecify.annotations.NonNull;
  * interact with a Hiero network. That account is the account that is used to pay for the transactions that are sent to
  * the Hedera network and called 'operator account'.
  */
-public interface FungibleTokenClient extends TokenClient {
-    
+public interface FungibleTokenClient {
+
     /**
      * Create a new token. The operator account is used as suppler account and as treasury account for the token.
      *

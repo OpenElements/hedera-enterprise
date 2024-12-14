@@ -5,10 +5,10 @@ import static com.openelements.hiero.base.data.ContractParam.string;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
-import com.openelements.hiero.base.ContractCallResult;
 import com.openelements.hiero.base.FileClient;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.SmartContractClient;
+import com.openelements.hiero.base.data.ContractCallResult;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

@@ -1,4 +1,4 @@
-package com.openelements.hiero.base;
+package com.openelements.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.Hbar;
 import java.math.BigInteger;
