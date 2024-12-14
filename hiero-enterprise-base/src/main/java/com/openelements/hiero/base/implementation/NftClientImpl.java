@@ -118,6 +118,4 @@ public class NftClientImpl implements NftClient {
                 fromAccountKey);
         client.executeTransferTransaction(request);
     }
-
-
 }

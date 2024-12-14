@@ -55,7 +55,7 @@ public class NftRepositoryImpl implements NftRepository {
 
     @NonNull
     @Override
-    public NftMetadata getNftMetadata(TokenId tokenId) throws HieroException {
+    public Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException {
         return mirrorNodeClient.getNftMetadata(tokenId);
     }
 

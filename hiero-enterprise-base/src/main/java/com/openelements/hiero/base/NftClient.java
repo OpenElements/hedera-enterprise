@@ -15,7 +15,7 @@ import org.jspecify.annotations.NonNull;
  * Hiero network. That account is the account that is used to pay for the transactions that are sent to the Hedera
  * network and called 'operator account'.
  */
-public interface NftClient extends TokenClient {
+public interface NftClient {
 
     /**
      * Create a new NFT type. That type is 'owned' by the operator account. The operator account is used as suppler

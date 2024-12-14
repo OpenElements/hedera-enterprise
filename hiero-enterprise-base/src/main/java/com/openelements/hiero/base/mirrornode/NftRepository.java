@@ -155,14 +155,14 @@ public interface NftRepository {
         return findByOwnerAndTypeAndSerial(AccountId.fromString(owner), TokenId.fromString(tokenId), serialNumber);
     }
 
-    default NftMetadata getNftMetadata(String tokenId) throws HieroException {
+    default Optional<NftMetadata> getNftMetadata(String tokenId) throws HieroException {
         Objects.requireNonNull(tokenId, "tokenId must not be null");
         return getNftMetadata(TokenId.fromString(tokenId));
     }
 
-    NftMetadata getNftMetadata(TokenId tokenId) throws HieroException;
+    Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException;
 
-    default NftMetadata getNftMetadata(Nft nft) throws HieroException {
+    default Optional<NftMetadata> getNftMetadata(Nft nft) throws HieroException {
         Objects.requireNonNull(nft, "nft must not be null");
         return getNftMetadata(nft.tokenId());
     }
