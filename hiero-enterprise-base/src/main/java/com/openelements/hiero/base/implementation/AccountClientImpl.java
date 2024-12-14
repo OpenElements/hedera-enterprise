@@ -1,5 +1,4 @@
 package com.openelements.hiero.base.implementation;
-
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.openelements.hiero.base.data.Account;
