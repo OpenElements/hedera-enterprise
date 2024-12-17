@@ -244,7 +244,7 @@ public class FileClientTests {
 
     @Test
     void testGetFileSize() throws HieroException {
-        final byte[] contents = "Hello, Hedera!".getBytes();
+        final byte[] contents = "Hello, Hiero!".getBytes();
         final FileId fileId = fileClient.createFile(contents);
         final int size = fileClient.getSize(fileId);
 
