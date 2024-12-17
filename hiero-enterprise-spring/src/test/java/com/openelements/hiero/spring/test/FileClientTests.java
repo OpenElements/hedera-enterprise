@@ -27,6 +27,7 @@ public class FileClientTests {
         Assertions.assertThrows(NullPointerException.class, () -> fileClient.deleteFile((String) null));
         Assertions.assertThrows(NullPointerException.class, () -> fileClient.deleteFile((FileId) null));
         Assertions.assertThrows(NullPointerException.class, () -> fileClient.getExpirationTime(null));
+        Assertions.assertThrows(NullPointerException.class, () -> fileClient.getSize(null));
     }
 
     @Test
@@ -239,5 +240,20 @@ public class FileClientTests {
 
         //then
         Assertions.assertArrayEquals(contents, result);
+    }
+
+    @Test
+    void testGetFileSize() throws HieroException {
+        final byte[] contents = "Hello, Hiero!".getBytes();
+        final FileId fileId = fileClient.createFile(contents);
+        final int size = fileClient.getSize(fileId);
+
+        Assertions.assertEquals(size, contents.length);
+    }
+
+    @Test
+    void testGetFileSizeThrowsExceptionForInvalidId() {
+        final FileId invalidFileId = FileId.fromString("1.2.3");
+        Assertions.assertThrows(HieroException.class, () -> fileClient.getSize(invalidFileId));
     }
 }
