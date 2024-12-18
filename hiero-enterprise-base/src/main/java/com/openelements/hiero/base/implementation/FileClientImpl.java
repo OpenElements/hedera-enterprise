@@ -152,13 +152,16 @@ public class FileClientImpl implements FileClient {
     }
 
     @Override
-    public boolean isDeleted(@NonNull final FileId fileId) throws HieroException {
-        Objects.requireNonNull(fileId, "fileId must not be null");
-        final FileInfoRequest request = FileInfoRequest.of(fileId);
-        final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
-        return infoResponse.deleted();
-    }
+    public boolean isDeleted(FileId fileId) throws HieroException {
+        if (fileId == null) {
+            throw new IllegalArgumentException("fileId must not be null");
+        }
 
+        FileInfoRequest request = FileInfoRequest.of(fileId);
+        FileInfoResponse response = protocolLayerClient.executeFileInfoQuery(request);
+
+        return response.deleted();
+    }
     @Override
     public int getSize(@NonNull final FileId fileId) throws HieroException {
         Objects.requireNonNull(fileId, "fileId must not be null");
