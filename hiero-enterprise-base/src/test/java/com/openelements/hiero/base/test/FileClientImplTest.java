@@ -59,9 +59,9 @@ public class FileClientImplTest {
         final FileCreateResult fileCreateResult = Mockito.mock(FileCreateResult.class);
 
         // given
-        byte[] content = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE * 2];
+        final byte[] content = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE * 2];
         // -1 because 1 for executeFileCreateTransaction()
-        int appendCount = Math.floorDiv(content.length, FileCreateRequest.FILE_CREATE_MAX_SIZE) - 1;
+        final int appendCount = Math.floorDiv(content.length, FileCreateRequest.FILE_CREATE_MAX_SIZE) - 1;
 
         //then
         when(protocolLayerClient.executeFileCreateTransaction(any(FileCreateRequest.class)))
