@@ -18,7 +18,9 @@ import org.mockito.Mockito;
 import java.time.Instant;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 public class FileClientImplTest {
     ProtocolLayerClient protocolLayerClient;
@@ -57,6 +59,7 @@ public class FileClientImplTest {
         // mock
         final FileId fileId = FileId.fromString("1.2.3");
         final FileCreateResult fileCreateResult = Mockito.mock(FileCreateResult.class);
+        final FileAppendResult fileAppendResult = Mockito.mock(FileAppendResult.class);
 
         // given
         final byte[] content = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE * 2];
@@ -68,7 +71,7 @@ public class FileClientImplTest {
                 .thenReturn(fileCreateResult);
         when(fileCreateResult.fileId()).thenReturn(fileId);
         when(protocolLayerClient.executeFileAppendRequestTransaction(any(FileAppendRequest.class)))
-                .thenReturn(any(FileAppendResult.class));
+                .thenReturn(fileAppendResult);
 
         final FileId result = fileClientImpl.createFile(content);
 
@@ -82,26 +85,39 @@ public class FileClientImplTest {
 
     @Test
     void testCreateFileThrowsExceptionForSizeGreaterThanMaxFileSize() {
+        final String message = "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes";
         // given
         final byte[] contents = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
 
         // then
-        Assertions.assertThrows(HieroException.class, () -> fileClientImpl.createFile(contents));
+        final HieroException exception = Assertions.assertThrows(
+                HieroException.class, () -> fileClientImpl.createFile(contents)
+        );
+        Assertions.assertTrue(exception.getMessage().contains(message));
     }
 
     @Test
     void testCreateFileThrowsExceptionForExpirationTimeBeforeNow() {
+        final String message = "Expiration time must be in the future";
         // given
         final byte[] contents = "Hello Hiero!".getBytes();
         final Instant expiration = Instant.now().minusSeconds(1);
 
         // then
-        Assertions.assertThrows(IllegalArgumentException.class, () -> fileClientImpl.createFile(contents, expiration));
+        final IllegalArgumentException exception =Assertions.assertThrows(
+                IllegalArgumentException.class, () -> fileClientImpl.createFile(contents, expiration)
+        );
+        Assertions.assertTrue(exception.getMessage().contains(message));
     }
 
     @Test
     void testCreateFileThrowsExceptionForNullContent() {
-        Assertions.assertThrows(NullPointerException.class, () -> fileClientImpl.createFile(null));
+        final String message = "contents must not be null";
+
+        final NullPointerException exception = Assertions.assertThrows(
+                NullPointerException.class, () -> fileClientImpl.createFile(null)
+        );
+        Assertions.assertTrue(exception.getMessage().contains(message));
     }
 
     @Test
@@ -140,6 +156,11 @@ public class FileClientImplTest {
 
     @Test
     void testGetFileSizeThrowsExceptionForNullId() {
-        Assertions.assertThrows(NullPointerException.class, () -> fileClientImpl.getSize(null));
+        final String message = "fileId must not be null";
+
+        final NullPointerException exception = Assertions.assertThrows(
+                NullPointerException.class, () -> fileClientImpl.getSize(null)
+        );
+        Assertions.assertTrue(exception.getMessage().contains(message));
     }
 }
