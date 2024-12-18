@@ -44,7 +44,7 @@ public class FileClientImpl implements FileClient {
 
     private FileId createFileImpl(@NonNull final byte[] contents, @Nullable final Instant expirationTime)
             throws HieroException {
-        Objects.requireNonNull(contents, "fileId must not be null");
+        Objects.requireNonNull(contents, "contents must not be null");
         if (contents.length > FileCreateRequest.FILE_MAX_SIZE) {
             throw new HieroException("File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
         }
