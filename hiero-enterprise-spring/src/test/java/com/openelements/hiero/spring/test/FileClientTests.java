@@ -7,6 +7,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.IntStream;
+
+import com.openelements.hiero.base.protocol.FileCreateRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,7 +47,7 @@ public class FileClientTests {
     @Test
     void testCreateSmallFile() throws Exception {
         //given
-        final byte[] contents = "Hello, Hedera!".getBytes();
+        final byte[] contents = "Hello, Hiero!".getBytes();
 
         //when
         final FileId fileId = fileClient.createFile(contents);
@@ -57,7 +59,7 @@ public class FileClientTests {
     @Test
     void testCreateLargeFile() throws Exception {
         //given
-        final byte[] contents = IntStream.range(0, 500).mapToObj(i -> "Hello, Hedera!")
+        final byte[] contents = IntStream.range(0, 500).mapToObj(i -> "Hello, Hiero!")
                 .reduce((a, b) -> a + b)
                 .get()
                 .getBytes();
@@ -67,6 +69,27 @@ public class FileClientTests {
 
         //then
         Assertions.assertNotNull(fileId);
+    }
+
+    @Test
+    void testCreateFileThrowExceptionIfExceedMaxFileSize() {
+        // given
+        final byte[] contents = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
+
+        // then
+        Assertions.assertThrows(HieroException.class, () -> fileClient.createFile(contents));
+    }
+
+    @Test
+    void testCreateFileThrowExceptionIfExpirationTimeBeforeNow() {
+        // given
+        final byte[] contents = "Hello Hiero!".getBytes();
+        final Instant definedExpirationTime = Instant.now().minusSeconds(60);
+
+        // then
+        Assertions.assertThrows(
+                IllegalArgumentException.class, () -> fileClient.createFile(contents, definedExpirationTime)
+        );
     }
 
     @Test
