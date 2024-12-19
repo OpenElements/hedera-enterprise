@@ -5,6 +5,8 @@ import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.implementation.FileClientImpl;
 import com.openelements.hiero.base.protocol.FileCreateResult;
 import com.openelements.hiero.base.protocol.FileCreateRequest;
+import com.openelements.hiero.base.protocol.FileUpdateResult;
+import com.openelements.hiero.base.protocol.FileUpdateRequest;
 import com.openelements.hiero.base.protocol.FileAppendRequest;
 import com.openelements.hiero.base.protocol.FileAppendResult;
 import com.openelements.hiero.base.protocol.FileInfoRequest;
@@ -118,6 +120,104 @@ public class FileClientImplTest {
                 NullPointerException.class, () -> fileClientImpl.createFile(null)
         );
         Assertions.assertTrue(exception.getMessage().contains(message));
+    }
+
+    @Test
+    void testUpdateFile() throws HieroException {
+        // mock
+        final FileUpdateResult fileUpdateResult = Mockito.mock(FileUpdateResult.class);
+
+        // given
+        final FileId fileId = FileId.fromString("1.2.3");
+        final byte[] updatedContent = "Hello Hiero! Updated".getBytes();
+
+        // then
+        when(protocolLayerClient.executeFileUpdateRequestTransaction(any(FileUpdateRequest.class)))
+                .thenReturn(fileUpdateResult);
+
+        fileClientImpl.updateFile(fileId, updatedContent);
+
+        verify(protocolLayerClient, times(1))
+                .executeFileUpdateRequestTransaction(any(FileUpdateRequest.class));
+    }
+
+    @Test
+    void testUpdateFileForSizeGreaterThanFileCreateMaxSize() throws HieroException {
+        // mock
+        final FileUpdateResult fileUpdateResult = Mockito.mock(FileUpdateResult.class);
+        final FileAppendResult fileAppendResult = Mockito.mock(FileAppendResult.class);
+
+        // given
+        final FileId fileId = FileId.fromString("1.2.3");
+        final byte[] updatedContent = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE * 2];
+        // -1 because 1 for executeFileCreateTransaction()
+        final int appendCount = Math.floorDiv(updatedContent.length, FileCreateRequest.FILE_CREATE_MAX_SIZE) - 1;
+
+        //then
+        when(protocolLayerClient.executeFileUpdateRequestTransaction(any(FileUpdateRequest.class)))
+                .thenReturn(fileUpdateResult);
+        when(protocolLayerClient.executeFileAppendRequestTransaction(any(FileAppendRequest.class)))
+                .thenReturn(fileAppendResult);
+
+        fileClientImpl.updateFile(fileId, updatedContent);
+
+        verify(protocolLayerClient, times(1))
+                .executeFileUpdateRequestTransaction(any(FileUpdateRequest.class));
+        verify(protocolLayerClient, times(appendCount))
+                .executeFileAppendRequestTransaction(any(FileAppendRequest.class));
+    }
+
+    @Test
+    void testUpdateFileThrowsExceptionForInvalidFileId() throws HieroException {
+        final String message = "Failed to execute transaction of type FileUpdateTransaction";
+
+        // given
+        final FileId fileId = FileId.fromString("1.2.3");
+        final byte[] updatedContent = "Hello Hiero! Updated".getBytes();
+
+        // then
+        when(protocolLayerClient.executeFileUpdateRequestTransaction(any(FileUpdateRequest.class)))
+                .thenThrow(new HieroException(message));
+
+        final HieroException exception = Assertions.assertThrows(
+                HieroException.class, () -> fileClientImpl.updateFile(fileId, updatedContent)
+        );
+        Assertions.assertTrue(exception.getMessage().contains(message));
+    }
+
+    @Test
+    void testUpdateFileThrowsExceptionForSizeGreaterThanMaxFileSize() {
+        final String message = "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes";
+
+        // given
+        final FileId fileId = FileId.fromString("1.2.3");
+        final byte[] updatedContent = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
+
+        // then
+        final HieroException exception = Assertions.assertThrows(
+                HieroException.class, () -> fileClientImpl.updateFile(fileId, updatedContent)
+        );
+        Assertions.assertTrue(exception.getMessage().contains(message));
+    }
+
+    @Test
+    void testUpdateFileThrowsExceptionForNullArguments() {
+        // given
+        final FileId fileId = FileId.fromString("1.2.3");
+        final byte[] updatedContent = "Hello Hiero! Updated".getBytes();
+
+        // then
+        final NullPointerException nullContentException = Assertions.assertThrows(
+                NullPointerException.class, () -> fileClientImpl.updateFile(fileId, null)
+        );
+        Assertions.assertTrue(nullContentException.getMessage().contains("content must not be null"));
+
+        final NullPointerException nullIdException = Assertions.assertThrows(
+                NullPointerException.class, () -> fileClientImpl.updateFile(null, updatedContent)
+        );
+        Assertions.assertTrue(nullIdException.getMessage().contains("fileId must not be null"));
+
+        Assertions.assertThrows(NullPointerException.class, () -> fileClientImpl.updateFile(null, null));
     }
 
     @Test

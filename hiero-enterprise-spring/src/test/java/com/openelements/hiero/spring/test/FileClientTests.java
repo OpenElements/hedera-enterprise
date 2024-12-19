@@ -3,6 +3,7 @@ package com.openelements.hiero.spring.test;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hiero.base.FileClient;
 import com.openelements.hiero.base.HieroException;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -147,9 +148,9 @@ public class FileClientTests {
     @Test
     void testUpdateFileByFileId() throws Exception {
         //given
-        final byte[] contents = "Hello, Hedera!".getBytes();
+        final byte[] contents = "Hello, Hiero!".getBytes();
         final FileId fileId = fileClient.createFile(contents);
-        final String newContent = "Hello, Hedera! Updated";
+        final String newContent = "Hello, Hiero! Updated";
 
         //when
         fileClient.updateFile(fileId, newContent.getBytes());
@@ -157,6 +158,55 @@ public class FileClientTests {
         //then
         final byte[] readContents = fileClient.readFile(fileId);
         Assertions.assertArrayEquals(newContent.getBytes(), readContents);
+    }
+
+    @Test
+    void testUpdateFileForSizeGreaterThanCreateFileSize() throws HieroException {
+        // given
+        final byte[] contents = "Hello, Hiero!".getBytes();
+        final FileId fileId = fileClient.createFile(contents);
+        final byte[] updatedContent = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE * 2];
+
+        // when
+        fileClient.updateFile(fileId, updatedContent);
+
+        // then
+        final byte[] readContent = fileClient.readFile(fileId);
+        Assertions.assertArrayEquals(updatedContent, readContent);
+    }
+
+    @Test
+    void testUpdateFileThrowExceptionForInvalidFileId() {
+        // given
+        final FileId fileId = FileId.fromString("1.2.3");
+        final byte[] updatedContent = "Hello, Hiero! Update".getBytes();
+
+        // then
+        Assertions.assertThrows(HieroException.class, () -> fileClient.updateFile(fileId, updatedContent));
+    }
+
+    @Test
+    void testUpdateFileThrowExceptionIfSizeExceedMaxSize() throws HieroException {
+        // given
+        final byte[] contents = "Hello, Hiero!".getBytes();
+        final FileId fileId = fileClient.createFile(contents);
+        final byte[] updatedContent = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
+
+        // then
+        Assertions.assertThrows(HieroException.class, () -> fileClient.updateFile(fileId, updatedContent));
+    }
+
+    @Test
+    void testUpdateFileThrowsErrorForNullValues() throws HieroException {
+        // given
+        final byte[] contents = "Hello, Hiero!".getBytes();
+        final FileId fileId = fileClient.createFile(contents);
+        final byte[] updatedContent = "Hello, Hiero! Update".getBytes();
+
+        // then
+        Assertions.assertThrows(NullPointerException.class, () -> fileClient.updateFile(fileId, null));
+        Assertions.assertThrows(NullPointerException.class, () -> fileClient.updateFile(null, updatedContent));
+        Assertions.assertThrows(NullPointerException.class, () -> fileClient.updateFile(null, null));
     }
 
     @Test
