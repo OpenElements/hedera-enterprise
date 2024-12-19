@@ -4,11 +4,9 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hiero.base.FileClient;
 import com.openelements.hiero.base.HieroException;
 
-import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import com.openelements.hiero.base.protocol.FileCreateRequest;

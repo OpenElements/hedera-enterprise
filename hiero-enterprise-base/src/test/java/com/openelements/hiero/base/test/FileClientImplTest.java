@@ -3,12 +3,19 @@ package com.openelements.hiero.base.test;
 import com.hedera.hashgraph.sdk.FileId;
 import com.openelements.hiero.base.HieroException;
 import com.openelements.hiero.base.implementation.FileClientImpl;
-import com.openelements.hiero.base.protocol.*;
+import com.openelements.hiero.base.protocol.FileCreateResult;
+import com.openelements.hiero.base.protocol.FileCreateRequest;
+import com.openelements.hiero.base.protocol.FileUpdateResult;
+import com.openelements.hiero.base.protocol.FileUpdateRequest;
+import com.openelements.hiero.base.protocol.FileAppendRequest;
+import com.openelements.hiero.base.protocol.FileAppendResult;
+import com.openelements.hiero.base.protocol.FileInfoRequest;
+import com.openelements.hiero.base.protocol.FileInfoResponse;
+import com.openelements.hiero.base.protocol.ProtocolLayerClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.internal.matchers.Null;
 
 import java.time.Instant;
 
